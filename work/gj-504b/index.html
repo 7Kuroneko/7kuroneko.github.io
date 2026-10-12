@@ -42,6 +42,9 @@ body.hud-hidden .chrome.eyebrow,body.hud-hidden .chrome.timecode{opacity:0}
 .card .sub{font-family:var(--mono);font-size:clamp(9px,.92vw,13px);letter-spacing:.32em;text-transform:uppercase;color:var(--silver);margin-top:clamp(22px,3.4vh,38px)}
 .card .sub b{color:var(--halo);font-weight:400}
 .card .sub .verse{color:var(--halo)}
+#oracle .mask{display:block;color:#FAFAFA;width:clamp(48px,min(6vw,10vh),112px);aspect-ratio:11/18;margin-bottom:clamp(14px,2.6vh,32px)}
+#oracle .who{font-family:var(--mono);font-size:clamp(9px,.85vw,12px);letter-spacing:.5em;text-transform:uppercase;color:var(--halo);margin-bottom:clamp(12px,2.4vh,30px)}
+#oracle p{font-family:var(--sans);font-weight:300;font-size:clamp(14px,min(1.7vw,3.1vh),30px);letter-spacing:.03em;line-height:1.45;margin:0;color:var(--lumen);max-width:40ch;text-wrap:pretty;padding:0 6%}
 .endmark{display:block;width:clamp(40px,5vw,70px);aspect-ratio:6/8;margin-bottom:clamp(26px,4vh,46px)}
 #replay{pointer-events:auto;margin-top:clamp(30px,4.6vh,52px);appearance:none;background:transparent;border:1px solid var(--meteor);color:var(--silver);font-family:var(--mono);font-size:clamp(9px,.82vw,12px);letter-spacing:.28em;text-transform:uppercase;padding:12px 22px;cursor:pointer;display:inline-flex;align-items:center;gap:12px;transition:border-color .15s,color .15s}
 #replay::before{content:'↻';color:var(--halo);font-size:1.2em;line-height:1}
@@ -143,6 +146,12 @@ body.recording #scrub,body.recording #hint,body.recording #tp{pointer-events:non
 <h1>GJ 504 b</h1>
 <div class="sub"><b id="intro-dur" style="color:var(--lumen)">30 MINUTE</b> &nbsp;·&nbsp; <span class="verse">59 VIRGINIS · 57 LIGHT-YEARS</span> &nbsp;·&nbsp; DEEP FOCUS</div>
 </div>
+<div class="card" id="oracle" style="padding-bottom:clamp(40px,10vh,110px)">
+<span class="mask" id="oracle-mask" aria-hidden="true"></span>
+<div class="who">THE ORACLE</div>
+<p>You are the light of the world. A city located on a hill can’t be hidden. Neither do you light a lamp, and put it under a measuring basket, but on a stand; and it shines to all who are in the house. Even so, let your light shine before men; that they may see your good works, and glorify your Father who is in heaven.</p>
+<div class="who" style="margin:clamp(12px,2.4vh,30px) 0 0">MATTHEW 5:14–16</div>
+</div>
 <div class="card" id="outro">
 <span class="endmark" id="endmark" aria-hidden="true"></span>
 <div class="eb"><span>FOCUSFIELD</span><span class="dot"></span><span>GJ 504 B</span></div>
@@ -160,7 +169,6 @@ body.recording #scrub,body.recording #hint,body.recording #tp{pointer-events:non
 <span class="ctl-time"><span id="ctl-cur">00:00</span> <span class="tot">/ <span id="ctl-tot">30:00</span></span></span>
 <span class="ctl-spacer"></span>
 <span class="ctl-label">FOCUSFIELD · GJ 504 B</span>
-<button class="ctl-btn" id="dl-btn" aria-label="Export video" title="Export video" onclick="document.getElementById('export-btn').click()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 4v11"></path><path d="M7 10l5 5 5-5"></path><path d="M5 20h14"></path></svg></button>
 <button class="ctl-btn" id="mute-btn" aria-label="Mute soundscape"><svg id="ic-sound" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 9v6h4l5 4V5L8 9H4z"></path><path d="M16.5 8.5a5 5 0 0 1 0 7M19 6a8 8 0 0 1 0 12"></path></svg><svg id="ic-muted" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:none"><path d="M4 9v6h4l5 4V5L8 9H4z"></path><path d="M22 9l-6 6M16 9l6 6"></path></svg></button>
 <button class="ctl-btn" id="full-btn" aria-label="Fullscreen"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"></path></svg></button>
 </div>
@@ -176,17 +184,6 @@ body.recording #scrub,body.recording #hint,body.recording #tp{pointer-events:non
 </div>
 <div id="hint">SPACE&nbsp;PLAY&nbsp;·&nbsp;F&nbsp;FULLSCREEN&nbsp;·&nbsp;M&nbsp;MUTE&nbsp;·&nbsp;T&nbsp;TWEAKS</div>
 <button id="snd-chip" type="button"><i></i>Tap for sound</button>
-<button id="export-btn" title="Export this video as a downloadable file">⬇ Export Video</button>
-<div id="rec-hud"><div class="rb"><span id="rec-dot2"></span><span><span id="rec-verb">Rendering</span> · <b id="rec-el">0%</b></span><button id="rec-stop">Cancel</button></div><div id="rec-note"></div></div>
-<div id="exp-modal"><div class="box">
-<div class="eb">Portals · FocusField · Export</div>
-<div class="h">Render this as a video file</div>
-<p>This renders the whole video and its sound into a finished <b>MP4</b> on your computer, ready to upload to YouTube.</p>
-<ul><li>Renders the full <b><span id="exp-len">30</span>-minute</b> video frame by frame, so motion is perfectly smooth regardless of your computer's speed.</li><li id="exp-save">Pick a folder to save into; it streams straight to disk. <b>Keep this tab in front</b> while it works.</li></ul>
-<div class="fmt" id="exp-fmt"><button data-f="4k60" class="on">4K · 60 fps</button><button data-f="4k30">4K · 30 fps</button><button data-f="hd60">1080p · 60 fps</button></div>
-<div class="btns"><button id="exp-cancel">Cancel</button><button id="exp-start">Start export</button></div>
-</div></div>
-
 <script src="pink-audio.js"></script>
 <script src="pink-render.js"></script>
 <script>
@@ -223,6 +220,11 @@ PinkAudio.setClock(() => videoTime);
 let driftCheck = 0;
 let videoTime = Math.min(savedTime, DURATION - 0.001), playing = false, lastFrame = performance.now(), ended = false;
 const INTRO_IN = 2.5, INTRO_HOLD_END = 10, INTRO_OUT_END = 15, OUT_DIM = 9, OUT_CARD = 7;
+const OR_IN = 16, OR_FULL = 19.5, OR_HOLD = 40, OR_OUT = 43.5;
+const ORACLE_G = ['...#####...', '.########..', '#########..', '#########..', '##########.', '#########..', '#....##...#', '#...###.#..', '##..###....', '#######.###', '#######.###', '#####...##.', '.######....', '.#####.....', '..##.##....', '...####....', '...###.....', '....##.....'];
+function oracleAlpha(t) { if (t < OR_IN || t > OR_OUT) return 0; if (t < OR_FULL) return (t - OR_IN) / (OR_FULL - OR_IN); if (t < OR_HOLD) return 1; return 1 - (t - OR_HOLD) / (OR_OUT - OR_HOLD); }
+const oracleCard = document.getElementById('oracle'); let lastOr = -1;
+(function () { let d = ''; ORACLE_G.forEach((row, r) => { for (let c = 0; c < row.length; c++) if (row[c] === '#') d += 'M' + c + ' ' + r + 'h1v1h-1z'; }); document.getElementById('oracle-mask').innerHTML = '<svg viewBox="0 0 11 18" width="100%" height="100%" style="display:block" shape-rendering="crispEdges" aria-hidden="true"><path fill="currentColor" d="' + d + '"></path></svg>'; })();
 const intro = document.getElementById('intro'), outro = document.getElementById('outro'), replayBtn = document.getElementById('replay');
 function fmt(sec) { sec = Math.max(0, Math.floor(sec)); const m = Math.floor(sec / 60), s = sec % 60; return (m < 10 ? '0' : '') + m + ':' + (s < 10 ? '0' : '') + s; }
 
@@ -249,6 +251,7 @@ function frame(now) {
     let io = 0;
     if (videoTime < INTRO_IN) io = videoTime / INTRO_IN; else if (videoTime < INTRO_HOLD_END) io = 1; else if (videoTime < INTRO_OUT_END) io = 1 - (videoTime - INTRO_HOLD_END) / (INTRO_OUT_END - INTRO_HOLD_END);
     io = Math.round(io * 1000) / 1000; if (io !== lastIo) { intro.style.opacity = io; lastIo = io; }
+    const ora = Math.round(oracleAlpha(videoTime) * 1000) / 1000; if (ora !== lastOr) { oracleCard.style.opacity = ora; lastOr = ora; }
     const toEnd = DURATION - videoTime;
     let oo = toEnd < OUT_CARD ? Math.min(1, (OUT_CARD - toEnd) / 2) : 0;
     oo = Math.round(oo * 1000) / 1000; if (oo !== lastOo) { outro.style.opacity = oo; outro.style.pointerEvents = 'none'; replayBtn.style.pointerEvents = oo > 0.5 ? 'auto' : 'none'; lastOo = oo; }
@@ -356,202 +359,5 @@ requestAnimationFrame(frame);
 setTimeout(() => { if (playing) hint.classList.add('gone'); }, 4500);
 </script>
 
-<script>
-(function () {
-  const btn = document.getElementById('export-btn'), hud = document.getElementById('rec-hud'), elEl = document.getElementById('rec-el');
-  const stopBtn = document.getElementById('rec-stop'), note = document.getElementById('rec-note');
-  const rc = document.createElement('canvas'); rc.width = 1920; rc.height = 1080;
-  const rx = rc.getContext('2d', { alpha: false });
-  const HALO = '#FFF738', LUMEN = '#FAFAFA', SILVER = '#C9C9C8', SIGNAL = '#6B6B70';
-  const NAME = 'GJ 504 B', TITLE = 'GJ 504 b';
-  const fmtt = s => { s = Math.max(0, Math.floor(s)); const m = Math.floor(s / 60), x = s % 60; return (m < 10 ? '0' : '') + m + ':' + (x < 10 ? '0' : '') + x; };
-  function centeredLine(segs, y, font, ls) {
-    rx.font = font; rx.letterSpacing = ls; rx.textAlign = 'left'; rx.textBaseline = 'alphabetic';
-    let total = 0; for (const s of segs) total += rx.measureText(s.text).width;
-    let x = 960 - total / 2; for (const s of segs) { rx.fillStyle = s.c; rx.fillText(s.text, x, y); x += rx.measureText(s.text).width; }
-    rx.letterSpacing = '0px';
-  }
-  function fitTitle(text, maxW, px) { rx.font = "300 " + px + "px 'DM Sans', system-ui, sans-serif"; while (rx.measureText(text).width > maxW && px > 40) { px -= 4; rx.font = "300 " + px + "px 'DM Sans', system-ui, sans-serif"; } return px; }
-  const MARK = [1,1,1,1,1,0, 1,1,0,0,1,1, 1,1,0,0,1,1, 1,1,1,1,1,1, 1,1,1,1,1,0, 1,1,0,0,0,0, 1,1,0,0,0,0, 1,1,0,0,0,0];
-  function drawChrome(t) {
-    const LEFT = 40, CY = 44, MW = 15, MH = 20, cw = MW / 6, ch = MH / 8, GAP = 12;
-    rx.fillStyle = SILVER;
-    for (let r = 0; r < 8; r++) for (let c = 0; c < 6; c++) if (MARK[r * 6 + c]) rx.fillRect(LEFT + c * cw, CY - MH / 2 + r * ch, cw + 0.4, ch + 0.4);
-    rx.font = "500 11px 'JetBrains Mono', ui-monospace, monospace"; rx.letterSpacing = '3.7px'; rx.textBaseline = 'middle'; rx.textAlign = 'left';
-    let x = LEFT + MW + GAP; rx.fillStyle = SIGNAL; rx.fillText('PORTALS · FOCUSFIELD', x, CY);
-    x += rx.measureText('PORTALS · FOCUSFIELD').width + GAP; rx.fillStyle = HALO; rx.fillRect(x, CY - 2, 4, 4);
-    x += 4 + GAP; rx.fillStyle = SIGNAL; rx.fillText(NAME, x, CY);
-    if (TWEAKS.timecode) {
-      rx.font = "500 12px 'JetBrains Mono', ui-monospace, monospace"; rx.letterSpacing = '2.6px'; rx.textAlign = 'right';
-      const cur = fmtt(t), tot = fmtt(DURATION); let r = 1880;
-      rx.fillStyle = SIGNAL; rx.fillText(tot, r, CY); r -= rx.measureText(tot).width + 6;
-      rx.fillStyle = '#424348'; rx.fillText('/', r, CY); r -= rx.measureText('/').width + 6;
-      rx.fillStyle = SILVER; rx.fillText(cur, r, CY);
-    }
-    rx.letterSpacing = '0px'; rx.textAlign = 'left'; rx.textBaseline = 'alphabetic';
-  }
-  function scrim(a) { rx.save(); rx.globalAlpha = a; rx.translate(960, 540); rx.scale(1344, 648); const g = rx.createRadialGradient(0, 0, 0, 0, 0, 1); g.addColorStop(0, 'rgba(4,4,8,0.62)'); g.addColorStop(0.7, 'rgba(4,4,8,0.16)'); g.addColorStop(1, 'rgba(4,4,8,0)'); rx.fillStyle = g; rx.fillRect(-1, -1, 2, 2); rx.restore(); }
-  function drawCards(t) {
-    let io = 0; if (t < 2.5) io = t / 2.5; else if (t < 10) io = 1; else if (t < 15) io = 1 - (t - 10) / 5;
-    io = Math.max(0, Math.min(1, io));
-    if (io > 0.002) {
-      scrim(io);
-      rx.save(); rx.globalAlpha = io;
-      centeredLine([{ text: 'PORTALS · FOCUSFIELD · VOL. 003  ', c: SILVER }, { text: '·', c: HALO }, { text: '  NO. 004', c: SILVER }], 392, "500 22px 'JetBrains Mono', monospace", '6px');
-      rx.textAlign = 'center'; rx.fillStyle = LUMEN; rx.font = "300 " + fitTitle(TITLE, 1640, 124) + "px 'DM Sans', system-ui, sans-serif"; rx.fillText(TITLE, 960, 552);
-      centeredLine([{ text: TWEAKS.durationMin + ' MINUTE', c: LUMEN }, { text: '  ·  ', c: SILVER }, { text: '59 VIRGINIS · 57 LIGHT-YEARS', c: HALO }, { text: '  ·  DEEP FOCUS', c: SILVER }], 618, "500 22px 'JetBrains Mono', monospace", '5px');
-      rx.restore();
-    }
-    const toEnd = DURATION - t; let oo = toEnd < 7 ? Math.min(1, (7 - toEnd) / 2) : 0; oo = Math.max(0, Math.min(1, oo));
-    if (oo > 0.002) {
-      scrim(oo);
-      rx.save(); rx.globalAlpha = oo;
-      rx.fillStyle = LUMEN; const MW2 = 56, cw2 = MW2 / 6, ch2 = (MW2 * 8 / 6) / 8;
-      for (let r = 0; r < 8; r++) for (let c = 0; c < 6; c++) if (MARK[r * 6 + c]) rx.fillRect(960 - MW2 / 2 + c * cw2, 300 + r * ch2, cw2 + 0.4, ch2 + 0.4);
-      centeredLine([{ text: 'FOCUSFIELD  ', c: SILVER }, { text: '·', c: HALO }, { text: '  ' + NAME, c: SILVER }], 452, "500 22px 'JetBrains Mono', monospace", '6px');
-      rx.textAlign = 'center'; rx.fillStyle = LUMEN; rx.font = "300 72px 'DM Sans', system-ui, sans-serif"; rx.fillText('Mission Complete', 960, 548);
-      centeredLine([{ text: 'RUNTIME ', c: SILVER }, { text: fmtt(DURATION), c: HALO }, { text: '  ·  THANK YOU FOR FOCUSING', c: SILVER }], 606, "500 22px 'JetBrains Mono', monospace", '4px');
-      rx.restore();
-    }
-  }
-  function renderFrameAt(t) {
-    renderScene(t, 2);
-    const I = dimFor(t);
-    if (I < 1) { ctx.fillStyle = 'rgba(0,0,0,' + (1 - I).toFixed(3) + ')'; ctx.fillRect(0, 0, 1920, 1080); }
-    rx.drawImage(canvas, 0, 0, 1920, 1080);
-    drawChrome(t); drawCards(t);
-  }
-
-  const FAST = !!(window.VideoEncoder && window.AudioEncoder && window.VideoFrame && window.AudioData);
-  const FORMATS = {
-    '4k60': { w: 3840, h: 2160, fps: 60, codec: 'avc1.640034', bitrate: 56000000, label: '4K60' },
-    '4k30': { w: 3840, h: 2160, fps: 30, codec: 'avc1.640033', bitrate: 40000000, label: '4K30' },
-    'hd60': { w: 1920, h: 1080, fps: 60, codec: 'avc1.64002A', bitrate: 18000000, label: '1080p60' },
-  };
-  let pick = '4k60', renderingMP4 = false, cancelMP4 = false;
-  const fmtBox = document.getElementById('exp-fmt');
-  [...fmtBox.children].forEach(b => b.addEventListener('click', () => { pick = b.dataset.f; [...fmtBox.children].forEach(x => x.classList.toggle('on', x === b)); }));
-
-  function cleanupMP4(wasMuted) {
-    window.__offlineRendering = false; renderingMP4 = false; cancelMP4 = false;
-    document.body.classList.remove('recording'); hud.classList.remove('on'); btn.disabled = false;
-    setMuted(wasMuted); seek(0); setPlaying(false);
-  }
-  const withTimeout = (p, ms, label) => { let to; const tm = new Promise((_, rej) => { to = setTimeout(() => rej(new Error('Timed out: ' + label)), ms); }); return Promise.race([p, tm]).finally(() => clearTimeout(to)); };
-
-  async function renderMP4() {
-    if (renderingMP4) return;
-    const wasMuted = TWEAKS.muted;
-    let RES = FORMATS[pick];
-    try { const sup = await VideoEncoder.isConfigSupported({ codec: RES.codec, width: RES.w, height: RES.h, bitrate: RES.bitrate, framerate: RES.fps }); if (!sup || !sup.supported) throw 0; }
-    catch (e) { const fb = pick === 'hd60' ? null : (pick === '4k60' ? FORMATS['4k30'] : FORMATS['hd60']); if (!fb) { alert('This browser can’t encode that format. Try Chrome or Edge.'); return; } alert(RES.label + ' isn’t supported by this browser’s encoder — rendering ' + fb.label + ' instead.'); RES = fb; }
-    const fps = RES.fps, total = DURATION, N = Math.round(total * fps), SX = RES.w / 1920, SY = RES.h / 1080;
-    const fname = 'Portals-GJ-504-b-' + TWEAKS.durationMin + 'min-' + RES.label + '.mp4';
-    let Mux;
-    try { Mux = await import('https://cdn.jsdelivr.net/npm/mp4-muxer@5/+esm'); } catch (e) { alert('Could not load the MP4 encoder (needs internet for the first render).'); return; }
-    let writable = null, target; const blobParts = [];
-    try {
-      if (window.showSaveFilePicker && window.self === window.top) {
-        const h = await window.showSaveFilePicker({ suggestedName: fname, types: [{ description: 'MP4 video', accept: { 'video/mp4': ['.mp4'] } }] });
-        writable = await h.createWritable(); target = new Mux.FileSystemWritableFileStreamTarget(writable);
-      }
-    } catch (e) { if (e && e.name === 'AbortError') return; writable = null; }
-    if (!writable) target = new Mux.StreamTarget({ chunked: true, onData: (d, _position) => blobParts.push(d.slice()) });
-
-    renderingMP4 = true; cancelMP4 = false;
-    if (playing) setPlaying(false);
-    document.body.classList.add('recording'); hud.classList.add('on'); btn.disabled = true; elEl.textContent = '0%';
-    note.textContent = 'Preparing the scene…';
-    await sceneReady;
-
-    let muxer, venc, aenc, encErr = null;
-    try {
-      rc.width = RES.w; rc.height = RES.h; rx.setTransform(SX, 0, 0, SY, 0, 0);
-      muxer = new Mux.Muxer({ target, video: { codec: 'avc', width: RES.w, height: RES.h, frameRate: fps }, audio: { codec: 'aac', numberOfChannels: 2, sampleRate: 48000 }, fastStart: writable ? false : 'fragmented', firstTimestampBehavior: 'offset' });
-      venc = new VideoEncoder({ output: (c, m) => muxer.addVideoChunk(c, m), error: e => { console.error('venc', e); encErr = encErr || e; } });
-      venc.configure({ codec: RES.codec, width: RES.w, height: RES.h, bitrate: RES.bitrate, framerate: fps, bitrateMode: 'variable', latencyMode: 'quality' });
-      aenc = new AudioEncoder({ output: (c, m) => muxer.addAudioChunk(c, m), error: e => { console.error('aenc', e); encErr = encErr || e; } });
-      aenc.configure({ codec: 'mp4a.40.2', numberOfChannels: 2, sampleRate: 48000, bitrate: 256000 });
-    } catch (e) { console.error(e); alert('This browser can’t hardware-encode MP4 here. Try Chrome or Edge.'); rx.setTransform(1, 0, 0, 1, 0, 0); rc.width = 1920; rc.height = 1080; cleanupMP4(wasMuted); return; }
-
-    // soundscape rendered in 20 s segments, fed straight into the encoder
-    const sr = 48000, SEG = 20, totalSamples = Math.round(total * sr), vol = 0.9;
-    let seg = null, segStart = 0, aOff = 0;
-    async function pumpAudioTo(sampleTarget) {
-      const limit = Math.min(sampleTarget, totalSamples);
-      while (aOff < limit) {
-        if (!seg || aOff >= segStart + seg.L.length) {
-          segStart = Math.floor(aOff / (SEG * sr)) * SEG * sr;
-          seg = await PinkAudio.renderSegment(segStart / sr, Math.min(SEG, (totalSamples - segStart) / sr), vol);
-        }
-        const o = aOff - segStart, len = Math.min(1024, limit - aOff, seg.L.length - o);
-        if (len <= 0) { aOff = limit; break; }
-        const data = new Float32Array(len * 2);
-        data.set(seg.L.subarray(o, o + len), 0); data.set(seg.R.subarray(o, o + len), len);
-        const ad = new AudioData({ format: 'f32-planar', sampleRate: sr, numberOfFrames: len, numberOfChannels: 2, timestamp: Math.round(aOff / sr * 1e6), data });
-        aenc.encode(ad); ad.close(); aOff += len;
-        if (aenc.encodeQueueSize > 40) await new Promise(r => setTimeout(r, 0));
-      }
-    }
-
-    window.__offlineRendering = true;
-    canvas.width = RES.w; canvas.height = RES.h; ctx.setTransform(SX, 0, 0, SY, 0, 0); PinkScene.resize(RES.w, RES.h);
-    note.textContent = 'Rendering ' + RES.label + '…';
-    const t0 = performance.now();
-    try {
-      for (let i = 0; i < N; i++) {
-        if (cancelMP4) break;
-        if (encErr) throw encErr;
-        renderFrameAt(i / fps);
-        const vf = new VideoFrame(rc, { timestamp: Math.round(i * 1e6 / fps), duration: Math.round(1e6 / fps) });
-        venc.encode(vf, { keyFrame: i % (fps * 2) === 0 }); vf.close();
-        await pumpAudioTo(Math.round((i + 1) / fps * sr));
-        if (venc.encodeQueueSize > 8) await new Promise(res => { const c = () => venc.encodeQueueSize <= 3 ? res() : setTimeout(c, 4); c(); });
-        if (i % 15 === 0) {
-          const p = i / N, el = (performance.now() - t0) / 1000, eta = p > 0.002 ? el / p - el : 0;
-          elEl.textContent = (p * 100).toFixed(1) + '%';
-          note.textContent = 'Rendering ' + RES.label + ' · frame ' + i + ' / ' + N + (eta ? ' · ~' + Math.ceil(eta / 60) + ' min left' : '');
-          if (i % 60 === 0) await new Promise(r => setTimeout(r, 0));
-        }
-      }
-      note.textContent = 'Finalizing the MP4…'; elEl.textContent = '100%';
-      if (!cancelMP4) { await pumpAudioTo(totalSamples); await withTimeout(aenc.flush(), 60000, 'the audio encoder stopped responding'); }
-      if (encErr) throw encErr;
-      await withTimeout(venc.flush(), 120000, 'the video encoder stopped responding while finishing up');
-      if (encErr) throw encErr;
-      muxer.finalize();
-      if (writable) { note.textContent = 'Saving to disk…'; await withTimeout(writable.close(), 180000, 'saving the file to disk timed out'); note.textContent = cancelMP4 ? 'Cancelled.' : 'Done — saved to the folder you chose.'; }
-      else if (!cancelMP4) {
-        note.textContent = 'Preparing download…';
-        const url = URL.createObjectURL(new Blob(blobParts, { type: 'video/mp4' }));
-        const a = document.createElement('a'); a.href = url; a.download = fname; document.body.appendChild(a); a.click(); a.remove();
-        setTimeout(() => URL.revokeObjectURL(url), 60000); note.textContent = 'Done — check your Downloads.';
-      } else note.textContent = 'Cancelled.';
-    } catch (e) {
-      console.error('render/finalize failed:', e);
-      if (writable) { try { await writable.close(); } catch (_) {} }
-      alert('The render couldn’t finish:\n\n' + ((e && e.message) ? e.message : e) + (!writable ? '\n\nTip: open this page in its own browser tab so it can save straight to a folder you pick — that handles very long videos best.' : ''));
-    }
-    canvas.width = 1920; canvas.height = 1080; ctx.setTransform(1, 0, 0, 1, 0, 0); PinkScene.resize(1920, 1080);
-    rx.setTransform(1, 0, 0, 1, 0, 0); rc.width = 1920; rc.height = 1080;
-    try { fit(); } catch (e) {}
-    cleanupMP4(wasMuted);
-  }
-
-  const modal = document.getElementById('exp-modal');
-  btn.addEventListener('click', () => {
-    document.getElementById('exp-len').textContent = Math.max(1, Math.round(DURATION / 60));
-    const canDisk = window.showSaveFilePicker && window.self === window.top;
-    document.getElementById('exp-save').innerHTML = canDisk
-      ? 'Pick a folder to save into; it streams straight to disk. <b>Keep this tab in front</b> while it works. 4K60 is a long render — the progress bar shows the time left.'
-      : 'The finished file downloads automatically when it’s done — it streams together in chunks so long videos stay within memory. <b>Keep this tab in front</b> while it works.';
-    modal.classList.add('on');
-  });
-  document.getElementById('exp-cancel').addEventListener('click', () => modal.classList.remove('on'));
-  document.getElementById('exp-start').addEventListener('click', () => { modal.classList.remove('on'); if (FAST) renderMP4(); else alert('This browser can’t render the MP4 here. Please open this page in Chrome or Edge and try Export again.'); });
-  stopBtn.addEventListener('click', () => { if (renderingMP4) cancelMP4 = true; });
-  addEventListener('keydown', e => { if (renderingMP4) { e.stopImmediatePropagation(); e.preventDefault(); } }, true);
-})();
-</script>
 </body>
 </html>
