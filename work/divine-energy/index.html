@@ -120,6 +120,9 @@
     margin-top: clamp(22px, 3.4vh, 38px);
   }
   .card .sub .verse { color: var(--halo); }
+  #oracle .mask{display:block;color:#FAFAFA;width:clamp(56px,min(7vw,12vh),140px);aspect-ratio:11/18;margin-bottom:clamp(18px,3.4vh,40px)}
+  #oracle .who{font-family:var(--mono);font-size:clamp(9px,.85vw,12px);letter-spacing:.5em;text-transform:uppercase;color:var(--halo);margin-bottom:clamp(14px,2.8vh,34px)}
+  #oracle p{font-family:var(--sans);font-weight:300;font-size:clamp(20px,min(2.8vw,5vh),48px);letter-spacing:.05em;line-height:1.4;margin:0;color:var(--lumen);max-width:24ch;text-wrap:balance;padding:0 6%}
   .card .sub b { color: var(--silver); font-weight: 400; }
 
   /* big pixel lettermark on end card */
@@ -334,6 +337,13 @@
     <div class="sub"><b id="intro-dur">30 MINUTE</b> &nbsp;·&nbsp; <span class="verse">PHILIPPIANS 4:13</span> &nbsp;·&nbsp; DEEP FOCUS</div>
   </div>
 
+  <div class="card" id="oracle">
+    <span class="mask" id="oracle-mask" aria-hidden="true"></span>
+    <div class="who">THE ORACLE</div>
+    <p>I can do all things through Christ, who strengthens me.</p>
+    <div class="who" style="margin:clamp(14px,2.8vh,34px) 0 0">PHILIPPIANS 4:13</div>
+  </div>
+
   <!-- end card -->
   <div class="card" id="outro">
     <span class="endmark" id="endmark" aria-hidden="true"></span>
@@ -464,30 +474,6 @@
 <script>
 (function(){ try { if (window.self !== window.top && location.protocol !== 'file:') document.body.classList.add('workspace'); } catch (e) {} })();
 </script>
-<button id="export-btn" title="Export this video as a downloadable file">⬇ Export Video</button>
-<div id="rec-hud">
-  <div class="rb">
-    <span id="rec-dot2"></span>
-    <span><span id="rec-verb">Recording</span> · <b id="rec-el">00:00</b> / <span id="rec-to">30:00</span></span>
-    <button id="rec-stop">Stop &amp; Save</button>
-  </div>
-  <div id="rec-note">Keep this tab in front · records in real time</div>
-</div>
-
-<div id="exp-modal">
-  <div class="box">
-    <div class="eb">Portals · FocusField · Export</div>
-    <div class="h">Render this as a video file</div>
-    <p>This renders the whole video and its sound into a finished <b>MP4</b> on your computer — the pre-made video you upload to YouTube.</p>
-    <ul>
-      <li>Renders the full <b><span id="exp-len">30</span>-minute</b> video from start to finish, at top quality.</li>
-      <li id="exp-speed">As fast as your computer allows — usually a few minutes.</li>
-      <li id="exp-save">Pick a folder to save into; it streams straight to disk. <b>Keep this tab in front</b> while it works.</li>
-    </ul>
-    <div class="btns"><button id="exp-cancel">Cancel</button><button id="exp-start">Start export</button></div>
-  </div>
-</div>
-
 <script src="divine-energy-v5-audio.js"></script>
 <script>
 // ============================================================================
@@ -829,6 +815,11 @@ let lastFrame = performance.now();
 let ended = false;
 
 const INTRO_IN = 2.5, INTRO_HOLD_END = 10, INTRO_OUT_END = 15;
+const OR_IN = 16, OR_FULL = 19.5, OR_HOLD = 30, OR_OUT = 33.5;
+const ORACLE_G = ['...#####...', '.########..', '#########..', '#########..', '##########.', '#########..', '#....##...#', '#...###.#..', '##..###....', '#######.###', '#######.###', '#####...##.', '.######....', '.#####.....', '..##.##....', '...####....', '...###.....', '....##.....'];
+function oracleAlpha(t) { if (t < OR_IN || t > OR_OUT) return 0; if (t < OR_FULL) return (t - OR_IN) / (OR_FULL - OR_IN); if (t < OR_HOLD) return 1; return 1 - (t - OR_HOLD) / (OR_OUT - OR_HOLD); }
+const oracleCard = document.getElementById('oracle');
+(function () { let d = ''; ORACLE_G.forEach((row, r) => { for (let c = 0; c < row.length; c++) if (row[c] === '#') d += 'M' + c + ' ' + r + 'h1v1h-1z'; }); document.getElementById('oracle-mask').innerHTML = '<svg viewBox="0 0 11 18" width="100%" height="100%" style="display:block" shape-rendering="crispEdges" aria-hidden="true"><path fill="currentColor" d="' + d + '"></path></svg>'; })();
 const OUT_DIM = 9;    // seconds before end the glory starts dimming
 const OUT_CARD = 7;   // seconds before end the card fades in
 
@@ -886,6 +877,7 @@ function frame(now) {
   else if (videoTime < INTRO_HOLD_END) io = 1;
   else if (videoTime < INTRO_OUT_END) io = 1 - (videoTime - INTRO_HOLD_END) / (INTRO_OUT_END - INTRO_HOLD_END);
   intro.style.opacity = io.toFixed(3);
+  oracleCard.style.opacity = oracleAlpha(videoTime).toFixed(3);
 
   // ---- end card opacity ----
   let oo = 0;
@@ -1142,383 +1134,5 @@ requestAnimationFrame(frame);
 setTimeout(() => { if (playing) hint.classList.add('gone'); }, 4500);
 </script>
 
-<!-- ============ Video exporter: deterministic frames + WebCodecs → MP4 ============ -->
-<script>
-(function () {
-  const btn     = document.getElementById('export-btn');
-  const hud     = document.getElementById('rec-hud');
-  const elEl    = document.getElementById('rec-el');
-  const elTo    = document.getElementById('rec-to');
-  const stopBtn = document.getElementById('rec-stop');
-  const note    = document.getElementById('rec-note');
-
-  // offscreen composite canvas: the field + the branded overlays (chrome +
-  // intro/outro cards) painted on, so the file matches the player exactly.
-  const rc = document.createElement('canvas'); rc.width = 1920; rc.height = 1080;
-  const rx = rc.getContext('2d', { alpha: false });
-
-  const HALO = '#FFF738', LUMEN = '#FAFAFA', SILVER = '#C9C9C8', SIGNAL = '#6B6B70';
-
-  function fmtt(s) { s = Math.max(0, Math.floor(s)); const m = Math.floor(s/60), x = s%60;
-    return (m<10?'0':'')+m+':'+(x<10?'0':'')+x; }
-
-  // centered line built from colored segments (so the verse stays halo-gold etc.)
-  function centeredLine(segs, y, font, ls) {
-    rx.font = font; rx.letterSpacing = ls; rx.textAlign = 'left'; rx.textBaseline = 'alphabetic';
-    let total = 0; for (const s of segs) total += rx.measureText(s.text).width;
-    let x = 960 - total / 2;
-    for (const s of segs) { rx.fillStyle = s.c; rx.fillText(s.text, x, y); x += rx.measureText(s.text).width; }
-    rx.letterSpacing = '0px';
-  }
-
-  // pixel "P" lettermark (6×8), matching the live HUD corner mark
-  const MARK_GRID = [
-    1,1,1,1,1,0,
-    1,1,0,0,1,1,
-    1,1,0,0,1,1,
-    1,1,1,1,1,1,
-    1,1,1,1,1,0,
-    1,1,0,0,0,0,
-    1,1,0,0,0,0,
-    1,1,0,0,0,0,
-  ];
-
-  // Replicate the live eyebrow + timecode exactly: pixel P (silver) · gap ·
-  // "PORTALS · FOCUSFIELD" (signal) · halo dot · "DIVINE ENERGY" (signal), at the
-  // design's 1920-space scale (11px text) — not an oversized chrome block.
-  function drawChrome(t) {
-    const LEFT = 40, CY = 44;          // left inset, vertical center of the row
-    const MW = 15, MH = 20;            // mark box 6/8 ratio
-    const cw = MW / 6, ch = MH / 8;    // pixel cell size
-    const GAP = 12;
-
-    // pixel P mark
-    rx.fillStyle = SILVER;
-    for (let r = 0; r < 8; r++) for (let c = 0; c < 6; c++) {
-      if (MARK_GRID[r * 6 + c]) rx.fillRect(LEFT + c * cw, CY - MH / 2 + r * ch, cw + 0.4, ch + 0.4);
-    }
-
-    rx.font = "500 11px 'JetBrains Mono', ui-monospace, monospace";
-    rx.letterSpacing = '3.7px';        // 0.34em
-    rx.textBaseline = 'middle';
-    rx.textAlign = 'left';
-
-    let x = LEFT + MW + GAP;
-    rx.fillStyle = SIGNAL;
-    rx.fillText('PORTALS · FOCUSFIELD', x, CY);
-    x += rx.measureText('PORTALS · FOCUSFIELD').width + GAP;
-    // halo dot (4px)
-    rx.fillStyle = HALO; rx.fillRect(x, CY - 2, 4, 4);
-    x += 4 + GAP;
-    rx.fillStyle = SIGNAL;
-    rx.fillText('DIVINE ENERGY', x, CY);
-
-    if (TWEAKS.timecode) {
-      rx.font = "500 12px 'JetBrains Mono', ui-monospace, monospace";
-      rx.letterSpacing = '2.6px';      // 0.22em
-      rx.textAlign = 'right';
-      const cur = fmtt(t), tot = fmtt(DURATION);
-      let rxr = 1880;
-      // draw right→left: total (signal) · sep (nebula) · current (silver)
-      rx.fillStyle = SIGNAL; rx.fillText(tot, rxr, CY);
-      rxr -= rx.measureText(tot).width + 6;
-      rx.fillStyle = '#424348'; rx.fillText('/', rxr, CY);
-      rxr -= rx.measureText('/').width + 6;
-      rx.fillStyle = SILVER; rx.fillText(cur, rxr, CY);
-    }
-
-    rx.letterSpacing = '0px'; rx.textAlign = 'left'; rx.textBaseline = 'alphabetic';
-  }
-
-  function drawCards(t) {
-    // intro card — in 0–2.5, hold to 10, out 10–15 (matches the live loop)
-    let io = 0;
-    if (t < 2.5) io = t / 2.5; else if (t < 10) io = 1; else if (t < 15) io = 1 - (t - 10) / 5;
-    io = Math.max(0, Math.min(1, io));
-    if (io > 0.002) {
-      rx.save(); rx.globalAlpha = io;
-      centeredLine([
-        { text: 'PORTALS · FOCUSFIELD · VOL. 000  ', c: LUMEN },
-        { text: '·', c: HALO },
-        { text: '  NO. 000', c: LUMEN },
-      ], 392, "500 22px 'JetBrains Mono', monospace", '6px');
-      rx.textAlign = 'center'; rx.fillStyle = LUMEN;
-      rx.font = "300 128px 'DM Sans', system-ui, sans-serif";
-      rx.fillText('Divine Energy', 960, 552);
-      centeredLine([
-        { text: '30 MINUTE', c: SILVER },
-        { text: '  ·  ', c: LUMEN },
-        { text: 'PHILIPPIANS 4:13', c: HALO },
-        { text: '  ·  DEEP FOCUS', c: LUMEN },
-      ], 618, "500 22px 'JetBrains Mono', monospace", '5px');
-      rx.restore();
-    }
-    // outro card — fades in over the last 7s
-    const toEnd = DURATION - t;
-    let oo = 0; if (toEnd < 7) oo = Math.min(1, (7 - toEnd) / 2); oo = Math.max(0, Math.min(1, oo));
-    if (oo > 0.002) {
-      rx.save(); rx.globalAlpha = oo;
-      centeredLine([
-        { text: 'FOCUSFIELD  ', c: LUMEN },
-        { text: '·', c: HALO },
-        { text: '  DIVINE ENERGY', c: LUMEN },
-      ], 452, "500 22px 'JetBrains Mono', monospace", '6px');
-      rx.textAlign = 'center'; rx.fillStyle = LUMEN;
-      rx.font = "300 72px 'DM Sans', system-ui, sans-serif";
-      rx.fillText('Mission Complete', 960, 548);
-      centeredLine([
-        { text: 'RUNTIME ', c: LUMEN },
-        { text: fmtt(DURATION), c: SILVER },
-        { text: '  ·  THANK YOU FOR FOCUSING', c: LUMEN },
-      ], 606, "500 22px 'JetBrains Mono', monospace", '4px');
-      rx.restore();
-    }
-  }
-
-  // render scene at absolute time t, apply the same intro/outro dimming the live
-  // loop does, then composite the branded overlays — straight into rc.
-  function renderFrameAt(t) {
-    videoTime = t;
-    renderScene(t);
-    let intensity = 1;
-    if (t < 13) { const b = Math.min(1, t / 13); const e = b * b * (3 - 2 * b); intensity = 0.04 + 0.96 * e; }
-    const toEnd = DURATION - t;
-    if (toEnd < 9) intensity = Math.min(intensity, Math.max(0, toEnd / 9));
-    if (intensity < 1) { ctx.fillStyle = 'rgba(0,0,0,' + (1 - intensity).toFixed(3) + ')'; ctx.fillRect(0, 0, 1920, 1080); }
-    rx.drawImage(canvas, 0, 0, 1920, 1080);
-    drawChrome(t);
-    drawCards(t);
-  }
-
-  const FAST = !!(window.VideoEncoder && window.AudioEncoder && window.VideoFrame && window.AudioData);
-  let renderingMP4 = false, cancelMP4 = false;
-
-  function cleanupMP4(wasMuted, wasVol) {
-    window.__offlineRendering = false; renderingMP4 = false; cancelMP4 = false;
-    document.body.classList.remove('recording'); hud.classList.remove('on');
-    btn.disabled = false; stopBtn.textContent = 'Stop & Save';
-    const rv = document.getElementById('rec-verb'); if (rv) rv.textContent = 'Recording';
-    setMuted(wasMuted); try { DivineAudio.setVolume(wasVol / 100); } catch (e) {}
-    rebuild(); seek(0); setPlaying(false);
-  }
-
-  // Race a promise against a timeout so a wedged encoder/disk write can't hang the UI forever.
-  function withTimeout(promise, ms, label) {
-    let to;
-    const timeout = new Promise((_, rej) => { to = setTimeout(() => rej(new Error('Timed out: ' + label)), ms); });
-    return Promise.race([promise, timeout]).finally(() => clearTimeout(to));
-  }
-
-  async function renderMP4() {
-    if (renderingMP4) return;
-    const fps = 30, total = DURATION, N = Math.round(total * fps);
-    const wasMuted = TWEAKS.muted, wasVol = TWEAKS.volume;
-
-    // ---- pick the best resolution this browser can actually hardware-encode ----
-    // 4K UHD for max YouTube quality; auto-fall back to 1080p if unsupported.
-    const RES_4K = { w: 3840, h: 2160, codec: 'avc1.640033', bitrate: 45000000, label: '4K' };   // High@L5.1
-    const RES_HD = { w: 1920, h: 1080, codec: 'avc1.640028', bitrate: 12000000, label: '1080p' }; // High@L4.0
-    let RES = RES_HD;
-    try {
-      const sup = await VideoEncoder.isConfigSupported({ codec: RES_4K.codec, width: RES_4K.w, height: RES_4K.h, bitrate: RES_4K.bitrate, framerate: fps });
-      if (sup && sup.supported) RES = RES_4K;
-    } catch (e) { /* stay on 1080p */ }
-    const SX = RES.w / 1920, SY = RES.h / 1080;       // logical 1920×1080 → output scale
-    let fieldScaled = false;                          // whether we resized the field canvas
-    const fname = 'Portals-Divine-Energy-' + TWEAKS.durationMin + 'min-' + RES.label + '.mp4';
-
-    let Mux;
-    try { Mux = await import('https://cdn.jsdelivr.net/npm/mp4-muxer@5/+esm'); }
-    catch (e) { alert('Could not load the MP4 encoder (needs internet for the first render).'); return; }
-
-    let writable = null, target;
-    const blobParts = [];                 // streamed MP4 chunks when we can't write to disk
-    // The native save-to-folder picker only works in a real top-level tab; it's blocked
-    // inside the embedded preview iframe. Only try it when we're actually top-level.
-    try {
-      if (window.showSaveFilePicker && window.self === window.top) {
-        const h = await window.showSaveFilePicker({ suggestedName: fname, types: [{ description: 'MP4 video', accept: { 'video/mp4': ['.mp4'] } }] });
-        writable = await h.createWritable();
-        target = new Mux.FileSystemWritableFileStreamTarget(writable);
-      }
-    } catch (e) {
-      // AbortError = user dismissed the picker. Anything else (e.g. picker blocked) → stream.
-      if (e && e.name === 'AbortError') return;
-      writable = null;
-    }
-    if (!writable) {
-      // No disk handle: stream the muxer's output into a disk-backed Blob in chunks,
-      // instead of one giant contiguous ArrayBuffer (which exhausts memory on long videos).
-      // chunked + fragmented ⇒ writes arrive in order, so we just append each chunk.
-      // (the muxer still requires the position param to be declared.)
-      target = new Mux.StreamTarget({ chunked: true, onData: (d, _position) => blobParts.push(d.slice()) });
-    }
-
-    renderingMP4 = true; cancelMP4 = false;
-    document.body.classList.add('recording'); hud.classList.add('on'); btn.disabled = true;
-    const rv = document.getElementById('rec-verb'); if (rv) rv.textContent = 'Rendering';
-    stopBtn.textContent = 'Cancel'; elTo.textContent = fmtt(total); elEl.textContent = '0%';
-
-    // 1) soundscape — rendered offline in chunks (responsive + cancellable)
-    note.textContent = 'Rendering soundscape…';
-    let audioBuf = null;
-    try {
-      audioBuf = await DivineAudio.renderOffline(total, 0.9, (frac) => {
-        const p = Math.round(frac * 100);
-        elEl.textContent = p + '%';
-        note.textContent = 'Rendering soundscape… ' + p + '%';
-      }, () => cancelMP4);
-    }
-    catch (e) { console.error(e); alert('Audio render failed: ' + e.message); cleanupMP4(wasMuted, wasVol); return; }
-    if (cancelMP4) { note.textContent = 'Cancelled.'; cleanupMP4(wasMuted, wasVol); if (writable) { try { await writable.close(); } catch (e) {} } return; }
-
-    // 2) muxer + hardware encoders
-    let muxer, venc, aenc, encErr = null;
-    try {
-      // size the composite canvas to the output res; scale its ctx so all the
-      // hardcoded 1920×1080 chrome/card coordinates map straight onto 4K.
-      rc.width = RES.w; rc.height = RES.h;
-      rx.setTransform(SX, 0, 0, SY, 0, 0);
-      muxer = new Mux.Muxer({
-        target,
-        video: { codec: 'avc', width: RES.w, height: RES.h, frameRate: fps },
-        audio: { codec: 'aac', numberOfChannels: 2, sampleRate: 48000 },
-        fastStart: writable ? false : 'fragmented',
-        firstTimestampBehavior: 'offset',
-      });
-      venc = new VideoEncoder({ output: (c, m) => muxer.addVideoChunk(c, m), error: e => { console.error('venc', e); encErr = encErr || e; } });
-      venc.configure({ codec: RES.codec, width: RES.w, height: RES.h, bitrate: RES.bitrate, framerate: fps });
-      aenc = new AudioEncoder({ output: (c, m) => muxer.addAudioChunk(c, m), error: e => { console.error('aenc', e); encErr = encErr || e; } });
-      aenc.configure({ codec: 'mp4a.40.2', numberOfChannels: 2, sampleRate: 48000, bitrate: 256000 });
-    } catch (e) {
-      console.error(e); alert('This browser can’t hardware-encode MP4 here. Try Chrome or Edge.');
-      cleanupMP4(wasMuted, wasVol); return;
-    }
-
-    // 3) audio is encoded *interleaved* with the video below, so audio + video
-    //    timestamps stay monotonic — that keeps fragmented streaming low-memory
-    //    (the muxer flushes each fragment to disk instead of buffering the whole track).
-    const sr = audioBuf.sampleRate, ch0 = audioBuf.getChannelData(0);
-    const ch1 = audioBuf.numberOfChannels > 1 ? audioBuf.getChannelData(1) : ch0;
-    let aOff = 0;                          // next audio sample index to encode
-    async function pumpAudioTo(sampleTarget) {
-      const limit = Math.min(sampleTarget, audioBuf.length);
-      while (aOff < limit) {
-        const len = Math.min(1024, limit - aOff);
-        const data = new Float32Array(len * 2);
-        data.set(ch0.subarray(aOff, aOff + len), 0);
-        data.set(ch1.subarray(aOff, aOff + len), len);
-        const ad = new AudioData({ format: 'f32-planar', sampleRate: sr, numberOfFrames: len, numberOfChannels: 2, timestamp: Math.round(aOff / sr * 1e6), data });
-        aenc.encode(ad); ad.close();
-        aOff += len;
-        if (aenc.encodeQueueSize > 40) await new Promise(r => setTimeout(r, 0));
-      }
-    }
-
-    // 4) render + encode every video frame deterministically.
-    //    Everything from here through the file write is wrapped so a wedged encoder,
-    //    a rejected flush, or an out-of-memory finalize can NEVER leave the HUD stuck
-    //    on "Finalizing…" — we always surface the error and run cleanup.
-    window.__offlineRendering = true; rebuild();
-    // render the FIELD natively at output resolution (crisp 4K, not upscaled):
-    // grow the field canvas and scale its context so renderScene draws in the
-    // same 1920×1080 logical space but fills every 4K pixel.
-    canvas.width = RES.w; canvas.height = RES.h;
-    ctx.setTransform(SX, 0, 0, SY, 0, 0);
-    fieldScaled = true;
-    note.textContent = 'Rendering video… (' + RES.label + ')';
-    try {
-      for (let i = 0; i < N; i++) {
-        if (cancelMP4) break;
-        if (encErr) throw encErr;
-        renderFrameAt(i / fps);
-        const vf = new VideoFrame(rc, { timestamp: Math.round(i * 1e6 / fps), duration: Math.round(1e6 / fps) });
-        venc.encode(vf, { keyFrame: i % (fps * 2) === 0 });
-        vf.close();
-        await pumpAudioTo(Math.round((i + 1) / fps * sr));   // interleave this frame's audio
-        if (venc.encodeQueueSize > 10) await new Promise(res => { const c = () => venc.encodeQueueSize <= 4 ? res() : setTimeout(c, 4); c(); });
-        if (i % 6 === 0) { const p = Math.round(i / N * 100); elEl.textContent = p + '%'; note.textContent = 'Rendering video… ' + p + '%'; if (i % 30 === 0) await new Promise(r => setTimeout(r, 0)); }
-      }
-
-      note.textContent = 'Finalizing the MP4…';
-      elEl.textContent = '100%';
-      if (!cancelMP4) { await pumpAudioTo(audioBuf.length); await aenc.flush(); }   // flush remaining audio
-      await new Promise(r => setTimeout(r, 50));
-      if (encErr) throw encErr;
-      // Backpressure keeps the queue tiny, so a real flush is near-instant. The watchdog
-      // only fires if a hardware encoder genuinely wedges — then we report instead of hang.
-      await withTimeout(venc.flush(), 90000, 'the video encoder stopped responding while finishing up');
-      if (encErr) throw encErr;
-      muxer.finalize();
-
-      // 5) write the file out
-      if (writable) {
-        note.textContent = 'Saving to disk…';
-        await new Promise(r => setTimeout(r, 30));
-        await withTimeout(writable.close(), 120000, 'saving the file to disk timed out');
-        note.textContent = cancelMP4 ? 'Cancelled.' : 'Done — saved to the folder you chose.';
-      } else if (!cancelMP4) {
-        note.textContent = 'Preparing download…';
-        await new Promise(r => setTimeout(r, 30));
-        const blob = new Blob(blobParts, { type: 'video/mp4' });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a'); a.href = url; a.download = fname;
-        document.body.appendChild(a); a.click(); a.remove();
-        setTimeout(() => URL.revokeObjectURL(url), 60000);
-        note.textContent = 'Done — check your Downloads.';
-      } else {
-        note.textContent = 'Cancelled.';
-      }
-    } catch (e) {
-      console.error('render/finalize failed:', e);
-      if (writable) { try { await writable.close(); } catch (_) {} }
-      const memHint = !writable
-        ? '\n\nTip: open this page in its own browser tab (outside the embedded preview) so it can save straight to a folder you pick — that handles very long videos best.'
-        : '';
-      alert('The render couldn’t finish:\n\n' + ((e && e.message) ? e.message : e) + memHint);
-      note.textContent = 'Render failed — see the message.';
-    }
-    // restore the field canvas to its normal 1080p backing store + transform
-    if (fieldScaled) {
-      canvas.width = 1920; canvas.height = 1080;
-      ctx.setTransform(1, 0, 0, 1, 0, 0);
-      try { fit(); } catch (e) {}
-    }
-    cleanupMP4(wasMuted, wasVol);
-  }
-
-  // explainer modal
-  const modal = document.getElementById('exp-modal');
-  function openModal() {
-    const m = Math.max(1, Math.round(DURATION / 60));
-    const len = document.getElementById('exp-len'); if (len) len.textContent = m;
-    const sp = document.getElementById('exp-speed');
-    if (sp) sp.textContent = FAST
-      ? 'Renders in up to 4K for best YouTube quality. As fast as your computer allows — a 4K render takes longer and makes a large file.'
-      : 'Your browser can’t fast-render here — please use Chrome or Edge to export.';
-    const sv = document.getElementById('exp-save');
-    const canDisk = window.showSaveFilePicker && window.self === window.top;
-    if (sv) sv.innerHTML = canDisk
-      ? 'Pick a folder to save into; it streams straight to disk. <b>Keep this tab in front</b> while it works.'
-      : 'The finished file downloads automatically when it’s done — it streams together in chunks, so even long videos stay within memory. <b>Keep this tab in front</b> while it works.';
-    modal.classList.add('on');
-  }
-  function closeModal() { modal.classList.remove('on'); }
-
-  btn.addEventListener('click', openModal);
-  document.getElementById('exp-cancel').addEventListener('click', closeModal);
-  document.getElementById('exp-start').addEventListener('click', () => {
-    closeModal();
-    if (FAST) renderMP4();
-    else alert('This browser can’t render the MP4 here. Please open this page in Chrome or Edge and try Export again.');
-  });
-  stopBtn.addEventListener('click', () => { if (renderingMP4) cancelMP4 = true; });
-
-  window.addEventListener('keydown', (e) => {
-    if (renderingMP4) { e.stopImmediatePropagation(); e.preventDefault(); }
-  }, true);
-})();
-</script>
-<template id="__bundler_thumbnail" data-bg-color="#000000"><svg viewBox="0 0 1200 800" xmlns="http://www.w3.org/2000/svg"><defs><radialGradient id="g" cx="50%" cy="50%" r="50%"><stop offset="0" stop-color="#FFF6E0"></stop><stop offset="0.35" stop-color="#FFF738" stop-opacity="0.9"></stop><stop offset="1" stop-color="#FFF738" stop-opacity="0"></stop></radialGradient></defs><rect width="1200" height="800" fill="#000"></rect><circle cx="600" cy="400" r="240" fill="url(#g)"></circle></svg></template>
 </body>
 </html>
