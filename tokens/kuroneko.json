@@ -1,0 +1,24 @@
+{
+  "color": {
+    "void": "#000000",
+    "night": "#0E0D0C",
+    "panel": "#0A0908",
+    "rule": "#24221F",
+    "ruleStrong": "#3A3733",
+    "bone": "#F2EFE8",
+    "ash": "#A8A39A",
+    "smoke": "#8E8980",
+    "moonlight": "#E8ECCC",
+    "shuLight": "#D6DCAE",
+    "shuDeep": "#B8301B",
+    "shuCore": "#FFFFF6"
+  },
+  "font": {
+    "sans": "Geist",
+    "mono": "Geist Mono"
+  },
+  "motion": {
+    "ease": "cubic-bezier(.2,.8,.2,1)",
+    "lightbar": "400ms"
+  }
+}

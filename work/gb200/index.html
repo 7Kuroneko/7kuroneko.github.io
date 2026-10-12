@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<script src="./kn-loader.js" data-bg="#07090b" data-accent="#76b900" data-ink="#dfe8ec" data-mute="#5d6f77" data-font="'Space Grotesk',sans-serif" data-title="GB200 Breakdown" data-kind="3D Component Teardown · NVIDIA GB200" data-variant="teardown" data-wait="event" data-steps="Building rack|Wiring NVLink|Lifting superchip|Mapping SM"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600&family=Geist+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+html,body{margin:0;padding:0;background:#07090b;color:#dfe8ec;font-family:'Space Grotesk',Helvetica,sans-serif;overflow-x:hidden}
+a{color:#7fe3f5}a:hover{color:#fff}
+*{box-sizing:border-box}
+input[type=range]{-webkit-appearance:none;appearance:none;background:transparent;width:100%;height:24px;cursor:pointer}
+input[type=range]::-webkit-slider-runnable-track{height:1px;background:rgba(127,227,245,.35)}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;height:14px;border-radius:50%;background:#07090b;border:1px solid #76b900;margin-top:-6.5px;box-shadow:0 0 12px rgba(118,185,0,.8)}
+input[type=range]::-moz-range-track{height:1px;background:rgba(127,227,245,.35)}
+input[type=range]::-moz-range-thumb{width:14px;height:14px;border-radius:50%;background:#07090b;border:1px solid #76b900;box-shadow:0 0 12px rgba(118,185,0,.8)}
+@keyframes flicker{0%,100%{opacity:1}92%{opacity:1}93%{opacity:.6}94%{opacity:1}}
+@keyframes pulse{0%,100%{opacity:.35}50%{opacity:1}}
+</style>
+</helmet>
+
+<div ref="{{ rootRef }}" style="position:relative;width:100%;background:#07090b">
+
+  <!-- HERO: interactive 3D -->
+  <section data-screen-label="01 Interactive 3D" style="position:relative;height:100vh;min-height:760px;overflow:hidden">
+    <div ref="{{ sceneRef }}" style="position:absolute;inset:0"></div>
+    <div style="position:absolute;inset:0;pointer-events:none;background:radial-gradient(ellipse 80% 70% at 50% 50%, rgba(7,9,11,0) 55%, rgba(7,9,11,.85) 100%)"></div>
+    <div style="position:absolute;inset:0;pointer-events:none;background:repeating-linear-gradient(0deg, rgba(255,255,255,0) 0 2px, rgba(0,0,0,.18) 2px 4px);mix-blend-mode:multiply"></div>
+    <sc-if value="{{ loading }}" hint-placeholder-val="{{ true }}">
+      <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;pointer-events:none;font-family:'Geist Mono',monospace;font-size:11px;letter-spacing:.2em;color:#7fe3f5;text-transform:uppercase;animation:pulse 1.6s ease-in-out infinite">{{ loadMsg }}</div>
+    </sc-if>
+
+    <div style="position:absolute;inset:0;pointer-events:none;display:grid;grid-template-columns:{{ hudCols }};grid-template-rows:auto auto minmax(0,1fr) auto;gap:0 24px;padding:24px 28px 20px">
+
+      <!-- header -->
+      <div style="grid-column:1/-1;display:flex;justify-content:space-between;align-items:flex-start;gap:24px;flex-wrap:wrap">
+        <div style="display:flex;flex-direction:column;gap:6px">
+          <a href="../../" style="pointer-events:auto;display:flex;align-items:center;gap:8px;text-decoration:none;font-family:'Geist Mono',monospace;font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:#8fa3ab;margin-bottom:4px" style-hover="color:#eef5f7"><svg viewBox="0 0 100 100" width="16" height="16" aria-hidden="true" style="display:block;flex:none"><path d="M11.2 5.5h5v4.6h-5zM84 5.5h5v4.6h-5zM11.6 13h15.4v4.6h-15.4zM73.2 13h15.4v4.6h-15.4zM12.2 20.5h25.8v4.6h-25.8zM62.2 20.5h25.8v4.6h-25.8zM12.6 28h75v4.6h-75zM11.2 35.5h77.8v4.6h-77.8zM9.2 43h81.8v4.6h-81.8zM8.2 50.5h13.4v4.6h-13.4zM40.2 50.5h19.8v4.6h-19.8zM78.6 50.5h13.4v4.6h-13.4zM8.2 58h24v4.6h-24zM39.4 58h21.4v4.6h-21.4zM68 58h24v4.6h-24zM9 65.5h82.2v4.6h-82.2zM12.2 73h75.8v4.6h-75.8zM18.4 80.5h63.4v4.6h-63.4zM31.2 88h37.8v4.6h-37.8z" fill="#E8ECCC"></path></svg>The Kuroneko Company · Portfolio</a>
+          <div style="font-family:'Geist Mono',monospace;font-size:11px;letter-spacing:.18em;color:#76b900;text-transform:uppercase">// Component Teardown &nbsp;·&nbsp; NVIDIA GB200 NVL72</div>
+          <h1 style="margin:0;font-weight:400;font-size:30px;line-height:1.05;letter-spacing:-.01em;color:#eef5f7">Grace Blackwell <span style="font-weight:300;color:#8fa3ab">Superchip</span></h1>
+        </div>
+        <div style="display:flex;flex-wrap:wrap;justify-content:flex-end;gap:10px 26px;white-space:nowrap;font-family:'Geist Mono',monospace;font-size:11px;letter-spacing:.12em;color:#8fa3ab;text-transform:uppercase;text-align:right">
+          <div style="display:flex;flex-direction:column;gap:4px"><span>Process</span><span style="color:#eef5f7;font-size:14px">TSMC 4NP</span></div>
+          <div style="display:flex;flex-direction:column;gap:4px"><span>Superchip Power</span><span style="color:#eef5f7;font-size:14px">{{ tel.power }} <span style="color:#5d6f77">W</span></span></div>
+          <div style="display:flex;flex-direction:column;gap:4px"><span>Die Temp</span><span style="color:{{ tel.tempColor }};font-size:14px">{{ tel.temp }} <span style="color:#5d6f77">°C</span></span></div>
+          <div style="display:flex;flex-direction:column;gap:4px"><span>HBM Traffic</span><span style="color:#eef5f7;font-size:14px">{{ tel.bw }} <span style="color:#5d6f77">TB/s</span></span></div>
+          <div style="display:flex;flex-direction:column;gap:4px"><span>Workload</span><span style="color:#76b900;font-size:14px;animation:flicker 6s infinite">{{ loadLabel }}</span></div>
+        </div>
+      </div>
+
+      <!-- toolbar -->
+      <div style="grid-column:1/-1;pointer-events:auto;display:flex;justify-content:space-between;align-items:center;gap:12px 28px;flex-wrap:wrap;margin-top:16px;padding:10px 0;border-top:1px solid rgba(127,227,245,.14);border-bottom:1px solid rgba(127,227,245,.14)">
+        <div style="display:flex;align-items:center;gap:4px;flex-wrap:wrap">
+          <span style="font-family:'Geist Mono',monospace;font-size:9.5px;letter-spacing:.18em;color:#5d6f77;text-transform:uppercase;margin-right:8px">Zoom</span>
+          <sc-for list="{{ views }}" as="v" hint-placeholder-count="5">
+            <div style="display:flex;align-items:center;gap:4px">
+              <button onClick="{{ v.go }}" style="display:flex;align-items:baseline;gap:8px;padding:7px 11px;background:{{ v.bg }};border:1px solid {{ v.border }};color:{{ v.color }};font-family:'Geist Mono',monospace;font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;cursor:pointer;transition:all .25s;backdrop-filter:blur(4px)"><span style="color:{{ v.numColor }}">{{ v.num }}</span>{{ v.label }}</button>
+              <span style="font-family:'Geist Mono',monospace;font-size:11px;color:#3d4b52;opacity:{{ v.sepOp }}">›</span>
+            </div>
+          </sc-for>
+        </div>
+        <div style="display:flex;align-items:center;gap:22px;flex-wrap:wrap">
+          <div style="display:flex;align-items:center;gap:4px">
+            <span style="font-family:'Geist Mono',monospace;font-size:9.5px;letter-spacing:.18em;color:#5d6f77;text-transform:uppercase;margin-right:8px">Workload</span>
+            <sc-for list="{{ loads }}" as="w" hint-placeholder-count="3">
+              <button onClick="{{ w.go }}" style="padding:6px 10px;background:{{ w.bg }};border:1px solid {{ w.border }};color:{{ w.color }};font-family:'Geist Mono',monospace;font-size:10px;letter-spacing:.14em;text-transform:uppercase;cursor:pointer;transition:all .25s">{{ w.label }}</button>
+            </sc-for>
+          </div>
+          <div style="display:flex;align-items:center;gap:4px">
+            <span style="font-family:'Geist Mono',monospace;font-size:9.5px;letter-spacing:.18em;color:#5d6f77;text-transform:uppercase;margin-right:8px">Overlay</span>
+            <sc-for list="{{ toggles }}" as="g" hint-placeholder-count="2">
+              <button onClick="{{ g.go }}" style="display:flex;align-items:center;gap:7px;padding:6px 10px;background:{{ g.bg }};border:1px solid {{ g.border }};color:{{ g.color }};font-family:'Geist Mono',monospace;font-size:10px;letter-spacing:.14em;text-transform:uppercase;cursor:pointer;transition:all .25s"><span style="width:6px;height:6px;border-radius:50%;background:{{ g.dot }};box-shadow:{{ g.dotGlow }}"></span>{{ g.label }}</button>
+            </sc-for>
+          </div>
+        </div>
+      </div>
+
+      <!-- left: detail panel -->
+      <sc-if value="{{ showPanel }}" hint-placeholder-val="{{ true }}">
+      <div style="grid-column:1;grid-row:3;pointer-events:auto;align-self:start;margin-top:22px;min-width:0;max-height:100%;overflow:auto">
+        <div style="position:relative;border:1px solid {{ panelBorder }};background:rgba(10,15,18,.78);padding:20px 20px 18px;backdrop-filter:blur(8px);transition:border-color .35s ease">
+          <sc-if value="{{ narrow }}" hint-placeholder-val="{{ false }}"><button onClick="{{ closePanel }}" aria-label="Close details" style="position:absolute;right:8px;top:8px;width:28px;height:28px;background:transparent;border:1px solid rgba(127,227,245,.4);color:#F2EFE8;font-size:14px;cursor:pointer;z-index:4">×</button></sc-if>
+          <div style="position:absolute;left:-1px;top:-1px;width:12px;height:12px;border-left:1px solid #76b900;border-top:1px solid #76b900"></div>
+          <div style="position:absolute;right:-1px;bottom:-1px;width:12px;height:12px;border-right:1px solid #76b900;border-bottom:1px solid #76b900"></div>
+          <div style="display:flex;justify-content:space-between;align-items:center;font-family:'Geist Mono',monospace;font-size:10px;letter-spacing:.18em;color:#7fe3f5;text-transform:uppercase"><span>{{ active.id }}</span><span style="color:{{ statusColor }}">{{ status }}</span></div>
+          <h2 style="margin:12px 0 0;font-size:20px;font-weight:500;line-height:1.15;color:#eef5f7;text-wrap:pretty">{{ active.name }}</h2>
+          <p style="margin:8px 0 0;font-size:13px;line-height:1.45;color:#a6b6bd;text-wrap:pretty">{{ active.desc }}</p>
+          <div style="margin-top:16px;height:1px;background:repeating-linear-gradient(90deg, rgba(127,227,245,.5) 0 3px, transparent 3px 7px)"></div>
+          <div style="margin-top:14px;display:grid;grid-template-columns:1fr 1fr;gap:12px 16px">
+            <sc-for list="{{ active.specs }}" as="s" hint-placeholder-count="4">
+              <div style="display:flex;flex-direction:column;gap:3px;min-width:0">
+                <span style="font-family:'Geist Mono',monospace;font-size:9.5px;letter-spacing:.14em;color:#5d6f77;text-transform:uppercase">{{ s.k }}</span>
+                <span style="font-size:15px;color:#dfe8ec;font-weight:500">{{ s.v }}</span>
+              </div>
+            </sc-for>
+          </div>
+          <div style="margin-top:16px;height:1px;background:repeating-linear-gradient(90deg, rgba(127,227,245,.5) 0 3px, transparent 3px 7px)"></div>
+          <div style="margin-top:12px;display:flex;justify-content:space-between;align-items:baseline;font-family:'Geist Mono',monospace;font-size:9.5px;letter-spacing:.16em;color:#5d6f77;text-transform:uppercase"><span>Thermal · {{ loadLabel }}</span><span style="color:{{ active.tColor }};font-size:11px;letter-spacing:.06em">{{ active.thermal }}</span></div>
+          <div style="margin-top:6px;height:3px;background:rgba(127,227,245,.12);position:relative;overflow:hidden"><div style="position:absolute;left:0;top:0;bottom:0;width:{{ active.thermalPct }}%;background:linear-gradient(90deg, rgba(127,227,245,.6), {{ active.thermalEnd }});transition:width .5s ease"></div></div>
+          <div style="margin-top:14px;display:flex;flex-direction:column;gap:5px">
+            <sc-for list="{{ active.parts }}" as="pt" hint-placeholder-count="4">
+              <div style="display:grid;grid-template-columns:34px minmax(0,1fr) auto;gap:0 8px;align-items:baseline;font-family:'Geist Mono',monospace;font-size:10.5px;line-height:1.3">
+                <span style="color:#5d6f77">{{ pt.addr }}</span>
+                <span style="color:#c7d4d9;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ pt.name }}</span>
+                <span style="color:#7fe3f5;white-space:nowrap">{{ pt.v }}</span>
+              </div>
+            </sc-for>
+          </div>
+          <sc-if value="{{ hasAction }}" hint-placeholder-val="{{ false }}">
+            <button onClick="{{ action.go }}" style="margin-top:18px;width:100%;padding:10px 12px;background:rgba(118,185,0,.1);border:1px solid #76b900;color:#d6f5a8;font-family:'Geist Mono',monospace;font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;cursor:pointer;text-align:left" style-hover="background:rgba(118,185,0,.2)">{{ action.label }}</button>
+          </sc-if>
+          <sc-if value="{{ hasSelection }}" hint-placeholder-val="{{ false }}">
+            <button onClick="{{ clearSelection }}" style="margin-top:8px;width:100%;padding:10px 12px;background:transparent;border:1px solid rgba(127,227,245,.35);color:#7fe3f5;font-family:'Geist Mono',monospace;font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;cursor:pointer;text-align:left" style-hover="background:rgba(127,227,245,.1)">← Clear Selection</button>
+          </sc-if>
+        </div>
+      </div>
+      </sc-if>
+      <sc-if value="{{ narrowClosed }}" hint-placeholder-val="{{ false }}">
+      <div style="grid-column:1;grid-row:3;align-self:start;margin-top:16px;pointer-events:auto"><button onClick="{{ openPanel }}" style="padding:9px 12px;background:rgba(10,9,8,.85);border:1px solid rgba(127,227,245,.4);color:#F2EFE8;font-family:'Geist Mono',monospace;font-size:10px;letter-spacing:.16em;text-transform:uppercase;cursor:pointer">Details ▾</button></div>
+      </sc-if>
+
+      <!-- right: index -->
+      <sc-if value="{{ wide }}" hint-placeholder-val="{{ true }}">
+      <div style="grid-column:3;grid-row:3;pointer-events:auto;align-self:center;display:flex;flex-direction:column;gap:2px;min-width:0;background:rgba(7,9,11,.92);backdrop-filter:blur(4px);padding:10px 0;position:relative;z-index:2">
+        <div style="font-family:'Geist Mono',monospace;font-size:9.5px;letter-spacing:.18em;color:#5d6f77;text-transform:uppercase;padding:0 12px 8px">{{ indexTitle }}</div>
+        <sc-for list="{{ index }}" as="l" hint-placeholder-count="8">
+          <div onMouseEnter="{{ l.hover }}" onMouseLeave="{{ unhoverIdx }}" onClick="{{ l.select }}" style="display:grid;grid-template-columns:26px minmax(0,1fr);gap:0 8px;align-items:baseline;padding:6px 12px;border-left:1px solid {{ l.borderColor }};background:{{ l.bg }};cursor:pointer;transition:all .25s ease">
+            <span style="font-family:'Geist Mono',monospace;font-size:10.5px;color:{{ l.numColor }}">{{ l.num }}</span>
+            <span style="font-size:12.5px;font-weight:500;color:{{ l.nameColor }};line-height:1.25">{{ l.name }}</span>
+          </div>
+        </sc-for>
+      </div>
+      </sc-if>
+
+      <!-- bottom -->
+      <div style="grid-column:1/-1;grid-row:4;pointer-events:auto;display:flex;align-items:center;gap:16px 36px;flex-wrap:wrap;padding-top:12px;border-top:1px solid rgba(127,227,245,.14)">
+        <div style="flex:1 1 380px;min-width:0;display:flex;align-items:center;gap:18px">
+          <sc-if value="{{ isSuper }}" hint-placeholder-val="{{ true }}">
+            <span style="font-family:'Geist Mono',monospace;font-size:10px;letter-spacing:.18em;color:#7fe3f5;text-transform:uppercase;white-space:nowrap">Assembled</span>
+            <input type="range" min="0" max="100" value="{{ explode }}" onChange="{{ onSlide }}" onInput="{{ onSlide }}" aria-label="Explode stack" style="flex:1;min-width:0">
+            <span style="font-family:'Geist Mono',monospace;font-size:10px;letter-spacing:.18em;color:#7fe3f5;text-transform:uppercase;white-space:nowrap">Exploded</span>
+          </sc-if>
+          <sc-if value="{{ notSuper }}" hint-placeholder-val="{{ false }}">
+            <span style="font-family:'Geist Mono',monospace;font-size:10px;letter-spacing:.16em;color:#8fa3ab;text-transform:uppercase">{{ levelHint }}</span>
+          </sc-if>
+        </div>
+        <div style="display:flex;align-items:center;gap:6px">
+          <button onClick="{{ zoomIn }}" aria-label="Zoom in" style="width:30px;height:30px;background:transparent;border:1px solid rgba(127,227,245,.3);color:#7fe3f5;font-family:'Geist Mono',monospace;font-size:14px;cursor:pointer">+</button>
+          <button onClick="{{ zoomOut }}" aria-label="Zoom out" style="width:30px;height:30px;background:transparent;border:1px solid rgba(127,227,245,.3);color:#7fe3f5;font-family:'Geist Mono',monospace;font-size:14px;cursor:pointer">−</button>
+          <button onClick="{{ resetView }}" style="height:30px;padding:0 10px;background:transparent;border:1px solid rgba(127,227,245,.3);color:#7fe3f5;font-family:'Geist Mono',monospace;font-size:9.5px;letter-spacing:.16em;text-transform:uppercase;cursor:pointer">Reset</button>
+        </div>
+        <div style="display:flex;gap:20px;flex-wrap:wrap">
+          <sc-for list="{{ sparks }}" as="sp" hint-placeholder-count="3">
+            <div style="display:flex;flex-direction:column;gap:4px;width:140px">
+              <div style="display:flex;justify-content:space-between;align-items:baseline;font-family:'Geist Mono',monospace;font-size:9px;letter-spacing:.14em;color:#5d6f77;text-transform:uppercase"><span>{{ sp.k }}</span><span style="color:{{ sp.color }};font-size:10.5px;letter-spacing:.04em">{{ sp.v }}</span></div>
+              <svg viewBox="0 0 120 26" preserveAspectRatio="none" style="width:140px;height:24px;display:block;border-bottom:1px solid rgba(127,227,245,.2)">
+                <polyline points="{{ sp.area }}" fill="{{ sp.areaFill }}" stroke="none"></polyline>
+                <polyline points="{{ sp.pts }}" fill="none" stroke="{{ sp.color }}" stroke-width="1" vector-effect="non-scaling-stroke"></polyline>
+              </svg>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+    </div>
+    <div style="position:absolute;left:50%;bottom:92px;transform:translateX(-50%);pointer-events:none;font-family:'Geist Mono',monospace;font-size:9.5px;letter-spacing:.16em;color:#5d6f77;text-transform:uppercase;white-space:nowrap">Drag To Orbit · Ctrl/⌘ + Scroll To Zoom · Click To Inspect · Double-Click To Dive</div>
+  </section>
+
+  <!-- SCROLL: five levels -->
+  <section data-screen-label="02 Five Levels" style="max-width:1320px;margin:0 auto;padding:120px 28px 40px;display:flex;flex-direction:column;gap:40px">
+    <div style="display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:24px 60px;align-items:end">
+      <div style="display:flex;flex-direction:column;gap:12px">
+        <span style="font-family:'Geist Mono',monospace;font-size:11px;letter-spacing:.18em;color:#76b900;text-transform:uppercase">// 02 · Scale</span>
+        <h2 style="margin:0;font-size:44px;font-weight:400;line-height:1.05;letter-spacing:-.015em;color:#eef5f7;text-wrap:balance">From a 120 kW rack down to a single streaming multiprocessor</h2>
+      </div>
+      <p style="margin:0;font-size:16px;line-height:1.55;color:#a6b6bd;max-width:520px;text-wrap:pretty">Each level above is a separate 3D model. The same chip appears five times, at five scales, so you can follow one NVLink signal or one HBM stack from the rack all the way into the die.</p>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px">
+      <sc-for list="{{ levelCards }}" as="c" hint-placeholder-count="5">
+        <div style="display:flex;flex-direction:column;border:1px solid rgba(127,227,245,.18);background:rgba(127,227,245,.02)">
+          <div style="position:relative;aspect-ratio:4/3;background:#0b0f12;border-bottom:1px solid rgba(127,227,245,.18)">
+            <sc-if value="{{ c.has }}" hint-placeholder-val="{{ false }}"><img src="{{ c.src }}" alt="{{ c.name }} render" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block"></sc-if>
+            <sc-if value="{{ c.pending }}" hint-placeholder-val="{{ true }}"><div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:'Geist Mono',monospace;font-size:10px;letter-spacing:.18em;color:#5d6f77;text-transform:uppercase;animation:pulse 1.6s ease-in-out infinite">Rendering…</div></sc-if>
+            <div style="position:absolute;left:10px;top:10px;font-family:'Geist Mono',monospace;font-size:9.5px;letter-spacing:.16em;color:#7fe3f5;text-transform:uppercase;text-shadow:0 0 6px #000">{{ c.num }} · {{ c.label }}</div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:8px;padding:16px 16px 18px;flex:1">
+            <span style="font-family:'Geist Mono',monospace;font-size:10px;letter-spacing:.16em;color:#76b900;text-transform:uppercase">{{ c.num }} · {{ c.scale }}</span>
+            <span style="font-size:18px;font-weight:500;color:#eef5f7">{{ c.name }}</span>
+            <span style="font-size:13px;line-height:1.45;color:#8fa3ab;text-wrap:pretty;flex:1">{{ c.line }}</span>
+            <button onClick="{{ c.go }}" style="align-self:flex-start;margin-top:6px;padding:7px 10px;background:transparent;border:1px solid rgba(127,227,245,.4);color:#7fe3f5;font-family:'Geist Mono',monospace;font-size:9.5px;letter-spacing:.16em;text-transform:uppercase;cursor:pointer" style-hover="background:rgba(127,227,245,.1)">View In 3D ↑</button>
+          </div>
+        </div>
+      </sc-for>
+    </div>
+  </section>
+
+  <!-- SCROLL: comparison -->
+  <section data-screen-label="03 Comparison" style="max-width:1320px;margin:0 auto;padding:100px 28px 60px;display:flex;flex-direction:column;gap:40px">
+    <div style="display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:24px 60px;align-items:end">
+      <div style="display:flex;flex-direction:column;gap:12px">
+        <span style="font-family:'Geist Mono',monospace;font-size:11px;letter-spacing:.18em;color:#76b900;text-transform:uppercase">// 03 · Generations</span>
+        <h2 style="margin:0;font-size:44px;font-weight:400;line-height:1.05;letter-spacing:-.015em;color:#eef5f7;text-wrap:balance">H100 vs B200 vs GB200</h2>
+      </div>
+      <div style="display:flex;gap:22px;flex-wrap:wrap;font-family:'Geist Mono',monospace;font-size:10.5px;letter-spacing:.14em;text-transform:uppercase">
+        <sc-for list="{{ cmpLegend }}" as="lg" hint-placeholder-count="3">
+          <div style="display:flex;flex-direction:column;gap:4px"><div style="display:flex;align-items:center;gap:8px;color:#eef5f7"><span style="width:14px;height:3px;background:{{ lg.color }}"></span>{{ lg.name }}</div><span style="color:#5d6f77;font-size:9.5px;letter-spacing:.1em">{{ lg.sub }}</span></div>
+        </sc-for>
+      </div>
+    </div>
+    <div style="display:flex;flex-direction:column;border-top:1px solid rgba(127,227,245,.18)">
+      <sc-for list="{{ cmpRows }}" as="r" hint-placeholder-count="6">
+        <div style="display:grid;grid-template-columns:minmax(160px,220px) minmax(0,1fr);gap:16px 32px;padding:20px 0;border-bottom:1px solid rgba(127,227,245,.12)">
+          <div style="display:flex;flex-direction:column;gap:4px">
+            <span style="font-size:16px;font-weight:500;color:#eef5f7">{{ r.k }}</span>
+            <span style="font-family:'Geist Mono',monospace;font-size:9.5px;letter-spacing:.12em;color:#5d6f77;text-transform:uppercase">{{ r.unit }}</span>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:7px;min-width:0">
+            <sc-for list="{{ r.bars }}" as="b" hint-placeholder-count="3">
+              <div style="display:grid;grid-template-columns:minmax(0,1fr) 120px;gap:14px;align-items:center">
+                <div style="height:12px;background:rgba(127,227,245,.05);position:relative"><div style="position:absolute;left:0;top:0;bottom:0;width:{{ b.pct }}%;background:{{ b.color }};box-shadow:{{ b.glow }}"></div></div>
+                <span style="font-family:'Geist Mono',monospace;font-size:12px;color:{{ b.text }};white-space:nowrap">{{ b.label }}</span>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+      </sc-for>
+    </div>
+    <p style="margin:0;font-family:'Geist Mono',monospace;font-size:10.5px;line-height:1.6;letter-spacing:.04em;color:#5d6f77;max-width:900px">Dense Tensor throughput (sparse figures are 2×). H100 = SXM5. B200 = HGX B200 per GPU. GB200 = one superchip (2 × Blackwell GPU + Grace CPU), whose GPUs run a higher power envelope than HGX B200. Figures from NVIDIA published specifications.</p>
+  </section>
+
+  <footer style="max-width:1320px;margin:0 auto;padding:40px 28px 60px;display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap;border-top:1px solid rgba(127,227,245,.12);font-family:'Geist Mono',monospace;font-size:10px;letter-spacing:.16em;color:#5d6f77;text-transform:uppercase">
+    <span>The Kuroneko Company · GB200 Teardown · Interactive Study</span>
+    <span>Die, SM and tray layouts are schematic · Not to scale</span>
+  </footer>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+const A='#7fe3f5', G='#76b900', C=o=>`rgba(127,227,245,${o})`, O=o=>`rgba(255,138,76,${o})`;
+const P=rows=>rows.map(([addr,name,v])=>({addr,name,v}));
+const S=rows=>rows.map(([k,v])=>({k,v}));
+const I=(id,name,temp,desc,specs,parts,extra={})=>({id,name,temp,desc,specs:S(specs),parts:P(parts),...extra});
+
+const INFO = {
+  rack: {
+    _: I('NVL72','GB200 NVL72 Rack',72,'Thirty-six GB200 superchips in one liquid-cooled rack, joined by NVLink into a single 72-GPU domain that software can address as one very large GPU. Click a compute tray to open it.',
+      [['GPUs','72 × Blackwell'],['CPUs','36 × Grace'],['NVLink Domain','130 TB/s'],['HBM3e','13.4 TB']],
+      [['R.00','Compute Trays','18 × 1U'],['R.01','NVLink Switch Trays','9 × 1U'],['R.02','HBM Bandwidth','576 TB/s'],['R.03','Rack Power','~120 kW']]),
+    compute: I('NVL72-CT','Compute Tray',72,'Each 1U tray carries two GB200 superchips: four Blackwell GPUs and two Grace CPUs on a shared liquid loop. NVLink leaves through the rear into the cable spine.',
+      [['Superchips','2 × GB200'],['GPUs','4 × Blackwell'],['CPUs','2 × Grace'],['Height','1U']],
+      [['C.00','Trays In Rack','18'],['C.01','HBM3e / Tray','Up To 768 GB'],['C.02','Uplink','Rear NVLink Spine'],['C.03','Cooling','Direct Liquid']],{drill:'tray'}),
+    switch: I('NVL72-SW','NVLink Switch Tray',55,'Nine switch trays sit in the middle of the rack. Each holds two NVLink Switch chips, and together they give every GPU full-bandwidth access to every other GPU in the domain.',
+      [['Trays','9 × 1U'],['Switch Chips','18 Total'],['Per GPU','1.8 TB/s'],['Domain','130 TB/s']],
+      [['S.00','NVLink Generation','5th'],['S.01','Topology','All-To-All · 72 GPU'],['S.02','SHARP','In-Network Reduction'],['S.03','Cooling','Direct Liquid']]),
+    spine: I('NVL72-SP','NVLink Cable Spine',40,'At the back of the rack, cartridges of copper cable link every compute tray to every switch tray. Staying on copper inside the rack avoids the power cost of optical transceivers.',
+      [['Cables','5,000+'],['Medium','Copper'],['Total Length','~2 Miles'],['Aggregate','130 TB/s']],
+      [['P.00','Cable Cartridges','Rear Blind-Mate'],['P.01','Link Rate','1.8 TB/s / GPU'],['P.02','Optics In Rack','None'],['P.03','Topology','Trays ↔ Switches']]),
+    cool: I('NVL72-LQ','Liquid Cooling Manifold',45,'Supply and return manifolds run the height of the rack, feeding quick-disconnect hoses to cold plates on every compute and switch tray.',
+      [['Method','Direct-To-Chip'],['Rack Power','~120 kW'],['Coverage','Compute + Switch'],['Connectors','Quick-Disconnect']],
+      [['L.00','Supply Manifold','Cold Side'],['L.01','Return Manifold','Hot Side'],['L.02','Heat Exchange','CDU'],['L.03','Cold Plates','Per Package']]),
+    psu: I('NVL72-PW','Power Shelves',48,'Power shelves at the top and bottom of the rack convert facility AC to a DC busbar at the rear, which every tray taps into when it slides in.',
+      [['Rack Power','~120 kW'],['Distribution','Rear DC Busbar'],['Bus Voltage','48 V DC'],['Location','Top + Bottom']],
+      [['W.00','Input','Facility AC'],['W.01','Output','48 V DC Busbar'],['W.02','Tray Feed','Blind-Mate'],['W.03','Shelves','Top + Bottom']]),
+  },
+  tray: {
+    _: I('CT-1U','Compute Tray · 1U',70,'One of eighteen compute trays. Two GB200 superchips sit side by side on a shared liquid loop, with network I/O at the front and NVLink plus power blind-mating at the rear. Click a superchip to open it.',
+      [['Superchips','2 × GB200'],['GPUs','4'],['CPUs','2 × Grace'],['Height','1U']],
+      [['T.00','HBM3e','Up To 768 GB'],['T.01','LPDDR5X','Up To 960 GB'],['T.02','NVLink Out','4 × 1.8 TB/s'],['T.03','Cooling','Direct Liquid']]),
+    module: I('GB200','GB200 Superchip',70,'One Grace CPU and two Blackwell GPUs on a single board, under a copper cold plate. Click to open it and explode the stack.',
+      [['GPUs','2 × Blackwell'],['CPU','72-Core Grace'],['HBM3e','384 GB'],['Power','Up To 2,700 W']],
+      [['M.00','Link','NVLink-C2C'],['M.01','C2C Bandwidth','900 GB/s'],['M.02','FP4 Dense','~20 PFLOPS'],['M.03','Per Tray','2']],{drill:'superchip'}),
+    front: I('CT-FR','Front I/O',35,'Network adapters and storage bays face the cold aisle, giving each tray its scale-out links to other racks and local NVMe storage.',
+      [['Position','Front Bezel'],['Network','Scale-Out'],['Storage','NVMe Bays'],['Service','Front Access']],
+      [['F.00','Status LEDs','Per Tray'],['F.01','Airflow','Minimal'],['F.02','Fabric','Separate From NVLink'],['F.03','Mgmt','BMC']]),
+    nic: I('CT-NIC','Network Adapters',52,'Add-in network cards carry the scale-out fabric that links this rack to others. NVLink handles traffic inside the rack; these handle everything beyond it.',
+      [['Role','Scale-Out'],['Fabric','InfiniBand / Ethernet'],['Placement','Front'],['Separate From','NVLink']],
+      [['N.00','Cards','Per Tray'],['N.01','Heatsinks','Finned'],['N.02','Traffic','Rack ↔ Rack'],['N.03','Host','Grace CPU']]),
+    rearnvl: I('CT-NVL','Rear NVLink Connectors',41,'NVLink leaves the tray through blind-mate connectors at the rear, which plug into the copper cable spine as the tray slides into the rack.',
+      [['Per GPU','1.8 TB/s'],['Per Tray','7.2 TB/s'],['Medium','Copper'],['Mating','Blind-Mate']],
+      [['V.00','GPUs Served','4'],['V.01','Destination','Switch Trays'],['V.02','Optics','None'],['V.03','Generation','NVLink 5']]),
+    busbar: I('CT-BB','48 V Busbar Clip',44,'A copper clip at the rear grabs the rack\u2019s DC busbar, feeding the tray as soon as it is seated.',
+      [['Voltage','48 V DC'],['Material','Copper'],['Mating','Blind-Mate'],['Feeds','Module VRMs']],
+      [['B.00','Source','Power Shelves'],['B.01','Path','Rear Busbar'],['B.02','Conversion','On-Module VRM'],['B.03','Per Tray','1']]),
+    cool: I('CT-LQ','Tray Liquid Loop',45,'Hoses run from the rear quick-disconnects to the cold plates on both superchips and back to the return manifold.',
+      [['Supply','Rear QD'],['Return','Rear QD'],['Plates','GPU + CPU'],['Method','Direct-To-Chip']],
+      [['Q.00','Flow','Supply → Plate → Return'],['Q.01','Hose','Flexible'],['Q.02','Fittings','Quick-Disconnect'],['Q.03','Air Cooling','Minimal']]),
+  },
+  superchip: {
+    _: I('GB200','GB200 Grace Blackwell Superchip',70,'One Grace CPU and two Blackwell GPUs on a single module, linked by NVLink-C2C. Drag the slider to pull the stack apart; double-click a die to go inside it.',
+      [['GPUs','2 × Blackwell'],['CPU','72-Core Grace'],['HBM3e','384 GB'],['Power','Up To 2,700 W']],
+      [['G.00','FP4 Dense','~20 PFLOPS'],['G.01','NVLink 5','2 × 1.8 TB/s'],['G.02','NVLink-C2C','900 GB/s'],['G.03','LPDDR5X','Up To 480 GB']]),
+    coldplate: I('GB-L01','Liquid Cold Plates',38,'Copper cold plates sit directly on both Blackwell packages and the Grace CPU. Coolant runs through internal channels, so the module can hold its full power envelope in a dense rack.',
+      [['Material','Copper'],['Method','Direct-To-Chip'],['Covers','2 GPU + 1 CPU'],['Rack','~120 kW']],
+      [['0x00','GPU Plate','Shared, 2 Packages'],['0x01','CPU Plate','Grace + LPDDR'],['0x02','Interface','TIM'],['0x03','Fasteners','Spring-Loaded']]),
+    coolant: I('GB-L01b','Coolant Fittings & Hoses',48,'Supply and return hoses connect the cold plates to the tray loop. A short bridge hose links the GPU and CPU plates.',
+      [['Supply','Cold Side'],['Return','Hot Side'],['Bridge','GPU ↔ CPU Plate'],['Fittings','Quick-Disconnect']],
+      [['0x04','Inlet','Cyan Path'],['0x05','Outlet','Orange Path'],['0x06','Hose','Flexible'],['0x07','Loop','Tray Manifold']]),
+    sm: I('GB-L02','SM / Tensor Array',74,'A logical layer lifted out of each die: the grid of GPCs and streaming multiprocessors where the Tensor Cores live. Double-click to go to die level.',
+      [['Tensor Cores','5th Generation'],['New Precisions','FP4 · FP6'],['Engine','Transformer Engine v2'],['FP4 Dense','~10 PFLOPS / GPU']],
+      [['0x10','Grouping','GPC → SM'],['0x11','Micro-Scaling','Per-Block'],['0x12','Decompression','800 GB/s'],['0x13','RAS Engine','Predictive']],{drill:'die'}),
+    die: I('GB-L03','Blackwell GPU Die',72,'Each Blackwell GPU is two reticle-sized dies fused into one by a 10 TB/s NV-HBI link. Double-click to open the die floorplan.',
+      [['Transistors','208 B / GPU'],['Per Die','~104 B'],['Process','TSMC 4NP'],['Die-To-Die','10 TB/s']],
+      [['0x20','Dies / GPU','2'],['0x21','GPUs / Module','2'],['0x22','Coherence','Full'],['0x23','Software View','1 GPU']],{drill:'die'}),
+    hbi: I('GB-L03b','NV-HBI Bridge',70,'The glowing seam between the two dies of each GPU. It carries 10 TB/s so the pair stays coherent and runs as one device.',
+      [['Bandwidth','10 TB/s'],['Coherence','Full'],['Placement','Abutting Edges'],['Result','1 Logical GPU']],
+      [['0x24','Bridge','CoWoS-L LSI'],['0x25','Per Module','2'],['0x26','Latency','Near On-Die'],['0x27','Dies Joined','2']]),
+    grace: I('GB-L03c','Grace CPU',58,'A 72-core Arm CPU shares the module with both GPUs. NVLink-C2C makes its LPDDR5X and the GPUs\u2019 HBM one coherent memory space.',
+      [['Cores','72 × Neoverse V2'],['Memory','Up To 480 GB'],['Type','LPDDR5X'],['Link','NVLink-C2C']],
+      [['0x28','C2C Bandwidth','900 GB/s'],['0x29','Coherence','CPU ↔ GPU'],['0x2A','ISA','Arm v9'],['0x2B','Per Module','1']]),
+    hbm: I('GB-L04','HBM3e Stacks',64,'Eight stacks of HBM3e flank each GPU\u2019s two dies, four per side. Each stack is a tower of DRAM layers sitting millimetres from compute.',
+      [['Per GPU','192 GB'],['Bandwidth','8 TB/s / GPU'],['Stacks','8 / GPU'],['Module','384 GB']],
+      [['0x30','Per Stack','24 GB · 1 TB/s'],['0x31','Interface','1024-bit / Stack'],['0x32','Placement','Interposer'],['0x33','Generation','HBM3e']]),
+    lpddr: I('GB-L04b','LPDDR5X',46,'Low-power DRAM packages ring the Grace CPU, giving it large, efficient memory that the GPUs can also reach over NVLink-C2C.',
+      [['Capacity','Up To 480 GB'],['Type','LPDDR5X'],['Attached To','Grace'],['GPU Access','Via C2C']],
+      [['0x34','Packages','Around Grace'],['0x35','Coherent','Yes'],['0x36','Use','CPU + Overflow'],['0x37','Power','Low']]),
+    interposer: I('GB-L05','CoWoS-L Interposer',66,'Under each GPU, a silicon interposer with local interconnect bridges carries the dense wiring between the dies and the HBM stacks.',
+      [['Technology','TSMC CoWoS-L'],['Bridges','LSI Chiplets'],['Wiring','Sub-Micron'],['Role','Die ↔ HBM Fabric']],
+      [['0x40','Per GPU','1'],['0x41','Links','Die ↔ Die · Die ↔ HBM'],['0x42','Bumps','Micro-Bumps'],['0x43','Layers','RDL']]),
+    substrate: I('GB-L06','Package Substrate',55,'Organic substrates fan each package\u2019s fine bumps out to a board-scale ball grid. Rows of decoupling capacitors line the edges.',
+      [['Type','Organic Laminate'],['Interface','BGA'],['Packages','3'],['Caps','Edge Decoupling']],
+      [['0x50','GPU Substrates','2'],['0x51','CPU Substrate','1'],['0x52','Ball Field','To PCB'],['0x53','Build-Up','Multi-Layer']]),
+    vrm: I('GB-L07','Power Delivery',69,'Rows of voltage regulators along the module edges step the rack\u2019s 48 V bus down to core voltages, feeding hundreds of amps into each die.',
+      [['Input','48 V DC'],['Regulation','Multi-Phase VRM'],['Current','100s Of Amps'],['Telemetry','Per Rail']],
+      [['0x60','Inductors','Edge Rows'],['0x61','Capacitors','Bulk + Decoupling'],['0x62','Core Rails','Sub-1 V'],['0x63','PMIC','Sequencing']]),
+    pcb: I('GB-L08','Module PCB',50,'The board that carries all three packages, routing power, NVLink and C2C between them and off the module.',
+      [['Type','Multi-Layer PCB'],['Carries','3 Packages'],['Signals','NVLink · C2C · PCIe'],['Mounting','4 Points']],
+      [['0x70','Traces','High-Speed'],['0x71','Edge','PCIe Gen 6'],['0x72','Connectors','4 × NVLink'],['0x73','Power In','48 V']]),
+    c2c: I('GB-L08b','NVLink-C2C',45,'Green traces run from the Grace CPU to each Blackwell GPU. NVLink-C2C is a coherent chip-to-chip link, so CPU and GPU share memory.',
+      [['Bandwidth','900 GB/s'],['Coherence','Full'],['Links','Grace ↔ 2 GPUs'],['Medium','Board Traces']],
+      [['0x74','Direction','Bidirectional'],['0x75','Use','CPU ↔ GPU Memory'],['0x76','vs PCIe 5','~7× Faster'],['0x77','Generation','C2C']]),
+    nvlink: I('GB-L08c','NVLink 5 Connectors',41,'Four connectors on the right edge carry fifth-generation NVLink off the module to the rack\u2019s copper spine and switch trays.',
+      [['Per GPU','1.8 TB/s'],['Links / GPU','18'],['Connectors','4'],['Domain','72 GPU']],
+      [['0x78','Per Link','100 GB/s'],['0x79','Destination','Switch Trays'],['0x7A','Medium','Copper'],['0x7B','Aggregate','130 TB/s']]),
+    pcie: I('GB-L08d','PCIe Gen 6 Edge',44,'A host connector on the left edge carries PCIe Gen 6 for networking and storage.',
+      [['Generation','PCIe Gen 6'],['Bandwidth','256 GB/s'],['Lanes','× 2'],['Use','NIC / NVMe']],
+      [['0x7C','Edge','Left'],['0x7D','Host','Grace'],['0x7E','Devices','Tray I/O'],['0x7F','Signals','High-Speed']]),
+  },
+  die: {
+    _: I('B200','B200 · Two-Die GPU',72,'Two reticle-limited dies sit edge to edge, joined by NV-HBI so they behave as one coherent GPU. Each die drives four HBM3e stacks on its outer edge. Double-click a GPC to go inside an SM.',
+      [['Transistors','208 B'],['Dies','2 × ~104 B'],['HBM3e','192 GB · 8 TB/s'],['NVLink 5','1.8 TB/s']],
+      [['D.00','Process','TSMC 4NP'],['D.01','Die-To-Die','10 TB/s NV-HBI'],['D.02','FP4 Dense','~10 PFLOPS'],['D.03','Packaging','CoWoS-L']]),
+    die: null,
+    gpc: I('B200-GPC','GPCs & Streaming Multiprocessors',74,'The bulk of each die is a grid of graphics processing clusters, each holding streaming multiprocessors with fifth-generation Tensor Cores. Block counts shown are illustrative.',
+      [['Tensor Cores','5th Generation'],['Precisions','FP4 → FP64'],['Engine','Transformer Engine v2'],['FP8 Dense','~5 PFLOPS / GPU']],
+      [['G.00','Micro-Scaling','MX Formats'],['G.01','Hierarchy','GPC → TPC → SM'],['G.02','Layout Here','Illustrative'],['G.03','Next Level','Double-Click']],{drill:'sm'}),
+    l2: I('B200-L2','L2 Cache & Crossbar',68,'A shared L2 cache and crossbar sit between the SM array and memory. Because NV-HBI keeps both dies coherent, either die can reach the other\u2019s cache and memory.',
+      [['Coherence','Across Both Dies'],['Fabric','On-Die Crossbar'],['Serves','All SMs'],['Backed By','HBM3e']],
+      [['X.00','Slices','Per Die'],['X.01','Remote Access','Via NV-HBI'],['X.02','Atomics','In-Cache'],['X.03','Placement Here','Illustrative']]),
+    hbm: I('B200-HBM','HBM3e Stacks',62,'Eight HBM3e stacks sit on the interposer beside the dies, four per die. Each stack is a tower of DRAM layers on a base logic die.',
+      [['Per Stack','24 GB'],['Per Stack BW','1 TB/s'],['Stacks','8'],['Total','192 GB · 8 TB/s']],
+      [['H.00','Generation','HBM3e'],['H.01','Interface','1024-bit / Stack'],['H.02','Placement','Outer Die Edges'],['H.03','Link','Interposer']]),
+    phy: I('B200-PHY','HBM Memory PHYs',64,'Memory PHYs line the outer edge of each die, one per HBM stack, turning on-die traffic into the wide, short interposer links to memory.',
+      [['Per Die','4'],['Width','1024-bit Each'],['Per GPU','8 TB/s'],['Edge','Outer']],
+      [['M.00','Controller','Per Stack'],['M.01','ECC','On-Die'],['M.02','Wiring','CoWoS-L RDL'],['M.03','Distance','Millimetres']]),
+    hbi: I('B200-HBI','NV-HBI Die-To-Die Link',70,'The NVIDIA High-Bandwidth Interface runs along the touching edges of the two dies at 10 TB/s, so caches and memory stay coherent and software sees one GPU.',
+      [['Bandwidth','10 TB/s'],['Coherence','Full'],['Placement','Abutting Edges'],['Result','1 Logical GPU']],
+      [['N.00','Bridge','CoWoS-L LSI'],['N.01','Software View','Single CUDA Device'],['N.02','Latency','Near On-Die'],['N.03','Dies Joined','2']]),
+    io: I('B200-IO','I/O · NVLink 5 · PCIe 6 · C2C',58,'The short edges of the dies carry off-package I/O: eighteen NVLink 5 links to the rack fabric, PCIe Gen 6, and NVLink-C2C to the Grace CPU.',
+      [['NVLink 5','18 Links'],['NVLink BW','1.8 TB/s'],['PCIe','Gen 6'],['C2C To Grace','900 GB/s']],
+      [['I.00','Per NVLink','100 GB/s'],['I.01','Fabric','NVL72 Switches'],['I.02','Host','Grace CPU'],['I.03','Placement Here','Illustrative']]),
+    eng: I('B200-ENG','Decompression · RAS · Security',62,'Dedicated engines offload data decompression, monitor chip health to predict faults, and support confidential computing with encrypted I/O.',
+      [['Decompression','800 GB/s'],['Formats','LZ4 · Snappy · Deflate'],['RAS Engine','Predictive'],['Security','TEE-I/O']],
+      [['E.00','Decomp Use','Databases · Spark'],['E.01','RAS Telemetry','Fleet-Level'],['E.02','Confidential','Near-Native Perf'],['E.03','Placement Here','Illustrative']]),
+    interposer: I('B200-INT','Interposer & Substrate',64,'The CoWoS-L interposer carries the two dies and eight HBM stacks; the organic substrate below fans everything out to the module.',
+      [['Interposer','CoWoS-L'],['Bridges','LSI'],['Substrate','Organic'],['Carries','2 Dies + 8 HBM']],
+      [['P.00','Wiring','Sub-Micron RDL'],['P.01','Bumps','Micro → C4 → BGA'],['P.02','Iridescence','Silicon Surface'],['P.03','Per GPU','1']]),
+  },
+  sm: {
+    _: I('SM','Streaming Multiprocessor',72,'The SM is the repeating compute unit of the GPU. It splits into four partitions, each with its own warp scheduler, register file, CUDA cores and a fifth-generation Tensor Core. Layout is illustrative.',
+      [['Partitions','4'],['Tensor Cores','4 × 5th Gen'],['New In Blackwell','Tensor Memory'],['Precisions','FP4 → FP64']],
+      [['S.00','Warp Size','32 Threads'],['S.01','Shared Memory','On-SM'],['S.02','Async Copy','TMA'],['S.03','Instructions','tcgen05 (MMA)']]),
+    icache: I('SM-IC','Instruction Cache',60,'Holds decoded instructions for all four partitions so schedulers can issue every cycle without stalling on fetch.',
+      [['Shared By','4 Partitions'],['Feeds','Warp Schedulers'],['Role','Fetch'],['Level','L0 / L1']],
+      [['I.00','Hit Path','Per Cycle'],['I.01','Backed By','L2'],['I.02','Granularity','Warp'],['I.03','Placement Here','Illustrative']]),
+    sched: I('SM-WS','Warp Scheduler & Dispatch',66,'Each partition picks a ready warp every clock and issues its next instruction, interleaving warps to hide memory latency.',
+      [['Per SM','4'],['Warp','32 Threads'],['Issue','Every Clock'],['Model','SIMT']],
+      [['W.00','Latency Hiding','Warp Switching'],['W.01','Switch Cost','Zero'],['W.02','Dispatch','Per Partition'],['W.03','Targets','CUDA · Tensor · LD/ST']]),
+    rf: I('SM-RF','Register File',68,'Holds per-thread registers for every resident warp, which is why switching between warps costs nothing.',
+      [['Location','Per Partition'],['Width','32-bit Registers'],['Holds','Thread State'],['Switching','Zero-Cost']],
+      [['R.00','Ports','Multi-Bank'],['R.01','Feeds','CUDA Cores'],['R.02','Freed By','TMEM'],['R.03','Placement Here','Illustrative']]),
+    cuda: I('SM-CC','CUDA Cores · FP32 / INT32',72,'General-purpose arithmetic lanes. Each partition runs one warp instruction across its lanes at a time.',
+      [['Per Partition','32 Lanes'],['Types','FP32 · INT32'],['Per SM','128 FP32'],['Use','Non-Tensor Math']],
+      [['C.00','Pipeline','Fused Multiply-Add'],['C.01','Issue','Per Warp'],['C.02','Count Basis','Hopper-Class SM'],['C.03','Placement Here','Illustrative']]),
+    tensor: I('SM-TC','5th-Gen Tensor Core',78,'Matrix-multiply engines that do almost all of the AI work. Blackwell adds FP4 and FP6 with micro-tensor scaling, and reads operands and accumulators from Tensor Memory.',
+      [['Per SM','4'],['New','FP4 · FP6'],['Scaling','Micro-Tensor (MX)'],['Instructions','tcgen05']],
+      [['T.00','Engine','Transformer Engine v2'],['T.01','Accumulators','In TMEM'],['T.02','Operands','SMEM · TMEM'],['T.03','FP4 Dense / GPU','~10 PFLOPS']]),
+    tmem: I('SM-TM','Tensor Memory (TMEM)',70,'New in datacenter Blackwell: a dedicated on-SM memory for Tensor Core accumulators, so large matrix tiles no longer have to live in the register file.',
+      [['Size','256 KB / SM'],['Holds','MMA Accumulators'],['Accessed By','tcgen05'],['New In','Blackwell']],
+      [['M.00','Frees','Registers'],['M.01','Tile Sizes','Larger'],['M.02','Copy From','SMEM'],['M.03','Placement Here','Illustrative']]),
+    ldst: I('SM-LS','Load/Store & SFU',62,'Load/store units move data between registers and memory; special function units handle transcendentals like sin, exp and reciprocal.',
+      [['LD/ST','Per Partition'],['SFU','Per Partition'],['SFU Ops','sin · exp · rcp'],['Targets','L1 · SMEM']],
+      [['L.00','Coalescing','Per Warp'],['L.01','Atomics','Supported'],['L.02','Path','To L1'],['L.03','Placement Here','Illustrative']]),
+    l1: I('SM-L1','L1 Cache / Shared Memory',64,'A fast on-SM memory shared by all four partitions, split between hardware-managed L1 cache and programmer-managed shared memory.',
+      [['Shared By','4 Partitions'],['Split','Configurable'],['Clusters','Distributed SMEM'],['Feeds','RF · Tensor Cores']],
+      [['L.04','Latency','Lowest Off-RF'],['L.05','Async Fill','TMA'],['L.06','Backed By','L2'],['L.07','Placement Here','Illustrative']]),
+    tma: I('SM-TMA','Tensor Memory Accelerator',60,'Moves multi-dimensional tiles between global and shared memory asynchronously, so warps keep computing while data streams in.',
+      [['Introduced','Hopper'],['Role','Async Bulk Copy'],['Multicast','Across Cluster'],['Frees','Threads']],
+      [['A.00','Descriptors','Tensor Maps'],['A.01','Direction','Global ↔ SMEM'],['A.02','Sync','Barriers'],['A.03','Placement Here','Illustrative']]),
+  },
+};
+INFO.die.die = INFO.die._;
+const ORDER = {
+  rack:['compute','switch','spine','cool','psu'],
+  tray:['module','front','nic','rearnvl','busbar','cool'],
+  superchip:['coldplate','sm','die','grace','hbm','interposer','substrate','vrm','nvlink'],
+  die:['gpc','l2','hbm','phy','hbi','io','eng','interposer'],
+  sm:['tensor','tmem','cuda','rf','sched','ldst','l1','tma','icache'],
+};
+const LEVELS=[
+  {id:'rack',num:'01',label:'NVL72 Rack',scale:'Rack',name:'GB200 NVL72',line:'72 GPUs, 36 CPUs and 9 switch trays on one copper NVLink spine.',ph:'Render: NVL72 rack'},
+  {id:'tray',num:'02',label:'Compute Tray',scale:'1U Tray',name:'Compute Tray',line:'Two superchips, four GPUs, one shared liquid loop.',ph:'Render: compute tray'},
+  {id:'superchip',num:'03',label:'Superchip',scale:'Module',name:'GB200 Superchip',line:'Grace CPU plus two Blackwell GPUs, exploded into eight layers.',ph:'Render: GB200 module'},
+  {id:'die',num:'04',label:'B200 Die',scale:'Package',name:'B200 Floorplan',line:'Two 104 B-transistor dies and eight HBM3e stacks on CoWoS-L.',ph:'Render: B200 die'},
+  {id:'sm',num:'05',label:'SM',scale:'Core',name:'Streaming Multiprocessor',line:'Four partitions, four Tensor Cores and the new Tensor Memory.',ph:'Render: SM macro'},
+];
+const LOADS=[{id:'idle',label:'Idle',w:.1},{id:'infer',label:'Inference',w:.6},{id:'train',label:'Training',w:1}];
+const CMP=[
+  {k:'GPU Memory',unit:'GB · HBM',v:[80,180,384],f:['80 GB HBM3','180 GB HBM3e','384 GB HBM3e']},
+  {k:'Memory Bandwidth',unit:'TB/s',v:[3.35,8,16],f:['3.35 TB/s','8 TB/s','16 TB/s']},
+  {k:'FP8 Tensor · Dense',unit:'PFLOPS',v:[1.98,4.5,10],f:['~2 PF','~4.5 PF','~10 PF']},
+  {k:'FP4 Tensor · Dense',unit:'PFLOPS',v:[0,9,20],f:['Not Supported','~9 PF','~20 PF']},
+  {k:'NVLink Bandwidth',unit:'TB/s',v:[0.9,1.8,3.6],f:['0.9 TB/s','1.8 TB/s','3.6 TB/s']},
+  {k:'Transistors (GPU)',unit:'Billions',v:[80,208,416],f:['80 B','208 B','416 B']},
+  {k:'Max Power',unit:'Watts',v:[700,1000,2700],f:['700 W','1,000 W','2,700 W']},
+];
+const CMPC=[{name:'H100',sub:'Hopper · SXM5',color:'#5d6f77',text:'#a6b6bd'},{name:'B200',sub:'Blackwell · HGX',color:'#7fe3f5',text:'#bff3fb'},{name:'GB200',sub:'Superchip · 2 GPU + CPU',color:'#76b900',text:'#c8ef8a'}];
+const KEY='gb200-3d';
+
+class Component extends DCLogic {
+  state = { renders:{}, rootW:1400, level:'superchip', explode:55, load:'infer', heat:false, flow:true, selected:null, sHover:null, iHover:null, ready:false, err:null, tick:0, hist:{p:[],t:[],b:[]} };
+  sceneRef = React.createRef(); rootRef = React.createRef();
+  componentDidMount(){
+    try{ const s=JSON.parse(localStorage.getItem(KEY)||'{}'); const k={}; ['level','explode','load','heat','flow'].forEach(n=>{ if(s[n]!==undefined) k[n]=s[n]; }); this.setState(k); }catch(e){}
+    this.tm=setInterval(()=>this.setState(s=>{ const m=this.metrics(s.load,s.tick+1), push=(a,v)=>[...a.slice(-47),v]; return {tick:s.tick+1,hist:{p:push(s.hist.p,m.power),t:push(s.hist.t,m.temp),b:push(s.hist.b,m.bw)}}; }),1000);
+    if(window.ResizeObserver&&this.rootRef.current){ this.ro=new ResizeObserver(([e])=>{ const w=Math.round(e.contentRect.width); if(Math.abs(w-this.state.rootW)>8) this.setState({rootW:w}); }); this.ro.observe(this.rootRef.current); }
+    const url=new URL('./gb200-scene.js', document.baseURI).href;
+    import(url).then(mod=>{
+      if(!this.sceneRef.current) return;
+      this.api=mod.mount(this.sceneRef.current,{
+        onHover:p=>this.setState({sHover:p}),
+        onSelect:p=>this.setState({selected:p}),
+        onDrill:(lvl)=>this.go(lvl),
+      });
+      this.push(); this.setState({ready:true}); window.__knReadyFired=true; window.dispatchEvent(new Event('kn-ready'));
+      setTimeout(()=>{ const renders={}; LEVELS.forEach(l=>{ try{ renders[l.id]=this.api.snapshot(l.id); }catch(e){ console.error(e); } }); this.setState({renders}); },900);
+    }).catch(e=>{ console.error(e); this.setState({err:String(e&&e.message||e)}); });
+  }
+  componentDidUpdate(){ this.push(); }
+  componentWillUnmount(){ clearInterval(this.tm); this.ro&&this.ro.disconnect(); this.api&&this.api.dispose(); }
+  push(){ if(!this.api) return; const s=this.state; this.api.set({shiftX: s.rootW>=1100 ? 0.04 : 0.14, level:s.level, explode:s.explode/100, heat:s.heat, flow:s.flow, load:this.lw(s.load), selected:s.selected, hover:s.iHover}); }
+  persist(){ const s=this.state; localStorage.setItem(KEY, JSON.stringify({level:s.level,explode:s.explode,load:s.load,heat:s.heat,flow:s.flow})); }
+  set(o){ this.setState(o,()=>this.persist()); }
+  go(level){ this.set({level, selected:null, sHover:null, iHover:null}); }
+  lw(id){ return (LOADS.find(l=>l.id===id)||LOADS[1]).w; }
+  sT(t,load,tick,i){ const w=this.lw(load); return 30+(t-30)*(.62+.38*w)+Math.sin(tick*.9+i)*.8; }
+  metrics(load,tick){ const w=this.lw(load); return { power:2700*(.16+.8*w)+Math.sin(tick*1.1)*45*(.3+w), temp:this.sT(72,load,tick,0), bw:16*(.05+.82*w)+Math.sin(tick*1.3)*.5*(.3+w) }; }
+  spark(arr,lo,hi){ if(arr.length<2) arr=[lo,lo]; const n=arr.length; const pts=arr.map((v,i)=>`${(i/(n-1)*120).toFixed(1)},${(25-Math.max(0,Math.min(1,(v-lo)/(hi-lo)))*23).toFixed(1)}`).join(' '); return {pts, area:`0,26 ${pts} 120,26`}; }
+  renderVals(){
+    const s=this.state, { level, load, tick } = s, m=this.metrics(load,tick), hot=m.temp>=70;
+    const tbl=INFO[level], key=s.selected||s.sHover||s.iHover, info=(key&&tbl[key])||tbl._;
+    const t=this.sT(info.temp,load,tick,3);
+    const active={...info, thermal:`${t.toFixed(1)} °C`, thermalPct:Math.round(Math.max(0,Math.min(100,(t-30)/60*100))), thermalEnd:t>=70?'rgba(255,138,76,.9)':'rgba(118,185,0,.95)', tColor:t>=70?'#ffb287':'#bff3fb'};
+    const drill=info.drill; const lvlIdx=LEVELS.findIndex(l=>l.id===level);
+    let action=null;
+    if (drill) action={label:`Open ${LEVELS.find(l=>l.id===drill).label} →`, go:()=>this.go(drill)};
+    else if (!key && lvlIdx>0) action={label:`← Back To ${LEVELS[lvlIdx-1].label}`, go:()=>this.go(LEVELS[lvlIdx-1].id)};
+    const index=ORDER[level].map((k,i)=>{ const on=key===k, sel=s.selected===k; return { num:String(i+1).padStart(2,'0'), name:tbl[k].name,
+      hover:()=>this.setState({iHover:k}), select:()=>this.setState({selected:sel?null:k}),
+      borderColor:on?G:'rgba(127,227,245,.18)', bg:on?'rgba(118,185,0,.08)':'transparent', numColor:on?G:'#5d6f77', nameColor:on?'#ffffff':(s.selected&&!sel?'#6f8189':'#c7d4d9') }; });
+    const sp=(k,v,arr,lo,hi,col)=>({k,v,color:col,areaFill:col==='#ffb287'?'rgba(255,178,135,.12)':'rgba(118,185,0,.12)',...this.spark(arr,lo,hi)});
+    const scrollTop=()=>window.scrollTo({top:0,behavior:'smooth'});
+    const wide=s.rootW>=1100;
+    return {
+      narrow:s.rootW<720, showPanel:s.rootW>=720||!!s.panelOpen||!!s.selected, narrowClosed:s.rootW<720&&!s.panelOpen&&!s.selected, openPanel:()=>this.setState({panelOpen:true}), closePanel:()=>this.setState({panelOpen:false,selected:null}),
+      wide, hudCols:s.rootW<720?'minmax(0,1fr) 0px 0px': wide ? 'minmax(250px,300px) minmax(0,1fr) minmax(200px,250px)' : 'minmax(230px,270px) minmax(0,1fr) 0px',
+      rootRef:this.rootRef, sceneRef:this.sceneRef,
+      loading:!s.ready, loadMsg:s.err?('Render Error · '+s.err):'Initializing Render Engine…',
+      tel:{ power:Math.round(m.power).toLocaleString(), temp:m.temp.toFixed(1), tempColor:hot?'#ffb287':'#eef5f7', bw:m.bw.toFixed(2) },
+      loadLabel:(LOADS.find(l=>l.id===load)||LOADS[1]).label,
+      views:LEVELS.map((v,i)=>{ const on=v.id===level; return {...v, go:()=>this.go(v.id), bg:on?'rgba(118,185,0,.14)':'rgba(7,9,11,.4)', border:on?G:'rgba(127,227,245,.22)', color:on?'#ffffff':'#8fa3ab', numColor:on?G:'#5d6f77', sepOp:i<LEVELS.length-1?1:0}; }),
+      loads:LOADS.map(l=>{ const on=l.id===load; return {...l, go:()=>this.set({load:l.id}), bg:on?(l.id==='train'?O(.14):'rgba(118,185,0,.12)'):'rgba(7,9,11,.4)', border:on?(l.id==='train'?O(.9):G):'rgba(127,227,245,.22)', color:on?'#ffffff':'#8fa3ab'}; }),
+      toggles:[['heat','Heatmap',s.heat,'#ffb287'],['flow','Data Flow',s.flow,G]].map(([k,label,on,c])=>({label, go:()=>this.set({[k]:!on}), bg:on?'rgba(127,227,245,.08)':'rgba(7,9,11,.4)', border:on?C(.7):'rgba(127,227,245,.22)', color:on?'#ffffff':'#8fa3ab', dot:on?c:'#33424a', dotGlow:on?'0 0 8px '+c:'none'})),
+      active, status:s.selected?'Locked':(key?'Inspect':'Overview'), statusColor:s.selected?G:'#5d6f77',
+      panelBorder:key?'rgba(118,185,0,.6)':'rgba(127,227,245,.25)',
+      hasAction:!!action, action:action||{label:'',go:()=>{}},
+      hasSelection:!!s.selected, clearSelection:()=>this.setState({selected:null}),
+      index, indexTitle:LEVELS[lvlIdx].label+' · Components', unhoverIdx:()=>this.setState({iHover:null}),
+      isSuper:level==='superchip', notSuper:level!=='superchip', explode:s.explode,
+      onSlide:e=>this.set({explode:+e.target.value}),
+      levelHint:{rack:'Zoom 01 · Click a compute tray to open it',tray:'Zoom 02 · Click a superchip to open it',die:'Zoom 04 · Double-click a GPC to enter an SM',sm:'Zoom 05 · Four partitions · Data flows L1 → registers → Tensor Cores'}[level]||'',
+      zoomIn:()=>this.api&&this.api.zoom(.8), zoomOut:()=>this.api&&this.api.zoom(1.25), resetView:()=>this.api&&this.api.reset(),
+      sparks:[ sp('Power',Math.round(m.power).toLocaleString()+' W',s.hist.p,0,2800,G), sp('Die Temp',m.temp.toFixed(1)+' °C',s.hist.t,30,90,hot?'#ffb287':G), sp('HBM',m.bw.toFixed(1)+' TB/s',s.hist.b,0,16,G) ],
+      levelCards:LEVELS.map(l=>({...l, src:s.renders[l.id]||'', has:!!s.renders[l.id], pending:!s.renders[l.id], go:()=>{ this.go(l.id); scrollTop(); }})),
+      cmpLegend:CMPC,
+      cmpRows:CMP.map(r=>{ const mx=Math.max(...r.v); return {...r, bars:r.v.map((v,i)=>({pct:v?Math.max(1.5,v/mx*100):0, color:CMPC[i].color, glow:i===2?'0 0 14px rgba(118,185,0,.45)':'none', label:r.f[i], text:CMPC[i].text}))}; }),
+    };
+  }
+}
+</script>
+</body>
+</html>

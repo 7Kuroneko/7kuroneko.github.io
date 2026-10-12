@@ -1,0 +1,30 @@
+/* Kuroneko brand tokens */
+:root{
+  /* Ground */
+  --kn-void:#000000;      /* the cat */
+  --kn-night:#0E0D0C;     /* page background */
+  --kn-panel:#0A0908;     /* inset panels, index box */
+  --kn-rule:#24221F;      /* hairlines */
+  --kn-rule-strong:#3A3733;
+  /* Ink */
+  --kn-bone:#F2EFE8;      /* primary text */
+  --kn-ash:#A8A39A;       /* secondary text */
+  --kn-smoke:#8E8980;     /* labels, meta */
+  /* Moonlight (signal red) */
+  --kn-moonlight:#E8ECCC;
+  --kn-moonlight-light:#D6DCAE;
+  --kn-moonlight-deep:#B8301B;
+  --kn-moonlight-core:#FFFFF6;  /* light-bar core */
+  /* Type */
+  --kn-font-sans:'Geist',system-ui,sans-serif;
+  --kn-font-mono:'Geist Mono',ui-monospace,monospace;
+  /* Light bar */
+  --kn-glow:0 0 2px #E8ECCC,0 0 6px #E8ECCC,0 0 16px #E8ECCC,0 0 32px rgba(232,236,204,.55);
+  --kn-glow-text:0 0 6px rgba(232,236,204,.9),0 0 18px rgba(232,236,204,.6);
+  --kn-ease:cubic-bezier(.2,.8,.2,1);
+}
+/* Light bar: a 2-3px bar that ignites on hover */
+.kn-lightbar{height:2px;background:var(--kn-moonlight-core);box-shadow:var(--kn-glow);border-radius:2px;transform:scaleX(0);transform-origin:left;transition:transform .4s var(--kn-ease)}
+:hover>.kn-lightbar{transform:scaleX(1)}
+.kn-label{font-family:var(--kn-font-mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--kn-smoke)}
+.kn-glow-text{color:var(--kn-moonlight);text-shadow:var(--kn-glow-text)}

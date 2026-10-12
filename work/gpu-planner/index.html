@@ -1,0 +1,744 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<script src="./kn-loader.js" data-bg="#0F1F66" data-accent="#C9D3FF" data-ink="#FFFFFF" data-mute="#D6DCF5" data-title="GPU Deployment Planner" data-kind="Interactive Tool · Independent Concept" data-variant="planner" data-steps="Loading workloads|Sizing servers|Drawing deployment"></script>
+<title>GPU Deployment Planner · Independent Concept</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@300..700&amp;family=Geist+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#EDEEE8;color:#0D1433;font-family:'Geist',system-ui,sans-serif;-webkit-font-smoothing:antialiased;font-variant-numeric:tabular-nums}
+*{box-sizing:border-box}
+a{color:#1F3FBF}a:hover{color:#0D1433}
+button{font-family:inherit;color:inherit;-webkit-tap-highlight-color:transparent}
+:focus{outline:none}
+:focus-visible{outline:2px solid #1F3FBF;outline-offset:3px}
+::selection{background:#1F3FBF;color:#FFFFFF}
+input[type=range]{accent-color:#1F3FBF;width:100%;height:28px;cursor:pointer;margin:0}
+@keyframes spin{from{transform:translate(-50%,-50%) rotate(0deg)}to{transform:translate(-50%,-50%) rotate(360deg)}}
+@keyframes blinkDot{0%,100%{opacity:1}50%{opacity:.3}}
+@keyframes sweep{from{transform:translateX(-120%)}to{transform:translateX(420%)}}
+@keyframes headPulse{0%,100%{opacity:1}50%{opacity:.55}}
+@keyframes beamX{from{left:-35%}to{left:100%}}
+@keyframes beamY{from{top:-35%}to{top:100%}}
+@keyframes beamYu{from{top:100%}to{top:-35%}}
+@keyframes rule{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+@keyframes loaderIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+@keyframes pip{0%,100%{opacity:1}50%{opacity:.35}}
+@keyframes tileIn{from{opacity:0;transform:translate(-14px,-14px)}to{opacity:1;transform:none}}
+@keyframes noteIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+@keyframes heroDrift{0%{transform:scale(1) translate(0,0)}100%{transform:scale(1.08) translate(-2.5%,1.5%)}}@keyframes glowSpin{to{transform:rotate(360deg)}}@keyframes rise{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+@media (pointer:coarse){input,select,textarea{font-size:16px}}
+html,body{overflow-x:hidden;-webkit-text-size-adjust:100%;text-size-adjust:100%}
+@media (prefers-reduced-motion: reduce){*{animation:none!important;transition:none!important}}
+</style>
+</helmet>
+<sc-if value="{{ showLoader }}" hint-placeholder-val="{{ true }}">
+<div role="status" aria-live="polite" aria-label="Loading planner" style="position:fixed;inset:0;z-index:1000;background:#EDEEE8;display:flex;align-items:center;justify-content:center;padding:24px;opacity:{{ loaderOpacity }};transition:opacity .5s ease;pointer-events:{{ loaderPE }};">
+  <div style="display:flex;flex-direction:column;gap:18px;width:min(360px,100%);animation:loaderIn .5s ease both;">
+    <span style="font-family:'Geist Mono',ui-monospace,monospace;font-size:11px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;color:#1F3FBF;">Independent Concept</span>
+    <span style="font-family:'Geist',system-ui,sans-serif;font-size:40px;font-weight:600;line-height:.92;letter-spacing:-.035em;">GPU Deployment<br><span style="color:#1F3FBF;">Planner</span></span>
+    <div style="display:flex;flex-direction:column;gap:6px;">
+      <div style="height:2px;background:#1F3FBF;transform-origin:left;animation:rule 1.2s cubic-bezier(.6,0,.2,1) both;"></div>
+      <div style="display:grid;grid-template-columns:repeat(10,1fr);height:6px;"><span style="border-left:1px solid #9AA3C7;"></span><span style="border-left:1px solid #9AA3C7;"></span><span style="border-left:1px solid #9AA3C7;"></span><span style="border-left:1px solid #9AA3C7;"></span><span style="border-left:1px solid #9AA3C7;"></span><span style="border-left:1px solid #9AA3C7;"></span><span style="border-left:1px solid #9AA3C7;"></span><span style="border-left:1px solid #9AA3C7;"></span><span style="border-left:1px solid #9AA3C7;"></span><span style="border-left:1px solid #9AA3C7;border-right:1px solid #9AA3C7;"></span></div>
+    </div>
+    <span style="font-family:'Geist Mono',ui-monospace,monospace;font-size:12px;color:#5A6182;">Loading Sample Regions And Rates</span>
+  </div>
+</div>
+</sc-if>
+<template id="__bundler_thumbnail"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect width="100" height="100" fill="#1F3FBF"></rect><text x="50" y="60" text-anchor="middle" font-family="Arial" font-size="28" font-weight="700" fill="#FFFFFF">GPU</text></svg></template>
+
+<div style="min-height:100vh;background:#EDEEE8;padding-bottom:{{ padB }};">
+
+<div style="position:relative;overflow:hidden;background:#0F1F66;color:#FFFFFF;isolation:isolate;">
+  <svg aria-hidden="true" viewBox="0 0 1400 720" preserveAspectRatio="xMidYMid slice" style="position:absolute;inset:0;width:100%;height:100%;z-index:-2;display:block;pointer-events:none;">
+    <rect width="1400" height="720" fill="#0F1F66"></rect>
+    <sc-for list="{{ hb.traces }}" as="t" hint-placeholder-count="0"><path d="{{ t.d }}" fill="none" stroke="{{ t.c }}" strokeWidth="{{ t.w }}" opacity="{{ t.o }}" strokeLinejoin="round"></path></sc-for>
+    <sc-for list="{{ hb.pads }}" as="p" hint-placeholder-count="0"><circle cx="{{ p.x }}" cy="{{ p.y }}" r="{{ p.r }}" fill="{{ p.f }}" stroke="{{ p.c }}" strokeWidth="1" opacity="{{ p.o }}"></circle></sc-for>
+    <sc-for list="{{ hb.lines }}" as="l" hint-placeholder-count="0"><line x1="{{ l.x1 }}" y1="{{ l.y1 }}" x2="{{ l.x2 }}" y2="{{ l.y2 }}" stroke="{{ l.c }}" strokeWidth="{{ l.w }}" opacity="{{ l.o }}"></line></sc-for>
+    <sc-for list="{{ hb.rects }}" as="r" hint-placeholder-count="0"><rect x="{{ r.x }}" y="{{ r.y }}" width="{{ r.w }}" height="{{ r.h }}" fill="{{ r.f }}" stroke="{{ r.c }}" strokeWidth="1" opacity="{{ r.o }}" style="transition:fill .25s,stroke .25s,opacity .25s;"></rect></sc-for>
+    <sc-for list="{{ hb.leds }}" as="l" hint-placeholder-count="0"><circle cx="{{ l.x }}" cy="{{ l.y }}" r="2.2" fill="{{ l.f }}" opacity="{{ l.o }}" style="transition:fill .25s,opacity .25s;"></circle></sc-for>
+    <sc-for list="{{ hb.texts }}" as="t" hint-placeholder-count="0"><text x="{{ t.x }}" y="{{ t.y }}" fill="#C9D3FF" opacity="{{ t.o }}" fontFamily="Geist Mono, ui-monospace, monospace" fontSize="{{ t.fs }}" textAnchor="{{ t.an }}" letterSpacing="1">{{ t.t }}</text></sc-for>
+  </svg>
+  <div aria-hidden="true" style="position:absolute;inset:0;z-index:-1;background:linear-gradient(90deg,rgba(15,31,102,.72) 0%,rgba(15,31,102,.35) 60%,rgba(15,31,102,.2) 100%),linear-gradient(180deg,rgba(15,31,102,.45) 0%,rgba(31,63,191,.3) 45%,rgba(15,31,102,.85) 100%);pointer-events:none;"></div>
+  <div aria-hidden="true" style="position:absolute;inset:0;z-index:-1;background-image:linear-gradient(rgba(255,255,255,.06) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.06) 1px,transparent 1px);background-size:48px 48px;pointer-events:none;"></div>
+<header style="max-width:1400px;margin:0 auto;padding:16px clamp(16px,4vw,40px);display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;border-bottom:1px solid rgba(255,255,255,.22);">
+  <a href="../../" style="display:flex;align-items:center;gap:10px;text-decoration:none;color:#FFFFFF;"><img src="./logo/cat-moonlight.svg" alt="" style="width:24px;height:24px;display:block;"><span style="font-family:'Geist',system-ui,sans-serif;font-size:14px;font-weight:600;letter-spacing:-.01em;">The Kuroneko Company</span><span style="font-size:14px;font-weight:500;color:#D6DCF5;">Portfolio</span></a>
+  <div role="note" style="display:flex;align-items:center;gap:8px;padding:6px 12px;border-radius:999px;background:rgba(255,247,238,.94);color:#9A3412;font-family:'Geist Mono',ui-monospace,monospace;font-size:11px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;font-size:11px;">
+    <span style="width:6px;height:6px;border-radius:50%;background:#C2410C;animation:blinkDot 1.4s steps(2) infinite;"></span>Independent Concept · Illustrative Sample Data
+  </div>
+</header>
+<section style="max-width:1400px;margin:0 auto;padding:clamp(36px,6vw,88px) clamp(16px,4vw,40px) clamp(20px,3vw,32px);display:flex;flex-direction:column;gap:clamp(28px,4vw,48px);">
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,420px),1fr));gap:clamp(24px,4vw,56px);align-items:end;">
+    <div style="display:flex;flex-direction:column;gap:20px;min-width:0;animation:rise .6s cubic-bezier(.2,.8,.2,1) both;">
+      <span style="font-family:'Geist Mono',ui-monospace,monospace;font-size:11px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;color:#D6DCF5;">Independent Concept</span>
+      <h1 style="margin:0;font-family:'Geist',system-ui,sans-serif;font-size:clamp(48px,7.4vw,112px);font-weight:600;line-height:.92;letter-spacing:-.045em;text-wrap:balance;">GPU Deployment<br><span style="color:#C9D3FF;">Planner</span></h1>
+      <p style="margin:0;max-width:500px;font-size:clamp(16px,1.4vw,18px);font-weight:400;line-height:1.5;color:#E2E6F8;text-wrap:pretty;">Pick A Workload, Choose A Server, Then Set Scale And Runtime. The Diagram, Cost And Reasoning Update Instantly.</p>
+    </div>
+    <div style="position:relative;overflow:hidden;border-radius:24px;border:1px solid rgba(255,255,255,.28);background:rgba(13,20,51,.28);backdrop-filter:blur(18px) saturate(1.3);-webkit-backdrop-filter:blur(18px) saturate(1.3);box-shadow:0 24px 60px rgba(5,10,40,.35);padding:clamp(20px,2.6vw,30px);display:flex;flex-direction:column;gap:clamp(28px,4vw,56px);animation:rise .6s cubic-bezier(.2,.8,.2,1) .08s both;">
+      <div style="position:relative;display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;"><span style="display:flex;align-items:center;gap:8px;font-family:'Geist Mono',ui-monospace,monospace;font-size:11px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;color:#FFFFFF;"><span style="width:7px;height:7px;border-radius:50%;background:#7CF0B4;box-shadow:0 0 0 4px rgba(124,240,180,.18);"></span>Live Estimate</span><span style="font-family:'Geist Mono',ui-monospace,monospace;font-size:11px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;color:#D6DCF5;">Illustrative</span></div>
+      <div style="position:relative;display:flex;flex-direction:column;gap:12px;">
+        <span aria-live="polite" style="font-family:'Geist',system-ui,sans-serif;font-size:clamp(44px,6vw,80px);font-weight:500;letter-spacing:-.05em;line-height:.95;color:#FFFFFF;font-variant-numeric:tabular-nums;">{{ disp.cost }}</span>
+        <span style="height:1px;background:rgba(255,255,255,.3);"></span>
+        <span style="display:flex;flex-wrap:wrap;gap:6px;">
+          <span style="font-family:'Geist Mono',ui-monospace,monospace;font-size:12px;padding:4px 10px;border-radius:999px;background:rgba(255,255,255,.14);">{{ gpusStr }} × {{ hw.short }}</span>
+          <span style="font-family:'Geist Mono',ui-monospace,monospace;font-size:12px;padding:4px 10px;border-radius:999px;background:rgba(255,255,255,.14);">{{ region.name }}</span>
+          <span style="font-family:'Geist Mono',ui-monospace,monospace;font-size:12px;padding:4px 10px;border-radius:999px;background:rgba(255,255,255,.14);">{{ hoursLabel }}</span>
+        </span>
+        <span style="display:flex;flex-direction:column;gap:6px;margin-top:4px;">
+          <span style="display:grid;grid-template-columns:repeat(16,minmax(0,1fr));gap:3px;height:12px;">
+            <sc-for list="{{ estSegs }}" as="g" hint-placeholder-count="16"><span style="border-radius:2px;background:{{ g.bg }};box-shadow:{{ g.sh }};transition:background .2s,box-shadow .2s;"></span></sc-for>
+          </span>
+          <span style="display:flex;justify-content:space-between;gap:8px;font-family:'Geist Mono',ui-monospace,monospace;font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:#D6DCF5;"><span>{{ servers }} Of 16 {{ serversWord }}</span><span>{{ gpusStr }} GPUs</span></span>
+        </span>
+      </div>
+    </div>
+  </div>
+  <div style="display:flex;align-items:center;gap:8px;min-width:0;padding-top:14px;border-top:1px solid rgba(255,255,255,.28);">
+    <span style="flex:none;font-family:'Geist Mono',ui-monospace,monospace;font-size:11px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;color:#E2E6F8;margin-right:4px;">Try A Scenario</span>
+    <div style="display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;padding:6px 0;min-width:0;">
+      <sc-for list="{{ presets }}" as="p" hint-placeholder-count="3">
+        <button onClick="{{ p.onClick }}" aria-pressed="{{ p.pressed }}" style="position:relative;overflow:hidden;flex:none;display:flex;align-items:center;gap:10px;min-height:42px;padding:6px 14px 6px 6px;border-radius:10px;backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);white-space:nowrap;border:1px solid {{ p.border }};background:{{ p.bg }};color:{{ p.color }};font-size:14px;font-weight:600;cursor:pointer;transition:background .2s,color .2s,border-color .2s;" style-hover="border-color:#FFFFFF;">{{ p.ring }}<span style="font-family:'Geist Mono',ui-monospace,monospace;font-size:11px;letter-spacing:.06em;text-transform:uppercase;padding:5px 7px;border-radius:6px;background:{{ p.kindBg }};color:{{ p.kindColor }};">{{ p.kind }}</span>{{ p.label }}</button>
+      </sc-for>
+      <button onClick="{{ reset }}" style="flex:none;display:flex;align-items:center;gap:6px;min-height:42px;padding:0 14px;border:1px dashed rgba(255,255,255,.6);border-radius:10px;background:rgba(13,20,51,.25);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);font-size:14px;font-weight:600;color:#FFFFFF;cursor:pointer;white-space:nowrap;" style-hover="border-color:#FFFFFF;"><span style="font-family:'Geist Mono',ui-monospace,monospace;">↺</span>Reset</button>
+    </div>
+  </div>
+</section>
+</div>
+<div style="height:clamp(20px,3vw,32px);"></div>
+<main style="max-width:1400px;margin:0 auto;padding:0 clamp(16px,4vw,40px) clamp(48px,6vw,88px);display:grid;grid-template-columns:{{ mainCols }};gap:clamp(16px,2.4vw,28px);align-items:start;">
+
+  <div aria-label="Configuration" style="order:{{ ctrlOrder }};min-width:0;background:#F7F7F3;border:1px solid #C3C8DD;display:flex;flex-direction:column;">
+    <div style="padding:20px clamp(16px,2vw,24px);display:flex;flex-direction:column;gap:14px;">
+      <div style="display:flex;align-items:baseline;gap:10px;padding-bottom:10px;border-bottom:1px solid #C3C8DD;"><span style="font-family:'Geist Mono',ui-monospace,monospace;font-size:11px;font-weight:500;color:#1F3FBF;">A</span><span style="font-family:'Geist',system-ui,sans-serif;font-size:17px;font-weight:700;letter-spacing:-.01em;">Workload</span><span style="flex:1;"></span><span style="font-family:'Geist Mono',ui-monospace,monospace;font-size:11px;color:#5A6182;text-align:right;">Job Shape</span></div>
+      <div role="radiogroup" aria-label="Workload" style="display:grid;grid-template-columns:1fr 1fr;gap:6px;">
+        <sc-for list="{{ wlOpts }}" as="w" hint-placeholder-count="2">
+          <button role="radio" aria-checked="{{ w.pressed }}" onClick="{{ w.onClick }}" style="text-align:left;min-height:64px;padding:12px 14px;border-radius:2px;border:1px solid {{ w.border }};background:{{ w.bg }};cursor:pointer;display:flex;flex-direction:column;gap:3px;transition:background .2s,border-color .2s;" style-hover="border-color:#1F3FBF;"><span style="font-size:16px;font-weight:700;color:{{ w.color }};">{{ w.label }}</span><span style="font-size:12.5px;color:{{ w.subColor }};">{{ w.short }}</span></button>
+        </sc-for>
+      </div>
+    </div>
+    <div style="padding:4px clamp(16px,2vw,24px) 20px;display:flex;flex-direction:column;gap:14px;">
+      <div style="display:flex;align-items:baseline;gap:10px;padding-bottom:10px;border-bottom:1px solid #C3C8DD;"><span style="font-family:'Geist Mono',ui-monospace,monospace;font-size:11px;font-weight:500;color:#1F3FBF;">B</span><span style="font-family:'Geist',system-ui,sans-serif;font-size:17px;font-weight:700;letter-spacing:-.01em;">Server</span><span style="flex:1;"></span><span style="font-family:'Geist Mono',ui-monospace,monospace;font-size:11px;color:#5A6182;text-align:right;">Rate / Server-Hr</span></div>
+      <div role="radiogroup" aria-label="Sample server configuration" style="display:flex;flex-direction:column;gap:6px;">
+        <sc-for list="{{ hwCards }}" as="c" hint-placeholder-count="3">
+          <button role="radio" aria-checked="{{ c.pressed }}" onClick="{{ c.onClick }}" style="position:relative;overflow:hidden;text-align:left;padding:13px 14px;border-radius:2px;border:1px solid {{ c.border }};background:{{ c.bg }};box-shadow:{{ c.shadow }};cursor:pointer;display:flex;flex-direction:column;gap:10px;transition:background .2s,border-color .2s;" style-hover="border-color:#1F3FBF;">{{ c.scan }}
+            <span style="display:flex;align-items:center;gap:12px;width:100%;">
+              <span style="width:14px;height:14px;border:1.5px solid {{ c.ring }};display:grid;place-items:center;flex:none;"><span style="width:6px;height:6px;background:#1F3FBF;opacity:{{ c.dot }};"></span></span>
+              <span style="flex:1;min-width:0;display:flex;flex-direction:column;gap:2px;">
+                <span style="display:flex;align-items:center;flex-wrap:wrap;gap:8px;"><span style="font-size:16px;font-weight:700;">{{ c.name }}</span><sc-if value="{{ c.suggested }}" hint-placeholder-val="{{ false }}"><span style="font-family:'Geist Mono',ui-monospace,monospace;font-size:11px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;font-size:11px;color:#1F3FBF;border:1px solid #1F3FBF;padding:2px 6px;">Suggested</span></sc-if></span>
+                <span style="font-size:12.5px;color:#5A6182;">{{ c.tag }}</span>
+              </span>
+              <span style="font-family:'Geist Mono',ui-monospace,monospace;font-size:16px;font-weight:500;color:{{ c.rateColor }};flex:none;">{{ c.rate }}</span>
+            </span>
+            <span style="display:flex;flex-wrap:wrap;gap:4px;padding-left:26px;">
+              <span style="font-family:'Geist Mono',ui-monospace,monospace;font-size:11.5px;color:#353D5E;border:1px solid #C3C8DD;background:{{ c.chipBg }};padding:3px 7px;white-space:nowrap;">{{ c.gpus }} GPUs</span>
+              <span style="font-family:'Geist Mono',ui-monospace,monospace;font-size:11.5px;color:#353D5E;border:1px solid #C3C8DD;background:{{ c.chipBg }};padding:3px 7px;white-space:nowrap;">{{ c.mem }} Each</span>
+              <span style="font-family:'Geist Mono',ui-monospace,monospace;font-size:11.5px;color:#353D5E;border:1px solid #C3C8DD;background:{{ c.chipBg }};padding:3px 7px;white-space:nowrap;">{{ c.link }}</span>
+            </span>
+          </button>
+        </sc-for>
+      </div>
+    </div>
+    <div style="padding:4px clamp(16px,2vw,24px) 20px;display:flex;flex-direction:column;gap:14px;">
+      <div style="display:flex;align-items:baseline;gap:10px;padding-bottom:10px;border-bottom:1px solid #C3C8DD;"><span style="font-family:'Geist Mono',ui-monospace,monospace;font-size:11px;font-weight:500;color:#1F3FBF;">C</span><span style="font-family:'Geist',system-ui,sans-serif;font-size:17px;font-weight:700;letter-spacing:-.01em;">Region</span><span style="flex:1;"></span><span style="font-family:'Geist Mono',ui-monospace,monospace;font-size:11px;color:#5A6182;text-align:right;">Availability · Factor</span></div>
+      <div role="radiogroup" aria-label="Region" style="display:grid;grid-template-columns:1fr 1fr;gap:6px;">
+        <sc-for list="{{ regionOpts }}" as="r" hint-placeholder-count="4">
+          <button role="radio" aria-checked="{{ r.pressed }}" onClick="{{ r.onClick }}" style="position:relative;overflow:hidden;text-align:left;min-height:68px;padding:11px 12px;border-radius:2px;border:1px solid {{ r.border }};background:{{ r.bg }};cursor:pointer;display:flex;flex-direction:column;justify-content:space-between;gap:8px;transition:background .2s,border-color .2s;" style-hover="border-color:#1F3FBF;">{{ r.scan }}
+            <span style="font-size:15px;font-weight:700;color:{{ r.color }};">{{ r.name }}</span>
+            <span style="display:flex;justify-content:space-between;align-items:center;width:100%;gap:6px;"><span style="display:flex;align-items:center;gap:5px;font-family:'Geist Mono',ui-monospace,monospace;font-size:11px;color:{{ r.availText }};"><span style="width:6px;height:6px;background:{{ r.availColor }};"></span>{{ r.avail }}</span><span style="font-family:'Geist Mono',ui-monospace,monospace;font-size:11.5px;color:#5A6182;">×{{ r.factor }}</span></span>
+          </button>
+        </sc-for>
+      </div>
+    </div>
+    <div style="padding:4px clamp(16px,2vw,24px) 20px;display:flex;flex-direction:column;gap:14px;">
+      <div style="display:flex;align-items:baseline;gap:10px;padding-bottom:10px;border-bottom:1px solid #C3C8DD;"><span style="font-family:'Geist Mono',ui-monospace,monospace;font-size:11px;font-weight:500;color:#1F3FBF;">D</span><span style="font-family:'Geist',system-ui,sans-serif;font-size:17px;font-weight:700;letter-spacing:-.01em;">Servers</span><span style="flex:1;"></span><span style="font-family:'Geist Mono',ui-monospace,monospace;font-size:12px;font-weight:500;color:#1F3FBF;">{{ gpusStr }} GPUs</span></div>
+      <div style="display:grid;grid-template-columns:48px minmax(0,1fr) 48px;align-items:center;gap:8px;">
+        <button onClick="{{ serversMinus }}" aria-label="Remove a server" style="height:48px;border:1px solid #9AA3C7;border-radius:2px;background:#FFFFFF;font-family:'Geist Mono',ui-monospace,monospace;font-size:20px;cursor:pointer;" style-hover="border-color:#1F3FBF;color:#1F3FBF;">−</button>
+        <span style="text-align:center;font-family:'Geist Mono',ui-monospace,monospace;font-size:44px;font-weight:500;letter-spacing:-.05em;line-height:1;color:#132A86;">{{ servers }}</span>
+        <button onClick="{{ serversPlus }}" aria-label="Add a server" style="height:48px;border:1px solid #9AA3C7;border-radius:2px;background:#FFFFFF;font-family:'Geist Mono',ui-monospace,monospace;font-size:20px;cursor:pointer;" style-hover="border-color:#1F3FBF;color:#1F3FBF;">+</button>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:6px;">
+        <div style="position:relative;display:grid;grid-template-columns:repeat(16,minmax(0,1fr));height:40px;border:1px solid {{ meterS.border }};box-shadow:{{ meterS.ring }};background:#FFFFFF;transition:border-color .2s,box-shadow .2s;">
+          <sc-for list="{{ serverSegs }}" as="g" hint-placeholder-count="16"><span style="border-right:1px solid #C3C8DD;background:{{ g.bg }};animation:{{ g.anim }};transition:background .2s;"></span></sc-for>
+          <div aria-hidden="true" style="position:absolute;left:0;top:0;bottom:0;width:{{ serverPct }};overflow:hidden;pointer-events:none;transition:width .25s cubic-bezier(.2,.8,.2,1);">{{ serverLaser }}</div>
+          <input type="range" min="1" max="16" step="1" value="{{ servers }}" onChange="{{ onServers }}" onFocus="{{ focusS }}" onBlur="{{ blurS }}" aria-label="Server count" aria-valuetext="{{ serversAria }}" style="position:absolute;inset:-8px 0;width:100%;height:calc(100% + 16px);opacity:0;cursor:pointer;margin:0;">
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(16,minmax(0,1fr));font-family:'Geist Mono',ui-monospace,monospace;font-size:11px;color:#5A6182;"><span>1</span><span></span><span></span><span>4</span><span></span><span></span><span></span><span>8</span><span></span><span></span><span></span><span>12</span><span></span><span></span><span></span><span style="text-align:right;">16</span></div>
+      </div>
+    </div>
+    <div style="padding:4px clamp(16px,2vw,24px) 24px;display:flex;flex-direction:column;gap:14px;">
+      <div style="display:flex;align-items:baseline;gap:10px;padding-bottom:10px;border-bottom:1px solid #C3C8DD;"><span style="font-family:'Geist Mono',ui-monospace,monospace;font-size:11px;font-weight:500;color:#1F3FBF;">E</span><span style="font-family:'Geist',system-ui,sans-serif;font-size:17px;font-weight:700;letter-spacing:-.01em;">Runtime</span><span style="flex:1;"></span><span style="font-family:'Geist Mono',ui-monospace,monospace;font-size:12px;font-weight:500;color:#1F3FBF;">{{ hoursStr }} Hrs</span></div>
+      <span style="font-family:'Geist Mono',ui-monospace,monospace;font-size:34px;font-weight:500;letter-spacing:-.04em;line-height:1;color:#132A86;">{{ hoursLabel }}</span>
+      <div style="display:flex;flex-direction:column;gap:6px;">
+        <div style="position:relative;display:grid;grid-template-columns:repeat(9,minmax(0,1fr));gap:4px;height:64px;align-items:end;padding:6px;border:1px solid {{ meterH.border }};box-shadow:{{ meterH.ring }};background:#FFFFFF;transition:border-color .2s,box-shadow .2s;">
+          <sc-for list="{{ hourSegs }}" as="g" hint-placeholder-count="9"><span style="height:{{ g.h }};background:{{ g.bg }};border-top:{{ g.cap }};transition:background .2s,height .25s cubic-bezier(.2,.8,.2,1);"></span></sc-for>
+          <input type="range" min="0" max="8" step="1" value="{{ hi }}" onChange="{{ onHours }}" onFocus="{{ focusH }}" onBlur="{{ blurH }}" aria-label="Runtime" aria-valuetext="{{ hoursLabel }}" style="position:absolute;inset:-8px 0;width:100%;height:calc(100% + 16px);opacity:0;cursor:pointer;margin:0;">
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(9,minmax(0,1fr));gap:4px;">
+          <sc-for list="{{ hourTicks }}" as="t" hint-placeholder-count="9"><button onClick="{{ t.onClick }}" aria-label="{{ t.aria }}" tabindex="-1" style="min-height:40px;border:0;background:transparent;padding:0;font-family:'Geist Mono',ui-monospace,monospace;font-size:11px;color:{{ t.color }};font-weight:{{ t.weight }};cursor:pointer;white-space:nowrap;" style-hover="color:#1F3FBF;">{{ t.label }}</button></sc-for>
+        </div>
+        <div style="display:grid;grid-template-columns:3fr 3fr 3fr;gap:4px;font-family:'Geist Mono',ui-monospace,monospace;font-size:11px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;font-size:11px;color:#5A6182;text-align:center;"><span style="border-top:1px solid #9AA3C7;padding-top:5px;">Hours</span><span style="border-top:1px solid #9AA3C7;padding-top:5px;">Days</span><span style="border-top:1px solid #9AA3C7;padding-top:5px;">Weeks</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div id="result" style="order:{{ resOrder }};position:{{ resPos }};top:16px;min-width:0;display:flex;flex-direction:column;gap:clamp(14px,2vw,20px);">
+    <section aria-label="Live deployment view" style="position:relative;border:1px solid #C3C8DD;background-color:#F7F7F3;background-image:linear-gradient(rgba(31,63,191,.05) 1px,transparent 1px),linear-gradient(90deg,rgba(31,63,191,.05) 1px,transparent 1px),linear-gradient(rgba(31,63,191,.09) 1px,transparent 1px),linear-gradient(90deg,rgba(31,63,191,.09) 1px,transparent 1px);background-size:12px 12px,12px 12px,60px 60px,60px 60px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:8px 12px;flex-wrap:wrap;padding:14px clamp(14px,2vw,22px);border-bottom:1px solid #C3C8DD;background:#F7F7F3;">
+        <span style="display:flex;align-items:center;gap:10px;"><span style="font-family:'Geist Mono',ui-monospace,monospace;font-size:11px;color:#1F3FBF;">F</span><span style="font-family:'Geist',system-ui,sans-serif;font-size:17px;font-weight:700;">Live Deployment</span><span style="font-family:'Geist Mono',ui-monospace,monospace;font-size:11px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;font-size:11px;color:#FFFFFF;background:#1F3FBF;padding:3px 7px;">{{ wl.label }}</span></span>
+        <span aria-live="polite" style="font-family:'Geist Mono',ui-monospace,monospace;font-size:12px;color:#353D5E;min-height:18px;">{{ changeNode }}</span>
+      </div>
+      <div style="padding:clamp(18px,3vw,30px) clamp(12px,2.4vw,26px);display:grid;grid-template-columns:{{ diagCols }};grid-template-rows:{{ diagRows }};grid-template-areas:{{ diagAreas }};align-items:center;">
+        <div style="grid-area:w;position:relative;min-width:0;background:#FBFBF8;border:1px solid {{ n0.border }};box-shadow:{{ n0.shadow }};transform:{{ n0.lift }};border-radius:3px;padding:14px 12px;min-height:104px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;text-align:center;transition:border-color .2s,box-shadow .2s,transform .2s;"><span style="font-family:'Geist Mono',ui-monospace,monospace;font-size:11px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;font-size:11px;color:#5A6182;">Workload</span><span style="font-family:'Geist',system-ui,sans-serif;font-size:19px;font-weight:700;letter-spacing:-.01em;line-height:1.1;color:#132A86;text-wrap:balance;">{{ wl.label }}</span><span style="font-size:12.5px;line-height:1.35;color:#5A6182;text-wrap:balance;">{{ wl.nodeSub }}</span></div>
+        <div style="grid-area:b0;align-self:stretch;display:flex;align-items:center;justify-content:center;min-height:24px;min-width:0;">{{ beam0 }}</div>
+        <div style="grid-area:c;position:relative;min-width:0;background:#FBFBF8;border:1px solid {{ n1.border }};box-shadow:{{ n1.shadow }};transform:{{ n1.lift }};border-radius:3px;padding:14px 12px;min-height:104px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;text-align:center;transition:border-color .2s,box-shadow .2s,transform .2s;"><span style="font-family:'Geist Mono',ui-monospace,monospace;font-size:11px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;font-size:11px;color:#5A6182;">Capacity</span><span style="font-family:'Geist',system-ui,sans-serif;font-size:19px;font-weight:700;letter-spacing:-.01em;line-height:1.1;color:#132A86;text-wrap:balance;">{{ gpusStr }} × {{ hw.short }}</span><span style="font-size:12.5px;line-height:1.35;color:#5A6182;text-wrap:balance;">{{ memTotal }} Memory</span></div>
+        <div style="grid-area:b1;align-self:stretch;display:flex;align-items:center;justify-content:center;min-height:24px;min-width:0;">{{ beam1 }}</div>
+        <div style="grid-area:s;align-self:stretch;position:relative;min-width:0;border:1px solid {{ n2.border }};box-shadow:{{ n2.shadow }};background:rgba(255,255,255,.7);border-radius:3px;padding:14px 10px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;text-align:center;transition:border-color .2s,box-shadow .2s;">
+          <span style="font-family:'Geist Mono',ui-monospace,monospace;font-size:11px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;font-size:11px;color:#5A6182;">Bare-Metal Servers</span>
+          <div style="height:{{ gridH }};width:100%;display:flex;align-items:center;justify-content:center;">{{ serverGrid }}</div>
+          <span style="font-family:'Geist',system-ui,sans-serif;font-size:19px;font-weight:700;letter-spacing:-.01em;color:#132A86;">{{ servers }} × {{ hw.gpus }}-GPU {{ serversWordCap }}</span>
+          <span style="font-size:12.5px;line-height:1.35;color:#5A6182;text-wrap:balance;">{{ wl.srvCaption }}</span>
+        </div>
+        <div style="grid-area:b2;align-self:stretch;display:flex;align-items:center;justify-content:center;min-height:24px;min-width:0;">{{ beam2 }}</div>
+        <div style="grid-area:d;position:relative;min-width:0;background:#FBFBF8;border:1px solid {{ n3.border }};box-shadow:{{ n3.shadow }};transform:{{ n3.lift }};border-radius:3px;padding:14px 12px;min-height:104px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;text-align:center;transition:border-color .2s,box-shadow .2s,transform .2s;"><span style="font-family:'Geist Mono',ui-monospace,monospace;font-size:11px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;font-size:11px;color:#5A6182;">Deployment</span><span style="font-family:'Geist',system-ui,sans-serif;font-size:19px;font-weight:700;letter-spacing:-.01em;line-height:1.1;color:#132A86;text-wrap:balance;">{{ region.name }}</span><span style="display:flex;align-items:center;gap:6px;font-family:'Geist Mono',ui-monospace,monospace;font-size:11px;color:{{ availText }};"><span style="width:6px;height:6px;background:{{ availColor }};"></span>{{ availNow }}</span></div>
+        <div style="grid-area:b3;align-self:stretch;display:flex;align-items:center;justify-content:center;min-height:24px;min-width:0;">{{ beam3 }}</div>
+        <div style="grid-area:r;position:relative;min-width:0;background:#FBFBF8;border:1px solid {{ n4.border }};box-shadow:{{ n4.shadow }};transform:{{ n4.lift }};border-radius:3px;padding:14px 12px;min-height:104px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;text-align:center;transition:border-color .2s,box-shadow .2s,transform .2s;"><span style="font-family:'Geist Mono',ui-monospace,monospace;font-size:11px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;font-size:11px;color:#5A6182;">Running</span><span style="font-family:'Geist',system-ui,sans-serif;font-size:19px;font-weight:700;letter-spacing:-.01em;line-height:1.1;color:#132A86;text-wrap:balance;">{{ wl.runTitle }}</span><span style="font-size:12.5px;line-height:1.35;color:#5A6182;text-wrap:balance;">{{ hoursLabel }}</span><div aria-hidden="true" style="width:72%;height:3px;background:#C3C8DD;overflow:hidden;"><div style="height:100%;width:{{ runPct }};background:#1F3FBF;transition:width .4s cubic-bezier(.2,.8,.2,1);"></div></div></div>
+      </div>
+      <div style="display:flex;align-items:center;gap:6px 8px;flex-wrap:wrap;padding:12px clamp(14px,2vw,22px);border-top:1px solid #C3C8DD;background:#F7F7F3;min-height:50px;">
+        <span style="font-family:'Geist Mono',ui-monospace,monospace;font-size:11px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;font-size:11px;color:#5A6182;margin-right:4px;">What Changed</span>
+        <sc-if value="{{ hasDeltas }}" hint-placeholder-val="{{ false }}"><sc-for list="{{ deltas }}" as="d" hint-placeholder-count="3"><span style="display:flex;align-items:center;gap:6px;font-family:'Geist Mono',ui-monospace,monospace;font-size:11.5px;padding:4px 8px;border:1px solid #C3C8DD;background:#FFFFFF;white-space:nowrap;"><span style="color:#353D5E;">{{ d.k }}</span><span style="color:#5A6182;text-decoration:line-through;">{{ d.from }}</span><span style="font-weight:500;color:{{ d.color }};">{{ d.arrow }} {{ d.to }}</span></span></sc-for></sc-if>
+        <sc-if value="{{ noDeltas }}" hint-placeholder-val="{{ true }}"><span style="font-size:12.5px;color:#5A6182;">Change Any Control To See Which Numbers Move</span></sc-if>
+      </div>
+    </section>
+
+    <section aria-label="Illustrative cost calculation" style="border:1px solid #C3C8DD;background:#F7F7F3;">
+      <div style="display:flex;align-items:baseline;gap:10px;padding:14px clamp(14px,2vw,22px);border-bottom:1px solid #C3C8DD;"><span style="font-family:'Geist Mono',ui-monospace,monospace;font-size:11px;color:#1F3FBF;">G</span><span style="font-family:'Geist',system-ui,sans-serif;font-size:17px;font-weight:700;">Illustrative Estimate</span><span style="flex:1;"></span><span style="font-family:'Geist Mono',ui-monospace,monospace;font-size:11px;color:#5A6182;">Not A Quote</span></div>
+      <div style="display:grid;grid-template-columns:repeat({{ costCols }},minmax(0,1fr));gap:1px;background:#C3C8DD;border-bottom:1px solid #C3C8DD;">
+        <div style="position:relative;overflow:hidden;padding:18px 14px;background-color:#F7F7F3;background-image:linear-gradient({{ fl.gpus }},{{ fl.gpus }});transition:background-image .5s;display:flex;flex-direction:column;gap:8px;min-width:0;">{{ lz.gpus }}<span style="font-family:'Geist Mono',ui-monospace,monospace;font-size:11px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;font-size:11px;color:#5A6182;">Total GPUs</span><span style="font-family:'Geist Mono',ui-monospace,monospace;font-size:clamp(22px,2.6vw,30px);font-weight:500;letter-spacing:-.03em;line-height:1;color:#0D1433;white-space:nowrap;">{{ disp.gpus }}</span><span style="font-size:12px;color:#5A6182;">{{ servers }} × {{ hw.gpus }} GPUs</span></div>
+        <div style="position:relative;overflow:hidden;padding:18px 14px;background-color:#F7F7F3;background-image:linear-gradient({{ fl.sh }},{{ fl.sh }});transition:background-image .5s;display:flex;flex-direction:column;gap:8px;min-width:0;">{{ lz.sh }}<span style="font-family:'Geist Mono',ui-monospace,monospace;font-size:11px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;font-size:11px;color:#5A6182;">Server-Hours</span><span style="font-family:'Geist Mono',ui-monospace,monospace;font-size:clamp(22px,2.6vw,30px);font-weight:500;letter-spacing:-.03em;line-height:1;color:#0D1433;white-space:nowrap;">{{ disp.sh }}</span><span style="font-size:12px;color:#5A6182;">{{ servers }} × {{ hoursStr }} Hours</span></div>
+        <div style="position:relative;overflow:hidden;padding:18px 14px;background-color:#F7F7F3;background-image:linear-gradient({{ fl.gh }},{{ fl.gh }});transition:background-image .5s;display:flex;flex-direction:column;gap:8px;min-width:0;">{{ lz.gh }}<span style="font-family:'Geist Mono',ui-monospace,monospace;font-size:11px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;font-size:11px;color:#5A6182;">GPU-Hours</span><span style="font-family:'Geist Mono',ui-monospace,monospace;font-size:clamp(22px,2.6vw,30px);font-weight:500;letter-spacing:-.03em;line-height:1;color:#0D1433;white-space:nowrap;">{{ disp.gh }}</span><span style="font-size:12px;color:#5A6182;">{{ gpusStr }} × {{ hoursStr }} Hours</span></div>
+        <div style="position:relative;overflow:hidden;padding:18px 14px;background-color:#1F3FBF;background-image:linear-gradient({{ fl.cost }},{{ fl.cost }});transition:background-image .5s;display:flex;flex-direction:column;gap:8px;min-width:0;">{{ lz.cost }}<span style="font-family:'Geist Mono',ui-monospace,monospace;font-size:11px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;font-size:11px;color:#D6DCF5;">Estimate</span><span style="font-family:'Geist Mono',ui-monospace,monospace;font-size:clamp(22px,2.6vw,30px);font-weight:500;letter-spacing:-.03em;line-height:1;color:#FFFFFF;white-space:nowrap;">{{ disp.cost }}</span><span style="font-size:12px;color:#D6DCF5;">Server-Hours × {{ rateStr }}</span></div>
+      </div>
+      <div style="display:flex;flex-wrap:wrap;align-items:flex-end;gap:10px 16px;padding:16px clamp(14px,2vw,22px);">
+        <span style="display:flex;flex-direction:column;gap:3px;"><span style="font-family:'Geist Mono',ui-monospace,monospace;font-size:11px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;font-size:11px;color:#5A6182;">Base Rate</span><span style="font-family:'Geist Mono',ui-monospace,monospace;font-size:16px;font-weight:500;">{{ baseStr }}</span></span>
+        <span style="font-family:'Geist Mono',ui-monospace,monospace;font-size:20px;color:#1F3FBF;line-height:1.1;">×</span>
+        <span style="display:flex;flex-direction:column;gap:3px;"><span style="font-family:'Geist Mono',ui-monospace,monospace;font-size:11px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;font-size:11px;color:#5A6182;">Region Factor</span><span style="font-family:'Geist Mono',ui-monospace,monospace;font-size:16px;font-weight:500;">{{ region.factorStr }}</span></span>
+        <span style="font-family:'Geist Mono',ui-monospace,monospace;font-size:20px;color:#1F3FBF;line-height:1.1;">=</span>
+        <span style="display:flex;flex-direction:column;gap:3px;"><span style="font-family:'Geist Mono',ui-monospace,monospace;font-size:11px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;font-size:11px;color:#5A6182;">Sample Rate / Server-Hour</span><span style="font-family:'Geist Mono',ui-monospace,monospace;font-size:16px;font-weight:500;padding:0 4px;margin:0 -4px;background:{{ fl.rate }};transition:background .5s;">{{ rateStr }}</span></span>
+        <span style="flex:1;"></span>
+        <span style="display:flex;flex-direction:column;gap:3px;"><span style="font-family:'Geist Mono',ui-monospace,monospace;font-size:11px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;font-size:11px;color:#5A6182;">≈ Per GPU-Hour</span><span style="font-family:'Geist Mono',ui-monospace,monospace;font-size:16px;font-weight:500;color:#1F3FBF;">{{ perGpuStr }}</span></span>
+      </div>
+      <div style="padding:10px clamp(14px,2vw,22px);border-top:1px dashed #C3C8DD;font-size:12px;color:#5A6182;">Not A Quote · Excludes Storage, Networking And Egress</div>
+    </section>
+
+    <section aria-label="Why this setup" aria-live="polite" style="border:1px solid #C3C8DD;background:#F7F7F3;display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr));overflow:hidden;">
+      <div style="display:flex;flex-direction:column;justify-content:space-between;gap:22px;padding:clamp(18px,2.4vw,26px);border-right:1px solid #C3C8DD;border-bottom:1px solid #C3C8DD;margin:0 -1px -1px 0;">
+        <div style="display:flex;flex-direction:column;gap:12px;">
+          <span style="display:flex;align-items:baseline;gap:10px;"><span style="font-family:'Geist Mono',ui-monospace,monospace;font-size:11px;color:#1F3FBF;">H</span><span style="font-family:'Geist Mono',ui-monospace,monospace;font-size:11px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;color:#5A6182;">Why This Setup?</span></span>
+          <p style="margin:0;font-family:'Geist',system-ui,sans-serif;font-size:clamp(24px,2.4vw,32px);font-weight:700;line-height:1.02;letter-spacing:-.025em;color:#0D1433;text-wrap:balance;">{{ why.headline }}</p>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:10px;">
+          <div style="display:flex;flex-wrap:wrap;gap:4px;">
+            <span style="font-family:'Geist Mono',ui-monospace,monospace;font-size:11.5px;color:#132A86;border:1px solid #1F3FBF;padding:3px 7px;white-space:nowrap;">{{ hw.short }}</span>
+            <span style="font-family:'Geist Mono',ui-monospace,monospace;font-size:11.5px;color:#132A86;border:1px solid #1F3FBF;padding:3px 7px;white-space:nowrap;">{{ servers }} {{ serversWord }}</span>
+            <span style="font-family:'Geist Mono',ui-monospace,monospace;font-size:11.5px;color:#132A86;border:1px solid #1F3FBF;padding:3px 7px;white-space:nowrap;">{{ hoursLabel }}</span>
+            <span style="font-family:'Geist Mono',ui-monospace,monospace;font-size:11.5px;color:#132A86;border:1px solid #1F3FBF;padding:3px 7px;white-space:nowrap;">{{ region.name }}</span>
+          </div>
+          <span style="font-size:12px;color:#5A6182;">Reasoning, Not A Recommendation</span>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;padding:clamp(10px,1.6vw,16px) clamp(18px,2.4vw,26px);">
+        <sc-for list="{{ whyPts }}" as="pt" hint-placeholder-count="3">
+          <div style="display:grid;grid-template-columns:44px minmax(0,1fr);gap:12px;padding:12px 0;border-bottom:{{ pt.rule }};">
+            <span style="font-family:'Geist Mono',ui-monospace,monospace;font-size:11px;color:{{ pt.color }};padding-top:2px;">N{{ pt.n }}</span>
+            <span style="display:flex;flex-direction:column;gap:3px;"><span style="font-family:'Geist Mono',ui-monospace,monospace;font-size:11px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;font-size:11px;color:{{ pt.color }};">{{ pt.k }}</span><span style="font-size:14.5px;font-weight:500;line-height:1.45;color:#353D5E;text-wrap:pretty;">{{ pt.t }}</span></span>
+          </div>
+        </sc-for>
+      </div>
+    </section>
+  </div>
+</main>
+
+<section aria-label="Sample regions" style="position:relative;background:#1F3FBF;color:#FFFFFF;overflow:hidden;">
+  <div aria-hidden="true" style="position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.06) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.06) 1px,transparent 1px);background-size:40px 40px;pointer-events:none;"></div>
+  <div style="position:relative;max-width:1400px;margin:0 auto;padding:clamp(40px,6vw,80px) clamp(16px,4vw,40px);display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,380px),1fr));gap:clamp(24px,4vw,48px);align-items:center;">
+    <div style="display:flex;flex-direction:column;gap:16px;min-width:0;">
+      <span style="font-family:'Geist Mono',ui-monospace,monospace;font-size:11px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;color:#D6DCF5;">Sample Regions</span>
+      <span style="font-family:'Geist',system-ui,sans-serif;font-size:clamp(40px,5.4vw,76px);font-weight:600;line-height:.9;letter-spacing:-.04em;">Deploying To <span style="display:block;color:#FFFFFF;">{{ region.name }}</span></span>
+      <span style="font-size:15px;line-height:1.5;color:#E2E6F8;max-width:420px;">Drag The Globe To Explore. Changing The Region Above Turns The Planet To Face It.</span>
+      <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:4px;">
+        <sc-for list="{{ regionOpts }}" as="r" hint-placeholder-count="4"><button onClick="{{ r.onClick }}" aria-pressed="{{ r.pressed }}" style="min-height:40px;padding:0 14px;border-radius:2px;border:1px solid {{ r.gBorder }};background:{{ r.gBg }};color:{{ r.gColor }};font-size:14px;font-weight:600;cursor:pointer;white-space:nowrap;transition:background .2s,color .2s;">{{ r.name }}</button></sc-for>
+      </div>
+    </div>
+    <div style="position:relative;display:flex;justify-content:center;min-width:0;"><span aria-hidden="true" style="position:absolute;width:14px;height:14px;pointer-events:none;left:0px;top:0px;border-left:1.5px solid rgba(255,255,255,.6);border-top:1.5px solid rgba(255,255,255,.6);"></span><span aria-hidden="true" style="position:absolute;width:14px;height:14px;pointer-events:none;right:0px;top:0px;border-right:1.5px solid rgba(255,255,255,.6);border-top:1.5px solid rgba(255,255,255,.6);"></span><span aria-hidden="true" style="position:absolute;width:14px;height:14px;pointer-events:none;left:0px;bottom:0px;border-left:1.5px solid rgba(255,255,255,.6);border-bottom:1.5px solid rgba(255,255,255,.6);"></span><span aria-hidden="true" style="position:absolute;width:14px;height:14px;pointer-events:none;right:0px;bottom:0px;border-right:1.5px solid rgba(255,255,255,.6);border-bottom:1.5px solid rgba(255,255,255,.6);"></span>{{ globe }}</div>
+  </div>
+</section>
+
+<section aria-label="Case study" style="max-width:1400px;margin:0 auto;padding:clamp(40px,6vw,80px) clamp(16px,4vw,40px);display:flex;flex-direction:column;gap:clamp(24px,3vw,36px);">
+  <div style="display:flex;flex-direction:column;gap:12px;max-width:760px;"><span style="font-family:'Geist Mono',ui-monospace,monospace;font-size:11px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;color:#1F3FBF;">Portfolio Case Study</span><h2 style="margin:0;font-family:'Geist',system-ui,sans-serif;font-size:clamp(34px,4.4vw,60px);font-weight:600;line-height:.94;letter-spacing:-.035em;text-wrap:balance;">Making Infrastructure Choices Visible</h2></div>
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,260px),1fr));gap:clamp(20px,3vw,36px);">
+    <div style="display:flex;flex-direction:column;gap:12px;padding-top:14px;border-top:2px solid #0D1433;"><span style="display:flex;gap:10px;align-items:baseline;"><span style="font-family:'Geist Mono',ui-monospace,monospace;font-size:11px;color:#1F3FBF;">01</span><span style="font-size:17px;font-weight:700;">The Design Problem</span></span>
+      <ul style="margin:0;padding-left:18px;display:flex;flex-direction:column;gap:8px;font-size:14.5px;line-height:1.5;color:#353D5E;"><li>GPU Planning Means Juggling Servers, GPUs, Runtime And Region At Once</li><li>Pricing Pages Usually Split These Into Separate Tables</li><li>This Concept Shows Every Choice's Effect In One View</li></ul></div>
+    <div style="display:flex;flex-direction:column;gap:12px;padding-top:14px;border-top:2px solid #0D1433;"><span style="display:flex;gap:10px;align-items:baseline;"><span style="font-family:'Geist Mono',ui-monospace,monospace;font-size:11px;color:#1F3FBF;">02</span><span style="font-size:17px;font-weight:700;">What Is Simulated</span></span>
+      <ul style="margin:0;padding-left:18px;display:flex;flex-direction:column;gap:8px;font-size:14.5px;line-height:1.5;color:#353D5E;"><li>Rates, Regional Factors And Availability Are Sample Data</li><li>GPU Memory And Interconnect Follow NVIDIA's Published Specs</li><li>No Connection To Any Provider's Inventory, Pricing Or APIs</li></ul></div>
+    <div style="display:flex;flex-direction:column;gap:12px;padding-top:14px;border-top:2px solid #0D1433;"><span style="display:flex;gap:10px;align-items:baseline;"><span style="font-family:'Geist Mono',ui-monospace,monospace;font-size:11px;color:#1F3FBF;">03</span><span style="font-size:17px;font-weight:700;">What Needs Real Validation</span></span>
+      <ul style="margin:0;padding-left:18px;display:flex;flex-direction:column;gap:8px;font-size:14.5px;line-height:1.5;color:#353D5E;"><li>Actual Rates, Minimum Terms And Regional Capacity</li><li>Network Fabric Between Servers For Multi-Node Training</li><li>Provisioning Time, Storage And Egress Costs</li></ul></div>
+  </div>
+  <p style="margin:0;padding-top:16px;border-top:1px solid #C3C8DD;font-size:13px;line-height:1.5;color:#5A6182;">Independent Concept Project. Not Affiliated With Or Endorsed By Any GPU Or Hosting Provider. All Prices, Regions And Availability Are Illustrative.</p>
+</section>
+
+<sc-if value="{{ narrow }}" hint-placeholder-val="{{ false }}">
+  <div aria-live="polite" style="position:fixed;left:0;right:0;bottom:0;z-index:40;display:flex;align-items:center;gap:12px;padding:10px 16px calc(10px + env(safe-area-inset-bottom));background:#0D1433;color:#FFFFFF;box-shadow:0 -8px 24px rgba(13,20,51,.18);">
+    <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:2px;">
+      <span style="font-size:13.5px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ gpusStr }} × {{ hw.short }} · {{ region.name }}</span>
+      <span style="font-family:'Geist Mono',ui-monospace,monospace;font-size:11.5px;color:#B9C0DE;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ servers }} {{ serversWord }} · {{ hoursLabel }}</span>
+    </div>
+    <span style="font-family:'Geist Mono',ui-monospace,monospace;font-size:18px;font-weight:500;letter-spacing:-.03em;background:{{ miniBg }};padding:2px 4px;transition:background .4s;">{{ disp.cost }}</span>
+    <button onClick="{{ toResult }}" aria-label="Jump to result" style="flex:none;width:44px;height:44px;border:1px solid rgba(255,255,255,.35);border-radius:2px;background:transparent;color:#FFFFFF;font-family:'Geist Mono',ui-monospace,monospace;font-size:16px;cursor:pointer;">↓</button>
+  </div>
+</sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;motion&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;Full&quot;,&quot;Reduced&quot;],&quot;default&quot;:&quot;Full&quot;,&quot;tsType&quot;:&quot;'Full'|'Reduced'&quot;},&quot;startWorkload&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;Training&quot;,&quot;Inference&quot;],&quot;default&quot;:&quot;Training&quot;,&quot;tsType&quot;:&quot;'Training'|'Inference'&quot;}}">
+// ---- Illustrative sample data (not live, not a quote) ----
+const HW = [
+  { id:'h100', name:'H100 SXM', short:'H100', tag:'Balanced Training Node', gpus:8, memGB:80, link:'NVLink', rate:19.60 },
+  { id:'h200', name:'H200 SXM', short:'H200', tag:'Large-Memory Node', gpus:8, memGB:141, link:'NVLink', rate:27.20 },
+  { id:'l40s', name:'L40S', short:'L40S', tag:'Cost-Efficient Serving Node', gpus:4, memGB:48, link:'PCIe', rate:7.20 },
+];
+const REGIONS = [
+  { id:'usw', name:'US West', factor:1.00 },
+  { id:'use', name:'US East', factor:1.00 },
+  { id:'euc', name:'EU Central', factor:1.06 },
+  { id:'apac', name:'Asia-Pacific', factor:1.12 },
+];
+const AVAIL = {
+  usw:{ h100:'Typical', h200:'Typical', l40s:'Typical' },
+  use:{ h100:'Typical', h200:'Limited', l40s:'Typical' },
+  euc:{ h100:'Typical', h200:'Limited', l40s:'Typical' },
+  apac:{ h100:'Limited', h200:'Limited', l40s:'Typical' },
+};
+const HOURS = [1,4,8,24,48,72,168,336,720];
+const HTICK = ['1H','4H','8H','1D','2D','3D','1W','2W','30D'];
+const WL = {
+  training:{ label:'Training', short:'One Large Job', nodeSub:'One Distributed Job', runTitle:'Training Job', srvCaption:'Linked As One Cluster', suggested:['h100','h200'],
+    defaults:{ hw:'h100', servers:4, hi:5, region:'use' } },
+  inference:{ label:'Inference', short:'Always-On Serving', nodeSub:'Serving Requests', runTitle:'Serving Endpoint', srvCaption:'Independent Replicas', suggested:['l40s'],
+    defaults:{ hw:'l40s', servers:2, hi:8, region:'usw' } },
+};
+const PRESETS = [
+  { id:'ft', kind:'Train', label:'Fine-Tuning Run', s:{ wl:'training', hw:'h100', servers:2, hi:4, region:'usw' } },
+  { id:'sprint', kind:'Train', label:'Large-Model Sprint', s:{ wl:'training', hw:'h200', servers:12, hi:7, region:'use' } },
+  { id:'serve', kind:'Serve', label:'Always-On Chat API', s:{ wl:'inference', hw:'l40s', servers:3, hi:8, region:'euc' } },
+];
+
+
+const GEO = { usw:[-121.9,37.4], use:[-77.5,39.0], euc:[8.7,50.1], apac:[103.8,1.35] };
+let LAND = null, LAND_P = null;
+function loadLand() {
+  if (LAND_P) return LAND_P;
+  LAND_P = fetch('https://cdn.jsdelivr.net/npm/world-atlas@2/land-110m.json').then(r => r.ok ? r.json() : Promise.reject()).catch(() => fetch('https://unpkg.com/world-atlas@2/land-110m.json').then(r => r.json())).then(t => {
+    const W = 720, H = 360, cv = document.createElement('canvas'); cv.width = W; cv.height = H;
+    const ctx = cv.getContext('2d'), [sx, sy] = t.transform.scale, [tx, ty] = t.transform.translate;
+    const arcs = t.arcs.map(a => { let x = 0, y = 0; return a.map(p => { x += p[0]; y += p[1]; return [x * sx + tx, y * sy + ty]; }); });
+    const arc = i => i < 0 ? arcs[~i].slice().reverse() : arcs[i];
+    const ring = r => { let pts = []; r.forEach(i => { const a = arc(i); pts = pts.concat(pts.length ? a.slice(1) : a); }); return pts; };
+    ctx.fillStyle = '#000'; ctx.beginPath();
+    const geoms = t.objects.land.geometries || [t.objects.land];
+    geoms.forEach(gm => { const polys = gm.type === 'Polygon' ? [gm.arcs] : gm.arcs;
+      polys.forEach(poly => poly.forEach(r => { const pts = ring(r); let px = null;
+        pts.forEach((p, k) => { const X = (p[0] + 180) / 360 * W, Y = (90 - p[1]) / 180 * H;
+          if (k === 0 || (px !== null && Math.abs(X - px) > W / 2)) ctx.moveTo(X, Y); else ctx.lineTo(X, Y); px = X; });
+        ctx.closePath(); })); });
+    ctx.fill('evenodd');
+    ctx.fillRect(0, H - 14, W, 14);
+    const d = ctx.getImageData(0, 0, W, H).data, m = new Uint8Array(W * H);
+    for (let i = 0; i < W * H; i++) m[i] = d[i * 4 + 3] > 100 ? 1 : 0;
+    LAND = { m, W, H }; return LAND;
+  }).catch(() => null);
+  return LAND_P;
+}
+const isLand = (lon, lat) => { if (!LAND) return false; const { m, W, H } = LAND;
+  let x = Math.floor(((lon + 180) % 360 + 360) % 360 / 360 * W), y = Math.floor((90 - lat) / 180 * H); if (y < 0) y = 0; if (y >= H) y = H - 1; return m[y * W + x] === 1; };
+
+class DotGlobe extends React.Component {
+  constructor(p) { super(p); this.cv = React.createRef(); this.lbl = React.createRef(); this.rot = 0; this.tilt = -0.42; this.pts = null; this.t0 = performance.now(); this.drag = null; this.target = null; }
+  componentDidMount() {
+    const g = GEO[this.props.region]; this.rot = -g[0] * Math.PI / 180 - 0.35;
+    loadLand().then(() => { this.build(); this.draw(performance.now()); });
+    this.build(); this.draw(performance.now());
+    this.faceRegion();
+    let last = performance.now();
+    const tick = now => { const dt = Math.min(50, now - last); last = now;
+      if (this.target !== null && !this.drag) { const d = this.target - this.rot; this.rot += d * Math.min(1, dt * 0.006); if (Math.abs(d) < 0.002) this.target = null; }
+      else if (!this.drag && !this.props.reduced) this.rot += dt * 0.00012;
+      this.draw(now); this.raf = requestAnimationFrame(tick); };
+    this.raf = requestAnimationFrame(tick);
+    const el = this.cv.current;
+    this._down = e => { this.drag = { x: e.clientX, y: e.clientY, r: this.rot, t: this.tilt }; this.target = null; el.setPointerCapture(e.pointerId); el.style.cursor = 'grabbing'; };
+    this._move = e => { if (!this.drag) return; this.rot = this.drag.r + (e.clientX - this.drag.x) * 0.008; this.tilt = Math.max(-0.95, Math.min(0.25, this.drag.t - (e.clientY - this.drag.y) * 0.004)); if (document.hidden) this.draw(performance.now()); };
+    this._up = () => { this.drag = null; el.style.cursor = 'grab'; };
+    el.addEventListener('pointerdown', this._down); el.addEventListener('pointermove', this._move); el.addEventListener('pointerup', this._up); el.addEventListener('pointercancel', this._up);
+  }
+  componentDidUpdate(pp) { if (pp.region !== this.props.region) { this.faceRegion(); if (this.props.reduced || document.hidden) { this.rot = this.target; this.target = null; this.draw(performance.now()); } } }
+  componentWillUnmount() { cancelAnimationFrame(this.raf); }
+  faceRegion() {
+    const g = GEO[this.props.region]; let t = -g[0] * Math.PI / 180 - 0.35;
+    const TAU = Math.PI * 2; while (t - this.rot > Math.PI) t -= TAU; while (t - this.rot < -Math.PI) t += TAU;
+    this.target = t;
+  }
+  build() {
+    const arr = []; const step = 1.7;
+    for (let lat = -88; lat <= 88; lat += step) {
+      const n = Math.max(1, Math.round(360 * Math.cos(lat * Math.PI / 180) / step));
+      for (let k = 0; k < n; k++) { const lon = -180 + (k + (Math.round(lat / step) % 2 ? .5 : 0)) * 360 / n;
+        arr.push(lat * Math.PI / 180, lon * Math.PI / 180, isLand(lon, lat) ? 1 : 0); }
+    }
+    this.pts = new Float32Array(arr); this.hasLand = !!LAND;
+  }
+  proj(la, lo, alt) {
+    const a = alt || 1, ct = Math.cos(this.tilt), st = Math.sin(this.tilt);
+    const X = Math.cos(la) * Math.sin(lo + this.rot), Y0 = -Math.sin(la), Z0 = Math.cos(la) * Math.cos(lo + this.rot);
+    return [X * a, (Y0 * ct - Z0 * st) * a, (Y0 * st + Z0 * ct) * a];
+  }
+  draw(now) {
+    const cv = this.cv.current; if (!cv || !this.pts) return;
+    const dpr = window.devicePixelRatio || 1, S = 480;
+    if (cv.width !== S * dpr) { cv.width = S * dpr; cv.height = S * dpr; }
+    const ctx = cv.getContext('2d'); ctx.setTransform(dpr, 0, 0, dpr, 0, 0); ctx.clearRect(0, 0, S, S);
+    const cx = S / 2, cy = S / 2, R = S * 0.4, t = (now - this.t0) / 1000;
+    let g = ctx.createRadialGradient(cx, cy, R * .9, cx, cy, R * 1.22); g.addColorStop(0, 'rgba(255,255,255,.14)'); g.addColorStop(1, 'rgba(255,255,255,0)');
+    ctx.fillStyle = g; ctx.beginPath(); ctx.arc(cx, cy, R * 1.22, 0, 7); ctx.fill();
+    g = ctx.createRadialGradient(cx - R * .35, cy - R * .4, R * .1, cx, cy, R); g.addColorStop(0, '#3556D4'); g.addColorStop(.7, '#2343BF'); g.addColorStop(1, '#17319C');
+    ctx.fillStyle = g; ctx.beginPath(); ctx.arc(cx, cy, R, 0, 7); ctx.fill();
+    const p = this.pts, ct = Math.cos(this.tilt), st = Math.sin(this.tilt);
+    for (let i = 0; i < p.length; i += 3) {
+      const la = p[i], lo = p[i + 1] + this.rot, land = p[i + 2];
+      const cl = Math.cos(la), X = cl * Math.sin(lo), Y0 = -Math.sin(la), Z0 = cl * Math.cos(lo);
+      const Z = Y0 * st + Z0 * ct; if (Z <= 0) continue;
+      const Y = Y0 * ct - Z0 * st, sx = cx + X * R, sy = cy + Y * R;
+      if (land) { const sz = 1.2 + Z * 1.5; ctx.fillStyle = 'rgba(255,255,255,' + (0.35 + Z * 0.65).toFixed(2) + ')'; ctx.fillRect(sx - sz / 2, sy - sz / 2, sz, sz); }
+      else if ((i / 3) % 3 === 0) { ctx.fillStyle = 'rgba(190,205,255,' + (0.10 + Z * 0.18).toFixed(2) + ')'; ctx.fillRect(sx - .6, sy - .6, 1.2, 1.2); }
+    }
+    ctx.strokeStyle = 'rgba(255,255,255,.55)'; ctx.lineWidth = 1.2; ctx.beginPath(); ctx.arc(cx, cy, R, 0, 7); ctx.stroke();
+    const sel = GEO[this.props.region], sla = sel[1] * Math.PI / 180, slo = sel[0] * Math.PI / 180;
+    const v = (la, lo) => [Math.cos(la) * Math.cos(lo), Math.cos(la) * Math.sin(lo), Math.sin(la)];
+    const A = v(sla, slo);
+    ctx.lineWidth = 1.6; ctx.setLineDash([4, 5]); ctx.lineDashOffset = -t * 18;
+    Object.keys(GEO).forEach(k => { if (k === this.props.region) return;
+      const q = GEO[k], B = v(q[1] * Math.PI / 180, q[0] * Math.PI / 180);
+      const d = Math.acos(Math.max(-1, Math.min(1, A[0] * B[0] + A[1] * B[1] + A[2] * B[2]))); if (d < 1e-3) return;
+      ctx.strokeStyle = 'rgba(255,190,150,.95)'; ctx.beginPath(); let pen = false;
+      for (let s2 = 0; s2 <= 40; s2++) { const u = s2 / 40, w1 = Math.sin((1 - u) * d) / Math.sin(d), w2 = Math.sin(u * d) / Math.sin(d);
+        const P = [A[0] * w1 + B[0] * w2, A[1] * w1 + B[1] * w2, A[2] * w1 + B[2] * w2];
+        const la = Math.asin(P[2]), lo = Math.atan2(P[1], P[0]);
+        const [x, y, z] = this.proj(la, lo, 1 + 0.16 * Math.sin(Math.PI * u) * Math.min(1, d));
+        if (z > 0 || x * x + y * y > 1) { const sx = cx + x * R, sy = cy + y * R; pen ? ctx.lineTo(sx, sy) : ctx.moveTo(sx, sy); pen = true; } else pen = false; }
+      ctx.stroke(); });
+    ctx.setLineDash([]);
+    Object.keys(GEO).forEach(k => { const q = GEO[k], [x, y, z] = this.proj(q[1] * Math.PI / 180, q[0] * Math.PI / 180); if (z <= 0) return;
+      const sx = cx + x * R, sy = cy + y * R, on = k === this.props.region;
+      if (on) { const ph = (t % 1.6) / 1.6; ctx.strokeStyle = 'rgba(255,255,255,' + (1 - ph).toFixed(2) + ')'; ctx.lineWidth = 2; ctx.beginPath(); ctx.arc(sx, sy, 6 + ph * 16, 0, 7); ctx.stroke(); }
+      ctx.fillStyle = on ? '#C2410C' : '#1F3FBF'; ctx.beginPath(); ctx.arc(sx, sy, on ? 6 : 4, 0, 7); ctx.fill();
+      ctx.strokeStyle = '#FFFFFF'; ctx.lineWidth = on ? 3 : 2; ctx.stroke(); });
+    const [lx, ly, lz] = this.proj(sla, slo);
+    if (this.lbl.current) { const st3 = this.lbl.current.style; st3.left = ((cx + lx * R) / S * 100) + '%'; st3.top = ((cy + ly * R) / S * 100) + '%'; st3.opacity = lz > 0.05 ? 1 : 0; }
+  }
+  render() {
+    const e = React.createElement;
+    return e('div', { style: { position:'relative', width:'min(480px,100%)', aspectRatio:'1' } },
+      e('canvas', { ref: this.cv, role:'img', 'aria-label': 'Globe showing sample regions, ' + this.props.label + ' selected', style: { width:'100%', height:'100%', display:'block', cursor:'grab', touchAction:'none' } }),
+      e('span', { ref: this.lbl, style: { position:'absolute', transform:'translate(14px,-50%)', whiteSpace:'nowrap', font:'500 12px "Geist Mono", monospace', color:'#132A86', background:'#FFFFFF', padding:'4px 8px', borderRadius:0, boxShadow:'0 4px 14px rgba(13,20,51,.18)', pointerEvents:'none', transition:'opacity .3s' } }, this.props.label));
+  }
+}
+
+const segOf = (on, head, rm) => ({ bg: on ? (head ? 'linear-gradient(180deg,#7FA0FF,#1F3FBF)' : 'linear-gradient(180deg,#5B86FF,#2A5CF0)') : '#DDE5F2', shadow: on ? (head ? '0 0 12px rgba(31,63,191,.7)' : 'inset 0 1px 0 rgba(255,255,255,.35)') : 'inset 0 1px 1px rgba(13,20,51,.06)', scale: head ? 'scaleY(1.12)' : 'none', anim: head && !rm ? 'headPulse 1.6s ease-in-out infinite' : 'none' });
+const hwById = id => HW.find(h => h.id === id);
+const regById = id => REGIONS.find(r => r.id === id);
+const fInt = n => Math.round(n).toLocaleString('en-US');
+const fMoney = n => '$' + n.toLocaleString('en-US', { minimumFractionDigits:2, maximumFractionDigits:2 });
+const hLabel = h => h === 1 ? '1 Hour' : h < 24 ? h + ' Hours' : h === 720 ? '30 Days' : h % 168 === 0 ? (h/168) + (h === 168 ? ' Week' : ' Weeks') : (h/24) + (h === 24 ? ' Day' : ' Days');
+const START = { wl:'training', ...WL.training.defaults };
+
+function calc(s) {
+  const hw = hwById(s.hw), r = regById(s.region), h = HOURS[s.hi];
+  const rate = Math.round(hw.rate * r.factor * 100) / 100, gpus = s.servers * hw.gpus;
+  return { gpus, sh: s.servers * h, gh: gpus * h, rate, cost: s.servers * h * rate };
+}
+
+function explain(s) {
+  const hw = hwById(s.hw), r = regById(s.region), h = HOURS[s.hi], n = s.servers;
+  const tb = (n * hw.gpus * hw.memGB / 1000).toFixed(2) + ' TB';
+  const P = (k, t, warn) => ({ k, t, color: warn ? '#C2410C' : '#132A86', bg: warn ? '#FBE9E1' : '#E6E9F6' });
+  let headline, pts = [];
+  if (s.wl === 'training') {
+    if (hw.id === 'h100') { headline = 'A Balanced Starting Point For Multi-GPU Training';
+      pts.push(P('Fit', 'NVLink Connects All Eight GPUs In Each Server. ' + tb + ' Of Memory In Total.')); }
+    if (hw.id === 'h200') { headline = 'More Memory Per GPU For Larger Models';
+      pts.push(P('Fit', '141 GB Per GPU Means Less Splitting Of The Model. ' + tb + ' In Total.'));
+      pts.push(P('Tradeoff', 'About 39% Higher Sample Rate Than H100. Worth It Only If The Memory Is Used.', true)); }
+    if (hw.id === 'l40s') { headline = 'Economical For Experiments, Tight For Large Training';
+      pts.push(P('Fit', 'Lowest Sample Rate Of The Three. Good For Small Models.'));
+      pts.push(P('Tradeoff', '48 GB Per GPU And PCIe Only. Large Multi-GPU Jobs Coordinate Slower.', true)); }
+    pts.push(n > 1
+      ? P('Scale', n + ' Servers Depend On The Network Between Them. Confirm The Fabric With The Operator.', n >= 8)
+      : P('Scale', 'One Server Keeps The Job In One Machine. No Cross-Server Networking.'));
+    if (h >= 336) pts.push(P('Runtime', 'A ' + hLabel(h) + ' Run Needs Regular Checkpoints.', true));
+  } else {
+    if (hw.id === 'l40s') { headline = 'Cost-Efficient Serving For Models Under 48 GB Per GPU';
+      pts.push(P('Fit', 'Lowest Sample Rate. Easy To Add Or Remove Replicas.'));
+      pts.push(P('Check', 'Larger Models May Need Several GPUs Per Replica.', true)); }
+    if (hw.id === 'h100') { headline = 'Headroom For Larger Models Or Heavier Traffic';
+      pts.push(P('Fit', '80 GB Per GPU Fits Larger Models In Each Replica.'));
+      pts.push(P('Tradeoff', 'About 2.7× The L40S Sample Rate, Multiplied By Always-On Runtime.', true)); }
+    if (hw.id === 'h200') { headline = 'Room For Very Large Models On Fewer GPUs';
+      pts.push(P('Fit', '141 GB Per GPU Fits Very Large Models Per Replica.'));
+      pts.push(P('Tradeoff', 'Highest Sample Rate. Dominates Long Always-On Estimates.', true)); }
+    pts.push(h < 24
+      ? P('Runtime', hLabel(h) + ' Suits A Load Test. Production Serving Runs Continuously.')
+      : P('Scale', n + (n === 1 ? ' Replica' : ' Replicas') + ' For ' + hLabel(h) + '. Idle Replicas Still Cost Money.', n === 1));
+  }
+  if (AVAIL[r.id][hw.id] === 'Limited') pts.push(P('Region', hw.short + ' Is Marked Limited In ' + r.name + '. Confirm Capacity First.', true));
+  else if (r.factor > 1) pts.push(P('Region', r.name + ' Adds A ' + Math.round((r.factor - 1) * 100) + '% Sample Adjustment.'));
+  return { headline, points: pts.slice(0, 4) };
+}
+
+class Component extends DCLogic {
+  state = { ...START, disp: calc(START), fl: {}, nodeOn: [false,false,false,false,false], change: null, preset: null, loader: 'on', narrow: false, mob: false, tall: true, reduced: false };
+
+  componentDidMount() {
+    this._r = () => this.setState({ narrow: window.innerWidth < 1000, mob: window.innerWidth < 640, tall: window.innerHeight >= 760 });
+    this._r(); window.addEventListener('resize', this._r);
+    this._mq = window.matchMedia('(prefers-reduced-motion: reduce)');
+    this.setState({ reduced: this._mq.matches || this.props.motion === 'Reduced' });
+    this._l1 = setTimeout(() => this.setState({ loader: 'fade' }), 1300);
+    this._l2 = setTimeout(() => this.setState({ loader: 'off' }), 1850);
+    if (this.props.startWorkload === 'Inference') this.apply({ wl:'inference', ...WL.inference.defaults }, 0, 'Inference');
+  }
+  componentDidUpdate(pp) { if (pp.motion !== this.props.motion) this.setState({ reduced: this._mq.matches || this.props.motion === 'Reduced' }); }
+  componentWillUnmount() { window.removeEventListener('resize', this._r); cancelAnimationFrame(this._raf); (this._pt || []).forEach(clearTimeout); clearTimeout(this._ft); clearTimeout(this._tt); clearTimeout(this._l1); clearTimeout(this._l2); }
+
+  apply(patch, origin, label, presetId) {
+    const s0 = this.state, s1 = { ...s0, ...patch };
+    const a = calc(s0), b = calc(s1);
+    const deltas = [];
+    const add = (k, x, y, f) => { if (Math.abs(x - y) > 1e-9) deltas.push({ k, from: f(x), to: f(y), arrow: y > x ? '↑' : '↓', color: y > x ? '#132A86' : '#1F3FBF' }); };
+    if (s0.hw !== s1.hw) deltas.push({ k:'Server', from: hwById(s0.hw).short, to: hwById(s1.hw).short, arrow:'→', color:'#132A86' });
+    if (s0.region !== s1.region) deltas.push({ k:'Region', from: regById(s0.region).name, to: regById(s1.region).name, arrow:'→', color:'#132A86' });
+    add('GPUs', a.gpus, b.gpus, fInt); add('GPU-Hours', a.gh, b.gh, fInt); add('Rate', a.rate, b.rate, fMoney); add('Estimate', a.cost, b.cost, fMoney);
+    const fl = {}; ['gpus','sh','gh','cost','rate'].forEach(k => { if (Math.abs(a[k] - b[k]) > 1e-9) fl[k] = true; });
+    this.setState({ ...patch, preset: presetId || null, change: { label, deltas, id: Date.now() }, fl });
+    clearTimeout(this._ft); this._ft = setTimeout(() => this.setState({ fl: {} }), 900);
+    this.pulse(origin);
+    this.tween(b);
+  }
+  tween(to) {
+    cancelAnimationFrame(this._raf);
+    if (this.state.reduced || document.hidden) { this.setState({ disp: to }); return; }
+    const from = { ...this.state.disp }, t0 = performance.now(), D = 420;
+    const step = now => {
+      const p = Math.min(1, (now - t0) / D), e = 1 - Math.pow(1 - p, 3), d = {};
+      for (const k in to) d[k] = from[k] + (to[k] - from[k]) * e;
+      this.setState({ disp: p < 1 ? d : to });
+      if (p < 1) this._raf = requestAnimationFrame(step);
+    };
+    this._raf = requestAnimationFrame(step);
+    clearTimeout(this._tt); this._tt = setTimeout(() => { cancelAnimationFrame(this._raf); this.setState({ disp: to }); }, D + 80);
+  }
+  pulse(o) {
+    (this._pt || []).forEach(clearTimeout); this._pt = [];
+    this.setState({ nodeOn: [false,false,false,false,false] });
+    const set = (i, v) => this.setState(s => { const n = s.nodeOn.slice(); n[i] = v; return { nodeOn: n }; });
+    for (let i = o; i < 5; i++) {
+      const d = this.state.reduced ? 0 : (i - o) * 110;
+      this._pt.push(setTimeout(() => set(i, true), d), setTimeout(() => set(i, false), d + 750));
+    }
+  }
+
+  ring(key, radius) {
+    if (this.state.reduced) return null;
+    const e = React.createElement;
+    return e('div', { key, 'aria-hidden': true, style: { position:'absolute', inset:0, borderRadius: radius, padding: 2, pointerEvents:'none', overflow:'hidden',
+      WebkitMask:'linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0)', WebkitMaskComposite:'xor', mask:'linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0)', maskComposite:'exclude' } },
+      e('div', { style: { position:'absolute', left:'50%', top:'50%', width:'250%', aspectRatio:'1', background:'conic-gradient(from 0deg, rgba(31,63,191,0) 0deg, rgba(31,63,191,0) 250deg, #5B74D6 320deg, #FFFFFF 350deg, rgba(31,63,191,0) 356deg)', animation:'spin 2.8s linear infinite' } }));
+  }
+  laser(key, once, delay) {
+    if (this.state.reduced) return null;
+    const e = React.createElement;
+    return e('div', { key, 'aria-hidden': true, style: { position:'absolute', left:0, right:0, bottom:0, height:2, overflow:'hidden', pointerEvents:'none' } },
+      e('div', { style: { width:'28%', height:'100%', background:'linear-gradient(90deg,rgba(31,63,191,0),#1F3FBF 45%,#C2410C 55%,rgba(31,63,191,0))', boxShadow:'none', transform:'translateX(-120%)', animation: once ? `sweep .9s cubic-bezier(.4,0,.2,1) ${delay || 0}s 1 both` : 'sweep 2.4s cubic-bezier(.45,0,.55,1) infinite' } }));
+  }
+  meterLaser(key) {
+    if (this.state.reduced) return null;
+    return React.createElement('div', { key, style: { position:'absolute', top:0, bottom:0, width:'30%', background:'linear-gradient(90deg,rgba(255,255,255,0),rgba(255,255,255,.55) 50%,rgba(255,255,255,0))', animation:'sweep 2s cubic-bezier(.45,0,.55,1) infinite' } });
+  }
+  beam(i, dir) {
+    const on = this.state.nodeOn[i + 1], rm = this.state.reduced, h = dir === 'right';
+    const core = on ? '#1F3FBF' : '#5B74D6';
+    const base = React.createElement('div', { style: { position:'absolute', inset: h ? '50% 0 auto 0' : '0 auto 0 50%', [h ? 'height' : 'width']: 2, [h ? 'marginTop' : 'marginLeft']: -1,
+      background: h ? 'linear-gradient(90deg,rgba(91,116,214,.15),rgba(91,116,214,.45),rgba(91,116,214,.15))' : 'linear-gradient(180deg,rgba(91,116,214,.15),rgba(91,116,214,.45),rgba(91,116,214,.15))', borderRadius: 2 } });
+    const grad = h ? `linear-gradient(90deg,rgba(31,63,191,0),${core} 70%,${on ? '#C2410C' : '#132A86'})` : dir === 'up' ? `linear-gradient(0deg,rgba(31,63,191,0),${core} 70%,${on ? '#C2410C' : '#132A86'})` : `linear-gradient(180deg,rgba(31,63,191,0),${core} 70%,${on ? '#C2410C' : '#132A86'})`;
+    const kf = h ? 'beamX' : dir === 'up' ? 'beamYu' : 'beamY';
+    const bolt = d => React.createElement('div', { key: d, style: { position:'absolute', [h ? 'top' : 'left']: '50%', [h ? 'marginTop' : 'marginLeft']: on ? -2 : -1.5,
+      [h ? 'width' : 'height']: '35%', [h ? 'height' : 'width']: on ? 4 : 3, borderRadius: 0, background: grad,
+      boxShadow: 'none',
+      [h ? 'left' : 'top']: rm ? '32%' : undefined,
+      animation: rm ? 'none' : `${kf} ${on ? .55 : 1.1}s cubic-bezier(.4,0,.6,1) ${d}s infinite` } });
+    return React.createElement('div', { 'aria-hidden': true, style: { position:'relative', overflow:'hidden', width: h ? '100%' : 14, height: h ? 14 : '100%', minHeight: h ? 14 : 28, alignSelf: h ? 'center' : 'stretch' } },
+      base, bolt(0), rm ? null : bolt(on ? .27 : .55));
+  }
+
+  serverGrid() {
+    const { servers, wl, reduced, narrow } = this.state, hw = hwById(this.state.hw), training = wl === 'training';
+    const cols = servers <= 2 ? servers : servers <= 4 ? 2 : servers <= 9 ? 3 : 4, rows = Math.ceil(servers / cols);
+    const T = cols <= 2 ? 58 : cols === 3 ? 48 : 40, G = 9, P = 12;
+    const pw = cols * T + (cols - 1) * G + P * 2, ph = rows * T + (rows - 1) * G + P * 2;
+    const c = Math.cos(40 * Math.PI / 180), sn = Math.sin(40 * Math.PI / 180);
+    const bw = pw * c + ph * sn, bh = (pw * sn + ph * c) * 0.56;
+    const sc = Math.min(1.25, (this.state.mob ? 300 : narrow ? 280 : 260) / bw, (this.state.mob ? 140 : 180) / bh);
+    const pipCols = hw.gpus === 8 ? 4 : 2;
+    const tiles = [];
+    for (let i = 0; i < servers; i++) {
+      const pips = [];
+      for (let j = 0; j < hw.gpus; j++) pips.push(React.createElement('div', { key: j, style: {
+        borderRadius: 0, background: '#1F3FBF',
+        animation: reduced ? 'none' : `pip 1.6s ease-in-out ${training ? 0 : ((i * 0.53) % 1.6).toFixed(2)}s infinite` } }));
+      tiles.push(React.createElement('div', { key: hw.id + '-' + i, style: {
+        width: T, height: T, borderRadius: 1, background: '#FFFFFF', padding: T * 0.16,
+        display: 'grid', gridTemplateColumns: `repeat(${pipCols},1fr)`, gap: T * 0.07,
+        boxShadow: `0 0 0 1px ${training ? '#1F3FBF' : '#9AA3C7'}, 2px 2px 0 #FFFFFF, 3px 3px 0 #1F3FBF, 5px 5px 0 #FFFFFF, 6px 6px 0 #9AA3C7, 12px 14px 18px rgba(13,20,51,.12)`,
+        animation: reduced ? 'none' : `tileIn .38s cubic-bezier(.2,.8,.2,1) ${(i * 0.025).toFixed(3)}s both` } }, pips));
+    }
+    return React.createElement('div', { style: {
+      display: 'grid', gridTemplateColumns: `repeat(${cols}, ${T}px)`, gap: G, padding: P, borderRadius: 1,
+      background: training ? 'rgba(31,63,191,0.08)' : 'rgba(255,255,255,0.7)',
+      border: training ? '1.5px solid #1F3FBF' : '1px dashed #9AA3C7',
+      transform: `scale(${sc.toFixed(3)}) rotateX(56deg) rotateZ(-40deg)`, transition: 'background .3s, border-color .3s' } }, tiles);
+  }
+
+  heroSchematic(n) {
+    if (!this.__hbBase) {
+      let seed = 7; const rnd = () => { seed = (seed * 16807) % 2147483647; return seed / 2147483647; };
+      const traces = [], pads = [], lines = [], rects = [], texts = [];
+      const slotY = k => 150 + (k % 8) * 56 + 22, rackX = k => k < 8 ? 1040 : 1190;
+      const feeds = [];
+      for (let k = 0; k < 16; k++) {
+        const x0 = 40 + rnd() * 560, y0 = 40 + rnd() * 640, xm = x0 + 80 + rnd() * 200, y1 = slotY(k), dx = Math.abs(y1 - y0), xe = rackX(k);
+        const d = 'M' + x0.toFixed(0) + ' ' + y0.toFixed(0) + ' H' + xm.toFixed(0) + ' L' + Math.min(xe - 30, xm + dx).toFixed(0) + ' ' + y1 + ' H' + xe;
+        feeds.push({ d, x0, y0 });
+      }
+      for (let i = 0; i < 26; i++) {
+        let x = rnd() * 1000, y = rnd() * 720, d = 'M' + x.toFixed(0) + ' ' + y.toFixed(0);
+        for (let j = 0; j < 4; j++) { const len = 40 + rnd() * 160, dir = Math.floor(rnd() * 4); if (dir === 0) x += len; else if (dir === 1) { x += len * 0.7; y += (rnd() < 0.5 ? -1 : 1) * len * 0.7; } else if (dir === 2) y += (rnd() < 0.5 ? -1 : 1) * len * 0.6; else x -= len * 0.5; d += ' L' + x.toFixed(0) + ' ' + y.toFixed(0); }
+        traces.push({ d, c: '#8FA2FF', w: 1, o: 0.14 }); pads.push({ x: +x.toFixed(0), y: +y.toFixed(0), r: 2.6, f: '#0F1F66', c: '#8FA2FF', o: 0.35 });
+      }
+      for (let x = 0; x <= 1400; x += 50) lines.push({ x1: x, y1: 0, x2: x, y2: x % 200 === 0 ? 14 : 7, c: '#C9D3FF', w: 1, o: 0.3 });
+      for (let x = 200; x < 1400; x += 200) texts.push({ x: x + 4, y: 26, t: String(x).padStart(4, '0'), fs: 10, an: 'start', o: 0.35 });
+      const FX = 180, FY = 560;
+      [86, 70, 40].forEach((r, i) => pads.push({ x: FX, y: FY, r, f: 'none', c: '#8FA2FF', o: [0.28, 0.18, 0.3][i] }));
+      for (let i = 0; i < 48; i++) { const t = i / 48 * Math.PI * 2, r0 = i % 4 ? 80 : 74; lines.push({ x1: +(FX + r0 * Math.cos(t)).toFixed(1), y1: +(FY + r0 * Math.sin(t)).toFixed(1), x2: +(FX + 86 * Math.cos(t)).toFixed(1), y2: +(FY + 86 * Math.sin(t)).toFixed(1), c: '#8FA2FF', w: 1, o: 0.3 }); }
+      for (let i = 0; i < 7; i++) { const t = i / 7 * Math.PI * 2; traces.push({ d: 'M' + FX + ' ' + FY + ' Q' + (FX + 50 * Math.cos(t + 0.6)).toFixed(1) + ' ' + (FY + 50 * Math.sin(t + 0.6)).toFixed(1) + ' ' + (FX + 68 * Math.cos(t)).toFixed(1) + ' ' + (FY + 68 * Math.sin(t)).toFixed(1), c: '#8FA2FF', w: 1, o: 0.3 }); }
+      texts.push({ x: FX, y: FY + 112, t: 'COOLING LOOP', fs: 11, an: 'middle', o: 0.4 });
+      [1040, 1190].forEach((x, r) => { rects.push({ x: x - 10, y: 126, w: 140, h: 470, f: 'rgba(13,20,51,.35)', c: '#8FA2FF', o: 0.45 }); texts.push({ x: x + 60, y: 114, t: 'RACK ' + 'AB'[r], fs: 11, an: 'middle', o: 0.5 }); lines.push({ x1: x - 10, y1: 604, x2: x + 130, y2: 604, c: '#8FA2FF', w: 2, o: 0.35 }); });
+      this.__hbBase = { traces, pads, lines, rects, texts, feeds };
+    }
+    const B = this.__hbBase, rects = B.rects.slice(), leds = [], lines = B.lines.slice(), traces = B.traces.slice(), pads = B.pads.slice();
+    B.feeds.forEach((f, k) => { const on = k < n; traces.push({ d: f.d, c: on ? '#7CF0B4' : '#8FA2FF', w: on ? 1.4 : 1, o: on ? 0.55 : 0.16 }); pads.push({ x: +f.x0.toFixed(0), y: +f.y0.toFixed(0), r: 3.4, f: on ? '#7CF0B4' : '#0F1F66', c: on ? '#7CF0B4' : '#8FA2FF', o: on ? 0.8 : 0.35 }); });
+    for (let k = 0; k < 16; k++) {
+      const x = k < 8 ? 1040 : 1190, y = 150 + (k % 8) * 56, on = k < n;
+      rects.push({ x, y, w: 120, h: 44, f: on ? 'rgba(124,240,180,.12)' : 'rgba(15,31,102,.4)', c: on ? '#7CF0B4' : '#8FA2FF', o: on ? 0.9 : 0.3 });
+      for (let v = 0; v < 8; v++) lines.push({ x1: x + 10 + v * 8, y1: y + 10, x2: x + 10 + v * 8, y2: y + 34, c: on ? '#7CF0B4' : '#8FA2FF', w: 1, o: on ? 0.45 : 0.15 });
+      [0, 1, 2].forEach(j => leds.push({ x: x + 92 + j * 9, y: y + 22, f: on ? (j === 2 ? '#FFFFFF' : '#7CF0B4') : '#8FA2FF', o: on ? 0.95 : 0.25 }));
+    }
+    return { traces, pads, lines, rects, leds, texts: B.texts };
+  }
+
+  renderVals() {
+    const s = this.state, hw = hwById(s.hw), region = regById(s.region), h = HOURS[s.hi], wl = WL[s.wl];
+    const c = calc(s), avail = AVAIL[s.region][s.hw];
+    const node = on => ({ border: on ? '#1F3FBF' : '#9AA3C7', shadow: on ? '0 0 0 3px rgba(31,63,191,.16)' : 'none', lift: on ? 'translateY(-2px)' : 'none' });
+    const flc = k => s.fl[k] ? (k === 'cost' ? 'rgba(255,255,255,.22)' : 'rgba(31,63,191,.12)') : 'rgba(31,63,191,0)';
+    const setWl = id => () => { if (id !== s.wl) this.apply({ wl: id, ...WL[id].defaults }, 0, WL[id].label + ' · Suggested Setup Applied'); };
+    const ch = s.change;
+    return {
+      showLoader: s.loader !== 'off', loaderOpacity: s.loader === 'on' ? 1 : 0, loaderPE: s.loader === 'on' ? 'auto' : 'none',
+      narrow: s.narrow, mainCols: s.narrow ? 'minmax(0,1fr)' : 'minmax(340px,400px) minmax(0,1fr)', padB: s.narrow ? 'calc(76px + env(safe-area-inset-bottom))' : '0px',
+      toResult: () => { const el = document.getElementById('result'); if (!el) return; const y = el.getBoundingClientRect().top + window.scrollY - 12; const atRes = Math.abs(window.scrollY - y) < 80; window.scrollTo({ top: atRes ? 0 : y, behavior: 'smooth' }); },
+      ctrlMax: '100%', ctrlOrder: 1, resOrder: 2,
+      resPos: !s.narrow && s.tall ? 'sticky' : 'relative',
+      diagCols: s.mob ? 'minmax(0,1fr) 24px minmax(0,1fr)' : 'minmax(0,1fr) 44px minmax(0,1.45fr) 44px minmax(0,1fr)',
+      diagRows: s.mob ? 'auto 30px auto 30px auto' : 'auto 40px auto',
+      diagAreas: s.mob ? '"w b0 c" ". . b1" "s s s" "b2 . ." "d b3 r"' : '"w . s . r" "b0 . s . b3" "c b1 s b2 d"',
+      gridH: s.mob ? '150px' : '190px',
+      miniBg: s.fl.cost ? '#1F3FBF' : 'rgba(31,63,191,0)',
+      presets: PRESETS.map(p => { const on = s.preset === p.id; return { ...p, ring: null, pressed: on ? 'true' : 'false', bg: on ? '#0D1433' : '#F7F7F3', color: on ? '#FFFFFF' : '#0D1433', border: on ? '#0D1433' : '#C3C8DD',
+        kindBg: on ? '#1F3FBF' : '#E6E9F6', kindColor: on ? '#FFFFFF' : '#132A86',
+        onClick: () => this.apply(p.s, 0, 'Scenario · ' + p.label, p.id) }; }),
+      reset: () => this.apply({ ...START }, 0, 'Reset To Default Setup'),
+      wlOpts: Object.keys(WL).map(id => { const on = s.wl === id; return { label: WL[id].label, short: WL[id].short, pressed: on ? 'true' : 'false',
+        bg: on ? '#1F3FBF' : '#FFFFFF', border: on ? '#1F3FBF' : '#C3C8DD', color: on ? '#FFFFFF' : '#0D1433', subColor: on ? '#DCE1F7' : '#5A6182', onClick: setWl(id) }; }),
+      hwCards: HW.map(x => { const on = s.hw === x.id; return { name: x.name, tag: x.tag, gpus: x.gpus, mem: x.memGB + ' GB', link: x.link, rate: fMoney(x.rate),
+        suggested: wl.suggested.includes(x.id), pressed: on ? 'true' : 'false',
+        bg: on ? '#FFFFFF' : '#F7F7F3', border: on ? '#1F3FBF' : '#C3C8DD', ring: on ? '#1F3FBF' : '#9AA3C7', dot: on ? 1 : 0,
+        chipBg: on ? '#E6E9F6' : '#FFFFFF',
+        shadow: on ? 'inset 3px 0 0 #1F3FBF' : 'none', lift: on ? 'translateY(-1px)' : 'none', rateColor: on ? '#132A86' : '#0D1433',
+        scan: null,
+        onClick: () => { if (!on) this.apply({ hw: x.id }, 1, 'Server → ' + x.name); } }; }),
+      regionOpts: REGIONS.map(r => { const on = s.region === r.id, av = AVAIL[r.id][s.hw], ok = av === 'Typical'; return { name: r.name, factor: r.factor.toFixed(2), avail: av,
+        availColor: ok ? '#1F7A52' : '#C2410C', availBg: ok ? '#E3F1EA' : '#FBE9E1', availText: ok ? '#17603F' : '#C2410C',
+        pressed: on ? 'true' : 'false', bg: on ? '#E6E9F6' : '#FFFFFF', border: on ? '#1F3FBF' : '#C3C8DD', color: on ? '#132A86' : '#0D1433',
+        gBg: on ? '#FFFFFF' : 'transparent', gBorder: on ? '#FFFFFF' : 'rgba(255,255,255,.5)', gColor: on ? '#132A86' : '#FFFFFF',
+        dot: on ? 1 : 0, scan: null,
+        onClick: () => { if (!on) this.apply({ region: r.id }, 3, 'Region → ' + r.name); } }; }),
+      servers: s.servers, serversWord: s.servers === 1 ? 'Server' : 'Servers', serversWordCap: s.servers === 1 ? 'Server' : 'Servers', serversAria: s.servers + ' servers',
+      serversMinus: () => { if (s.servers > 1) this.apply({ servers: s.servers - 1 }, 2, 'Servers → ' + (s.servers - 1)); },
+      serversPlus: () => { if (s.servers < 16) this.apply({ servers: s.servers + 1 }, 2, 'Servers → ' + (s.servers + 1)); },
+      onServers: e => { const v = +e.target.value; if (v !== s.servers) this.apply({ servers: v }, 2, 'Servers → ' + v); },
+      hi: s.hi, hoursLabel: hLabel(h), hoursStr: fInt(h),
+      onHours: e => { const v = +e.target.value; if (v !== s.hi) this.apply({ hi: v }, 4, 'Runtime → ' + hLabel(HOURS[v])); },
+      costCols: s.mob ? 2 : 4,
+      hourTicks: HTICK.map((t, i) => ({ label: t, pos: (i / 8 * 100) + '%', bg: i === s.hi ? '#E6E9F6' : 'transparent', aria: 'Set runtime to ' + hLabel(HOURS[i]), color: i === s.hi ? '#1F3FBF' : '#5A6182', weight: i === s.hi ? 700 : 500,
+        onClick: () => { if (i !== s.hi) this.apply({ hi: i }, 4, 'Runtime → ' + hLabel(HOURS[i])); } })),
+      hw, region: { ...region, factorStr: region.factor.toFixed(2) }, wl,
+      gpusStr: fInt(c.gpus), memTotal: (c.gpus * hw.memGB / 1000).toFixed(2) + ' TB',
+      availNow: avail + ' Availability', availColor: avail === 'Typical' ? '#1F7A52' : '#C2410C', availBg: avail === 'Typical' ? '#E3F1EA' : '#FBE9E1', availText: avail === 'Typical' ? '#17603F' : '#C2410C',
+      runPct: Math.max(2, h / 720 * 100).toFixed(1) + '%',
+      rateStr: fMoney(c.rate), baseStr: fMoney(hw.rate), perGpuStr: fMoney(c.rate / hw.gpus),
+      disp: { gpus: fInt(s.disp.gpus), sh: fInt(s.disp.sh), gh: fInt(s.disp.gh), cost: fMoney(s.disp.cost) },
+      fl: { gpus: flc('gpus'), sh: flc('sh'), gh: flc('gh'), cost: flc('cost'), rate: flc('rate') },
+      n0: node(s.nodeOn[0]), n1: node(s.nodeOn[1]), n2: node(s.nodeOn[2]), n3: node(s.nodeOn[3]), n4: node(s.nodeOn[4]),
+      beam0: this.beam(0, s.mob ? 'right' : 'down'), beam1: this.beam(1, s.mob ? 'down' : 'right'), beam2: this.beam(2, s.mob ? 'down' : 'right'), beam3: this.beam(3, s.mob ? 'right' : 'up'),
+      serverGrid: this.serverGrid(),
+      changeNode: ch ? React.createElement('span', { key: ch.id, style: { display:'inline-flex', alignItems:'center', gap:6, animation: s.reduced ? 'none' : 'noteIn .3s ease-out both' } },
+        React.createElement('span', { style: { width:6, height:6, borderRadius:'50%', background:'#1F3FBF' } }), ch.label) : 'Default Training Setup',
+      deltas: ch ? ch.deltas.slice(0, 5) : [], hasDeltas: !!(ch && ch.deltas.length), noDeltas: !(ch && ch.deltas.length),
+      why: explain(s),
+      whyPts: explain(s).points.map((p, i, a) => ({ ...p, n: '0' + (i + 1), rule: i === a.length - 1 ? '0 solid transparent' : '1px solid #C3C8DD' })),
+      hb: this.heroSchematic(s.servers),
+      estSegs: Array.from({ length: 16 }, (_, i) => ({ bg: i < s.servers ? '#7CF0B4' : 'rgba(255,255,255,.16)', sh: i === s.servers - 1 ? '0 0 8px rgba(124,240,180,.8)' : 'none' })),
+      serverSegs: Array.from({ length: 16 }, (_, i) => { const on = i < s.servers, head = i === s.servers - 1;
+        return { bg: on ? (head ? '#132A86' : '#1F3FBF') : 'transparent', shadow: on ? (head ? '0 0 10px rgba(91,116,214,.9)' : 'none') : 'inset 0 1px 0 rgba(255,255,255,.06)', scale: 'none', anim: 'none' }; }),
+      serverPct: (s.servers / 16 * 100) + '%', serverLaser: null,
+      hourSegs: HOURS.map((_, i) => ({ h: (22 + i * 9.75) + '%', bg: i === s.hi ? '#1F3FBF' : i < s.hi ? '#B4BCE2' : '#E3E5EE', cap: i === s.hi ? '3px solid #132A86' : '0 solid transparent' })),
+      
+      meterS: { border: s.focusS ? '#1F3FBF' : '#9AA3C7', ring: s.focusS ? '0 0 0 3px rgba(31,63,191,.18)' : 'none' },
+      meterH: { border: s.focusH ? '#1F3FBF' : '#9AA3C7', ring: s.focusH ? '0 0 0 3px rgba(31,63,191,.18)' : 'none' },
+      focusS: () => this.setState({ focusS: true }), blurS: () => this.setState({ focusS: false }),
+      focusH: () => this.setState({ focusH: true }), blurH: () => this.setState({ focusH: false }),
+      lz: ['gpus','sh','gh','cost'].reduce((o, k, i) => { o[k] = s.fl[k] && ch ? this.laser('m' + k + ch.id, true, i * 0.06) : null; return o; }, {}),
+      heroBg: this.__hb || (this.__hb = React.createElement('img', { src: 'assets/hydra-clouds.jpg', alt: '', 'aria-hidden': true, style: { position: 'absolute', inset: '-6%', width: '112%', height: '112%', objectFit: 'cover', objectPosition: 'center 40%', zIndex: -2, pointerEvents: 'none', animation: s.reduced ? 'none' : 'heroDrift 38s ease-in-out infinite alternate' } })),
+      estGlow: this.__eg || (this.__eg = React.createElement('div', { 'aria-hidden': true, style: { position: 'absolute', inset: '-40%', pointerEvents: 'none', background: 'radial-gradient(40% 40% at 30% 30%, rgba(124,150,255,.55), transparent 70%), radial-gradient(35% 35% at 75% 70%, rgba(255,160,120,.28), transparent 70%)', animation: s.reduced ? 'none' : 'glowSpin 18s linear infinite' } })),
+      globe: React.createElement(DotGlobe, { region: s.region, label: region.name, reduced: s.reduced }),
+    };
+  }
+}
+</script>
+</body>
+</html>

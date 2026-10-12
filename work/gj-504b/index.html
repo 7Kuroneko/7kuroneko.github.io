@@ -1,0 +1,557 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Portals · FocusField · GJ 504 b · 30 Min</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root{--lumen:#FAFAFA;--silver:#C9C9C8;--signal:#6B6B70;--nebula:#424348;--meteor:#171717;--void:#0A0A0A;--halo:#FFF738;--mono:'JetBrains Mono',ui-monospace,"SF Mono",Menlo,monospace;--sans:'DM Sans',system-ui,sans-serif}
+*{box-sizing:border-box}
+a{color:var(--silver)}a:hover{color:var(--halo)}
+html,body{margin:0;padding:0;background:#000;height:100vh;width:100vw;overflow:hidden}
+body{display:flex;align-items:center;justify-content:center;cursor:none}
+body.show-cursor{cursor:default}
+#stage{position:relative;background:#000;display:block;overflow:hidden}
+canvas#field{display:block;width:100%;height:100%}
+.chrome{position:absolute;z-index:6;font-family:var(--mono);pointer-events:none;transition:opacity .6s ease}
+.chrome.eyebrow{top:clamp(16px,3.2vh,34px);left:clamp(18px,3.2vw,40px);display:flex;align-items:center;gap:12px;font-size:clamp(8px,.74vw,11px);letter-spacing:.34em;text-transform:uppercase;color:var(--signal)}
+.chrome.eyebrow .mark{display:block;width:clamp(11px,1vw,15px);aspect-ratio:6/8}
+.chrome.eyebrow .dot{width:4px;height:4px;background:var(--halo)}
+.chrome.timecode{top:clamp(16px,3.2vh,34px);right:clamp(18px,3.2vw,40px);display:flex;align-items:center;gap:10px;font-size:clamp(9px,.8vw,12px);letter-spacing:.22em;color:var(--signal);font-variant-numeric:tabular-nums}
+.chrome.timecode b{color:var(--silver);font-weight:400}
+.chrome.timecode .sep{color:var(--nebula)}
+body.hud-hidden .chrome.eyebrow,body.hud-hidden .chrome.timecode{opacity:0}
+.chrome.timecode.off{display:none}
+#loading{position:absolute;left:50%;bottom:14%;transform:translateX(-50%);z-index:9;font-family:var(--mono);font-size:clamp(8px,.74vw,11px);letter-spacing:.34em;text-transform:uppercase;color:var(--signal);pointer-events:none;transition:opacity .8s}
+#loading.gone{opacity:0}
+#boot{position:fixed;inset:0;z-index:40;background:#0B0C0E;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:22px;transition:opacity .9s ease;cursor:default}
+#boot.gone{opacity:0;pointer-events:none}
+#boot .bp{width:34px;height:40px;display:grid;grid-template-columns:repeat(7,1fr);grid-template-rows:repeat(8,1fr);gap:0}
+#boot .bp i{background:#FAFAFA}#boot .bp i.o{background:transparent}
+#boot .bl{font-family:var(--mono);font-size:clamp(9px,.8vw,12px);letter-spacing:.34em;text-transform:uppercase;color:#8A8B90;display:flex;gap:12px;align-items:center}
+#boot .bl b{font-weight:500;color:#C9C9C8}
+#boot .bar{width:120px;height:1px;background:rgba(242,243,241,.12);overflow:hidden;position:relative}
+#boot .bar::after{content:'';position:absolute;left:-40%;top:0;width:40%;height:100%;background:#FFF738;animation:bootbar 1.3s ease-in-out infinite}
+@keyframes bootbar{to{left:100%}}
+.card{position:absolute;inset:0;z-index:8;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;pointer-events:none;opacity:0}
+.card::after{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 70% 60% at 50% 50%,rgba(4,4,8,.62),rgba(4,4,8,.16) 70%,transparent);z-index:-1}
+.card .eb{font-family:var(--mono);font-size:clamp(9px,.95vw,13px);letter-spacing:.4em;text-transform:uppercase;color:var(--silver);margin-bottom:clamp(20px,3vh,34px);display:flex;align-items:center;gap:14px}
+.card .eb .dot{width:5px;height:5px;background:var(--halo)}
+.card h1{font-family:var(--sans);font-weight:300;font-size:clamp(40px,7.4vw,124px);letter-spacing:.04em;line-height:.92;margin:0;color:var(--lumen);text-shadow:0 4px 60px rgba(0,0,0,.55)}
+.card .sub{font-family:var(--mono);font-size:clamp(9px,.92vw,13px);letter-spacing:.32em;text-transform:uppercase;color:var(--silver);margin-top:clamp(22px,3.4vh,38px)}
+.card .sub b{color:var(--halo);font-weight:400}
+.card .sub .verse{color:var(--halo)}
+.endmark{display:block;width:clamp(40px,5vw,70px);aspect-ratio:6/8;margin-bottom:clamp(26px,4vh,46px)}
+#replay{pointer-events:auto;margin-top:clamp(30px,4.6vh,52px);appearance:none;background:transparent;border:1px solid var(--meteor);color:var(--silver);font-family:var(--mono);font-size:clamp(9px,.82vw,12px);letter-spacing:.28em;text-transform:uppercase;padding:12px 22px;cursor:pointer;display:inline-flex;align-items:center;gap:12px;transition:border-color .15s,color .15s}
+#replay::before{content:'↻';color:var(--halo);font-size:1.2em;line-height:1}
+#replay:hover{border-color:var(--halo);color:var(--lumen)}
+#controls{position:absolute;left:0;right:0;bottom:0;z-index:7;padding:clamp(40px,6vh,70px) clamp(18px,3vw,40px) clamp(14px,2.4vh,26px);background:linear-gradient(to top,rgba(0,0,0,.72) 0%,rgba(0,0,0,.34) 55%,transparent 100%);transition:opacity .45s ease,transform .45s ease;display:flex;flex-direction:column;gap:clamp(10px,1.4vh,16px)}
+body.hud-hidden #controls{opacity:0;transform:translateY(8px)}
+#scrub{position:relative;height:14px;padding:10px 0;margin:-10px 0;box-sizing:content-box;display:flex;align-items:center;cursor:pointer}
+#scrub .track{position:relative;width:100%;height:2px;background:rgba(250,250,250,.16)}
+#scrub .fill{position:absolute;left:0;top:0;bottom:0;width:0%;background:var(--halo)}
+#scrub .knob{position:absolute;top:50%;width:9px;height:9px;background:var(--halo);transform:translate(-50%,-50%) scale(.5);opacity:0;transition:opacity .15s,transform .15s}
+#scrub:hover .knob{opacity:1;transform:translate(-50%,-50%) scale(1)}
+#scrub:hover .track{height:3px}
+.ctl-row{display:flex;align-items:center;gap:clamp(14px,1.6vw,22px);font-family:var(--mono)}
+.ctl-btn{appearance:none;background:transparent;border:none;color:var(--silver);cursor:pointer;padding:4px;display:inline-flex;align-items:center;justify-content:center;transition:color .15s}
+.ctl-btn:hover{color:var(--lumen)}
+.ctl-btn svg{display:block;width:clamp(16px,1.5vw,20px);height:clamp(16px,1.5vw,20px)}
+.ctl-time{font-size:clamp(10px,.86vw,13px);letter-spacing:.16em;color:var(--silver);font-variant-numeric:tabular-nums}
+.ctl-time .tot{color:var(--nebula)}
+.ctl-spacer{flex:1}
+.ctl-label{font-size:clamp(8px,.7vw,10px);letter-spacing:.3em;text-transform:uppercase;color:var(--signal)}
+#tp{position:fixed;top:24px;right:24px;width:256px;background:#0A0A0B;border:1px solid #1d1e20;padding:18px 18px 22px;font-family:var(--sans);color:var(--lumen);z-index:50;display:none;box-shadow:0 30px 80px rgba(0,0,0,.5)}
+#tp.open{display:block}
+#tp .hd{display:flex;justify-content:space-between;align-items:center;font-family:var(--mono);font-size:10px;letter-spacing:.3em;color:#818283;padding-bottom:14px;border-bottom:1px solid #1d1e20;margin-bottom:14px}
+#tp .hd .x{color:#4F5052;cursor:pointer;padding:4px 8px;margin:-4px -8px;border:1px solid transparent}
+#tp .hd .x:hover{border-color:#232323;color:#C5C6C8}
+#tp label{display:block;font-size:9px;letter-spacing:.3em;color:#818283;margin:16px 0 8px;text-transform:uppercase}
+#tp .seg{display:grid;grid-template-columns:1fr 1fr;gap:2px}
+#tp .seg button{text-align:left;background:transparent;border:1px solid #1d1e20;color:#818283;padding:8px 10px;font-family:inherit;font-size:10px;letter-spacing:.18em;cursor:pointer;text-transform:uppercase;transition:all .12s}
+#tp .seg button:hover{color:#C5C6C8;border-color:#2a2b2e}
+#tp .seg button.on{background:#16171a;border-color:#4F5052;color:var(--lumen)}
+#tp .row{display:flex;align-items:center;gap:10px}
+#tp input[type=range]{flex:1;appearance:none;-webkit-appearance:none;background:transparent;height:14px;cursor:pointer}
+#tp input[type=range]::-webkit-slider-runnable-track{height:1px;background:#2a2b2e}
+#tp input[type=range]::-moz-range-track{height:1px;background:#2a2b2e}
+#tp input[type=range]::-webkit-slider-thumb{appearance:none;-webkit-appearance:none;width:8px;height:14px;background:var(--lumen);border:0;margin-top:-7px;border-radius:0}
+#tp input[type=range]::-moz-range-thumb{width:8px;height:14px;background:var(--lumen);border:0;border-radius:0}
+#tp .val{font-family:var(--mono);font-size:10px;color:#818283;min-width:46px;text-align:right;letter-spacing:.06em}
+#hint{position:fixed;bottom:18px;left:50%;transform:translateX(-50%);color:#4F5052;font-family:var(--sans);font-size:10px;letter-spacing:.34em;text-transform:uppercase;z-index:9;pointer-events:none;transition:opacity 1.2s ease}
+#hint.gone{opacity:0}
+@media (max-width:760px){
+#controls{padding:28px 14px calc(env(safe-area-inset-bottom,0px) + 10px)}
+#controls .ctl-label{display:none}
+#controls .ctl-time{font-size:10px;letter-spacing:.08em;white-space:nowrap}
+.ctl-row{gap:10px}
+.chrome.eyebrow{font-size:8px;letter-spacing:.2em;gap:8px;top:12px;left:12px}
+.chrome.timecode{font-size:9px;letter-spacing:.12em;gap:6px;top:12px;right:12px}
+.card .eb{font-size:8px;letter-spacing:.22em;gap:8px;margin-bottom:12px}
+.card h1{font-size:clamp(34px,11vw,60px)}
+.card .sub{font-size:8px;letter-spacing:.18em;line-height:1.9;margin-top:12px;padding:0 8%;text-wrap:balance}
+#hint{display:none}
+}
+#snd-chip{position:fixed;left:50%;bottom:calc(env(safe-area-inset-bottom,0px) + 96px);transform:translateX(-50%);z-index:70;appearance:none;background:rgba(10,10,10,.88);border:1px solid var(--lumen);color:var(--lumen);font-family:var(--mono);font-size:11px;letter-spacing:.3em;text-transform:uppercase;padding:14px 22px;border-radius:999px;display:none;align-items:center;gap:10px;cursor:pointer}
+#snd-chip.on{display:flex}#snd-chip i{width:6px;height:6px;border-radius:50%;background:var(--halo);animation:sc 1.2s ease-in-out infinite}@keyframes sc{50%{opacity:.2}}
+#export-btn{position:fixed;right:24px;bottom:96px;z-index:60;appearance:none;background:rgba(10,10,10,.82);border:1px solid var(--halo);color:var(--halo);font-family:var(--mono);font-size:11px;letter-spacing:.22em;text-transform:uppercase;padding:10px 14px;cursor:pointer;backdrop-filter:blur(8px);transition:all .14s ease}
+#export-btn:hover{background:var(--halo);color:var(--void)}
+#export-btn:disabled{opacity:.4;cursor:default}
+#export-btn{display:none!important}
+body.recording #hint{display:none}
+#rec-hud{position:fixed;inset:0;z-index:70;display:none;align-items:flex-start;justify-content:center;pointer-events:none}
+#rec-hud.on{display:flex}
+#rec-hud .rb{margin-top:30px;display:flex;align-items:center;gap:14px;padding:11px 16px;background:rgba(10,10,10,.92);border:1px solid var(--halo);font-family:var(--mono);font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:var(--lumen);pointer-events:auto}
+#rec-hud b{color:var(--silver);font-weight:400}
+#rec-dot2{width:11px;height:11px;border-radius:50%;background:#ff3b30;animation:recblink 1s steps(2) infinite}
+@keyframes recblink{50%{opacity:.15}}
+#rec-stop{appearance:none;background:transparent;border:1px solid var(--halo);color:var(--halo);font-family:var(--mono);font-size:11px;letter-spacing:.18em;text-transform:uppercase;padding:6px 12px;cursor:pointer}
+#rec-stop:hover{background:var(--halo);color:var(--void)}
+#rec-note{position:fixed;top:76px;left:50%;transform:translateX(-50%);font-family:var(--mono);font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--signal);pointer-events:none}
+body.recording #controls{opacity:.22!important;pointer-events:none}
+body.recording #scrub,body.recording #hint,body.recording #tp{pointer-events:none}
+#exp-modal{position:fixed;inset:0;z-index:80;display:none;align-items:center;justify-content:center;background:rgba(5,5,5,.74)}
+#exp-modal.on{display:flex}
+#exp-modal .box{width:min(560px,90vw);background:#0d0d0d;border:1px solid var(--meteor);padding:30px 32px;font-family:var(--sans);color:var(--silver)}
+#exp-modal .eb{font-family:var(--mono);font-size:10px;letter-spacing:.28em;text-transform:uppercase;color:var(--halo);margin-bottom:14px}
+#exp-modal .h{font-weight:500;font-size:25px;color:var(--lumen);margin-bottom:14px;letter-spacing:-.01em}
+#exp-modal p{font-size:15px;line-height:1.6;margin:0 0 14px;text-wrap:pretty}
+#exp-modal b{color:var(--lumen);font-weight:500}
+#exp-modal ul{margin:0 0 20px;padding-left:18px;font-size:14px;line-height:1.75}
+#exp-modal .fmt{display:grid;grid-template-columns:repeat(3,1fr);gap:4px;margin:0 0 24px}
+#exp-modal .fmt button{text-align:left;padding:10px 12px;font-size:10px}
+#exp-modal .fmt button.on{border-color:var(--halo);color:var(--lumen)}
+#exp-modal .btns{display:flex;gap:12px;justify-content:flex-end}
+#exp-modal button{appearance:none;font-family:var(--mono);font-size:11px;letter-spacing:.2em;text-transform:uppercase;padding:12px 18px;cursor:pointer;border:1px solid var(--meteor);background:transparent;color:var(--silver);transition:all .14s ease}
+#exp-cancel:hover{border-color:var(--signal);color:var(--lumen)}
+#exp-start{border-color:var(--halo)!important;color:var(--halo)!important}
+#exp-start:hover{background:var(--halo)!important;color:var(--void)!important}
+</style>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@500;600&family=Geist+Mono:wght@500&display=swap" rel="stylesheet">
+</head>
+<body>
+<script src="./kn-loader.js" data-variant="mirror" data-scene-t="300" data-bg="#05060C" data-accent="#E8ECCC" data-accent2="#FF7BC1" data-ink="#F2EFE8" data-mute="#8E8980" data-title="GJ 504 b" data-kind="Portals · Video · Focus soundscape" data-steps="Plotting the orbit|Crossing 57 light-years|Tuning the soundscape|Entering" data-min="3200"></script>
+<template id="__bundler_thumbnail" data-bg-color="#0B0C0E"><svg viewBox="0 0 1200 800" xmlns="http://www.w3.org/2000/svg"><circle cx="600" cy="400" r="200" fill="#E98AB4"/><circle cx="600" cy="400" r="200" fill="url(#g)"/><defs><radialGradient id="g" cx=".35" cy=".35" r=".8"><stop offset="0" stop-color="#FFD6E6" stop-opacity=".6"/><stop offset=".6" stop-color="#C2497F" stop-opacity="0"/><stop offset="1" stop-color="#2A0A18" stop-opacity=".85"/></radialGradient></defs></svg></template>
+<div id="stage">
+<canvas id="field"></canvas>
+<div class="chrome eyebrow"><span class="mark" id="mark-tl" aria-hidden="true"></span><span>PORTALS · FOCUSFIELD</span><span class="dot"></span><span>GJ 504 B</span></div>
+<div class="chrome timecode" id="tc"><b id="tc-cur">00:00</b><span class="sep">/</span><span id="tc-tot">30:00</span></div>
+<div id="loading" class="gone">This video needs WebGL 2 — please open it in Chrome or Edge.</div>
+<div class="card" id="intro">
+<div class="eb"><span>PORTALS · FOCUSFIELD · VOL. 003</span><span class="dot"></span><span>NO. 004</span></div>
+<h1>GJ 504 b</h1>
+<div class="sub"><b id="intro-dur" style="color:var(--lumen)">30 MINUTE</b> &nbsp;·&nbsp; <span class="verse">59 VIRGINIS · 57 LIGHT-YEARS</span> &nbsp;·&nbsp; DEEP FOCUS</div>
+</div>
+<div class="card" id="outro">
+<span class="endmark" id="endmark" aria-hidden="true"></span>
+<div class="eb"><span>FOCUSFIELD</span><span class="dot"></span><span>GJ 504 B</span></div>
+<h1 style="font-size:clamp(28px,4.4vw,70px);">Mission Complete</h1>
+<div class="sub">RUNTIME <b id="outro-dur">30:00</b> &nbsp;·&nbsp; THANK YOU FOR FOCUSING</div>
+<button id="replay">Replay</button>
+</div>
+<div id="controls">
+<div id="scrub"><div class="track"><div class="fill" id="scrub-fill"></div></div><div class="knob" id="scrub-knob"></div></div>
+<div class="ctl-row">
+<button class="ctl-btn" id="restart-btn" aria-label="Restart from beginning"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M6 5h2v14H6z"></path><path d="M20 5l-10 7 10 7z"></path></svg></button>
+<button class="ctl-btn" id="play-btn" aria-label="Play / pause"><svg id="ic-pause" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="5" width="4" height="14"></rect><rect x="14" y="5" width="4" height="14"></rect></svg><svg id="ic-play" viewBox="0 0 24 24" fill="currentColor" style="display:none"><path d="M7 5l12 7-12 7z"></path></svg></button>
+<button class="ctl-btn" id="back-btn" aria-label="Back 60 seconds"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 5L5 11l6 6"></path><path d="M5 11h9a5 5 0 0 1 5 5v0"></path></svg></button>
+<button class="ctl-btn" id="fwd-btn" aria-label="Forward 60 seconds"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 5l6 6-6 6"></path><path d="M19 11h-9a5 5 0 0 0-5 5v0"></path></svg></button>
+<span class="ctl-time"><span id="ctl-cur">00:00</span> <span class="tot">/ <span id="ctl-tot">30:00</span></span></span>
+<span class="ctl-spacer"></span>
+<span class="ctl-label">FOCUSFIELD · GJ 504 B</span>
+<button class="ctl-btn" id="dl-btn" aria-label="Export video" title="Export video" onclick="document.getElementById('export-btn').click()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 4v11"></path><path d="M7 10l5 5 5-5"></path><path d="M5 20h14"></path></svg></button>
+<button class="ctl-btn" id="mute-btn" aria-label="Mute soundscape"><svg id="ic-sound" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 9v6h4l5 4V5L8 9H4z"></path><path d="M16.5 8.5a5 5 0 0 1 0 7M19 6a8 8 0 0 1 0 12"></path></svg><svg id="ic-muted" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:none"><path d="M4 9v6h4l5 4V5L8 9H4z"></path><path d="M22 9l-6 6M16 9l6 6"></path></svg></button>
+<button class="ctl-btn" id="full-btn" aria-label="Fullscreen"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"></path></svg></button>
+</div>
+</div>
+</div>
+<div id="tp" role="dialog" aria-label="Tweaks">
+<div class="hd"><span>TWEAKS · GJ 504 B</span><span class="x" id="tp-close">×</span></div>
+<label>Orbit motion</label><div class="row"><input type="range" id="r-sway" min="0" max="1.6" step="0.1"><span class="val" id="r-sway-v"></span></div>
+<label>Shooting stars</label><div class="row"><input type="range" id="r-met" min="0" max="2" step="0.1"><span class="val" id="r-met-v"></span></div>
+<label>Runtime · minutes</label><div class="row"><input type="range" id="r-dur" min="5" max="60" step="5"><span class="val" id="r-dur-v"></span></div>
+<label>Persistent timecode</label><div class="seg" id="seg-tc"><button data-v="1">Show</button><button data-v="0">Hide</button></div>
+<label>Soundscape volume</label><div class="row"><input type="range" id="r-vol" min="0" max="100" step="2"><span class="val" id="r-vol-v"></span></div>
+</div>
+<div id="hint">SPACE&nbsp;PLAY&nbsp;·&nbsp;F&nbsp;FULLSCREEN&nbsp;·&nbsp;M&nbsp;MUTE&nbsp;·&nbsp;T&nbsp;TWEAKS</div>
+<button id="snd-chip" type="button"><i></i>Tap for sound</button>
+<button id="export-btn" title="Export this video as a downloadable file">⬇ Export Video</button>
+<div id="rec-hud"><div class="rb"><span id="rec-dot2"></span><span><span id="rec-verb">Rendering</span> · <b id="rec-el">0%</b></span><button id="rec-stop">Cancel</button></div><div id="rec-note"></div></div>
+<div id="exp-modal"><div class="box">
+<div class="eb">Portals · FocusField · Export</div>
+<div class="h">Render this as a video file</div>
+<p>This renders the whole video and its sound into a finished <b>MP4</b> on your computer, ready to upload to YouTube.</p>
+<ul><li>Renders the full <b><span id="exp-len">30</span>-minute</b> video frame by frame, so motion is perfectly smooth regardless of your computer's speed.</li><li id="exp-save">Pick a folder to save into; it streams straight to disk. <b>Keep this tab in front</b> while it works.</li></ul>
+<div class="fmt" id="exp-fmt"><button data-f="4k60" class="on">4K · 60 fps</button><button data-f="4k30">4K · 30 fps</button><button data-f="hd60">1080p · 60 fps</button></div>
+<div class="btns"><button id="exp-cancel">Cancel</button><button id="exp-start">Start export</button></div>
+</div></div>
+
+<script src="pink-audio.js"></script>
+<script src="pink-render.js"></script>
+<script>
+const LS_KEY = 'focusfield-pink-planet-30min';
+const TWEAKS = { sway: 1, meteors: 1, durationMin: 30, timecode: 1, muted: 0, volume: 80 };
+let savedTime = 0, savedPlaying = false;
+try { const s = JSON.parse(localStorage.getItem(LS_KEY) || '{}'); if (s.tweaks) Object.assign(TWEAKS, s.tweaks); if (typeof s.time === 'number') savedTime = s.time; if (typeof s.playing === 'boolean') savedPlaying = s.playing; } catch (e) {}
+
+const stage = document.getElementById('stage'), canvas = document.getElementById('field');
+const W = 1920, H = 1080; canvas.width = W; canvas.height = H;
+const ctx = canvas.getContext('2d', { alpha: false });
+function fit() { const vw = innerWidth, vh = innerHeight, r = 16 / 9; let cw, ch; if (vw / vh > r) { ch = vh; cw = Math.round(vh * r); } else { cw = vw; ch = Math.round(vw / r); } stage.style.width = cw + 'px'; stage.style.height = ch + 'px'; }
+fit(); addEventListener('resize', fit);
+
+let glOk = false;
+try { glOk = PinkScene.init(); } catch (e) { console.error(e); }
+if (!glOk) document.getElementById('loading').classList.remove('gone');
+let bootDone = false;
+function bootOff(){ bootDone = true; }
+if (!glOk) bootOff();
+const sceneReady = Promise.resolve();
+let liveSS = (navigator.hardwareConcurrency || 4) <= 4 || devicePixelRatio > 1.5 ? 1 : 2, perfN = 0, perfAcc = 0;
+function renderScene(t, ss) { PinkScene.draw(ctx, t, { sway: TWEAKS.sway, meteors: TWEAKS.meteors, ss: ss || liveSS }); }
+function dimFor(t) {
+  let I = 1;
+  if (t < 13) { const b = Math.min(1, t / 13); I = 0.04 + 0.96 * b * b * (3 - 2 * b); }
+  const toEnd = DURATION - t; if (toEnd < OUT_DIM) I = Math.min(I, Math.max(0, toEnd / OUT_DIM));
+  return I;
+}
+
+let DURATION = TWEAKS.durationMin * 60;
+PinkAudio.setDuration(DURATION);
+PinkAudio.setClock(() => videoTime);
+let driftCheck = 0;
+let videoTime = Math.min(savedTime, DURATION - 0.001), playing = false, lastFrame = performance.now(), ended = false;
+const INTRO_IN = 2.5, INTRO_HOLD_END = 10, INTRO_OUT_END = 15, OUT_DIM = 9, OUT_CARD = 7;
+const intro = document.getElementById('intro'), outro = document.getElementById('outro'), replayBtn = document.getElementById('replay');
+function fmt(sec) { sec = Math.max(0, Math.floor(sec)); const m = Math.floor(sec / 60), s = sec % 60; return (m < 10 ? '0' : '') + m + ':' + (s < 10 ? '0' : '') + s; }
+
+let lastFrameTick = 0, rafPending = false, lastSec = -1, lastIo = -1, lastOo = -1;
+function frame(now) {
+  rafPending = false;
+  if (window.__offlineRendering) { rafPending = true; lastFrameTick = performance.now(); requestAnimationFrame(frame); return; }
+  if (now == null) now = performance.now();
+  try {
+    let dt = (now - lastFrame) / 1000; lastFrame = now;
+    if (dt < 0) dt = 0; if (dt > 0.25) dt = 0.25;
+    if (playing && !ended) {
+      // the sound is the master clock: the picture follows it, so the music never has to restart
+      const ap = PinkAudio.position();
+      if (ap != null && ap >= 0 && Math.abs(ap - videoTime) < 1.5) { videoTime += dt + Math.max(-dt * 0.1, Math.min(dt * 0.1, ap - videoTime)); driftCheck = 0; }
+      else { videoTime += dt; if (ap != null && (driftCheck += dt) > 4) { driftCheck = 0; PinkAudio.seek(); } }
+      if (videoTime >= DURATION) { videoTime = DURATION; setPlaying(false); ended = true; }
+    }
+    renderScene(videoTime);
+    bootOff();
+    if (playing && liveSS > 1 && dt > 0) { perfAcc += dt; if (++perfN === 30) { if (perfAcc / perfN > 0.02) liveSS = 1; perfN = 0; perfAcc = 0; } }
+    const I = dimFor(videoTime);
+    if (I < 1) { ctx.fillStyle = 'rgba(0,0,0,' + (1 - I).toFixed(3) + ')'; ctx.fillRect(0, 0, W, H); }
+    let io = 0;
+    if (videoTime < INTRO_IN) io = videoTime / INTRO_IN; else if (videoTime < INTRO_HOLD_END) io = 1; else if (videoTime < INTRO_OUT_END) io = 1 - (videoTime - INTRO_HOLD_END) / (INTRO_OUT_END - INTRO_HOLD_END);
+    io = Math.round(io * 1000) / 1000; if (io !== lastIo) { intro.style.opacity = io; lastIo = io; }
+    const toEnd = DURATION - videoTime;
+    let oo = toEnd < OUT_CARD ? Math.min(1, (OUT_CARD - toEnd) / 2) : 0;
+    oo = Math.round(oo * 1000) / 1000; if (oo !== lastOo) { outro.style.opacity = oo; outro.style.pointerEvents = 'none'; replayBtn.style.pointerEvents = oo > 0.5 ? 'auto' : 'none'; lastOo = oo; }
+    const pct = (videoTime / DURATION) * 100;
+    scrubFill.style.width = pct + '%'; scrubKnob.style.left = pct + '%';
+    const sec = Math.floor(videoTime); if (sec !== lastSec) { tcCur.textContent = ctlCur.textContent = fmt(videoTime); lastSec = sec; }
+    persistThrottle += dt; if (persistThrottle > 2) { persist(); persistThrottle = 0; }
+  } catch (e) {
+    if (!frame._warned) { console.error('frame() error (loop continues):', (e && (e.stack || e.message)) || e); frame._warned = true; }
+  } finally { lastFrameTick = performance.now(); rafPending = true; requestAnimationFrame(frame); }
+}
+setInterval(() => { if (document.hidden) return; if (rafPending && performance.now() - lastFrameTick < 1500) return; rafPending = true; requestAnimationFrame(frame); }, 1000);
+
+let persistThrottle = 0;
+function persist() { try { localStorage.setItem(LS_KEY, JSON.stringify({ tweaks: TWEAKS, time: videoTime, playing })); } catch (e) {} }
+
+const icPlay = document.getElementById('ic-play'), icPause = document.getElementById('ic-pause');
+function setPlaying(p) {
+  playing = p;
+  icPlay.style.display = p ? 'none' : 'block'; icPause.style.display = p ? 'block' : 'none';
+  if (p) { hint.classList.add('gone'); scheduleHide(); PinkAudio.play(); }
+  else { showHud(); PinkAudio.pause(); }
+  persist();
+}
+function togglePlay() { if (ended && !playing) { restart(); return; } setPlaying(!playing); }
+function restart() { videoTime = 0; ended = false; lastFrame = performance.now(); lastSec = -1; setPlaying(true); }
+function seek(sec, resync = true) {
+  videoTime = Math.max(0, Math.min(DURATION - 0.001, sec)); if (videoTime < DURATION) ended = false;
+  lastFrame = performance.now(); showHud(); persist(); if (resync) PinkAudio.seek();
+}
+const scrub = document.getElementById('scrub'), scrubFill = document.getElementById('scrub-fill'), scrubKnob = document.getElementById('scrub-knob');
+const tcCur = document.getElementById('tc-cur'), ctlCur = document.getElementById('ctl-cur'), hint = document.getElementById('hint');
+document.getElementById('play-btn').addEventListener('click', togglePlay);
+document.getElementById('back-btn').addEventListener('click', () => seek(videoTime - 60));
+document.getElementById('fwd-btn').addEventListener('click', () => seek(videoTime + 60));
+replayBtn.addEventListener('click', restart);
+document.getElementById('restart-btn').addEventListener('click', restart);
+document.getElementById('full-btn').addEventListener('click', toggleFull);
+document.getElementById('mute-btn').addEventListener('click', () => setMuted(!TWEAKS.muted));
+const icSound = document.getElementById('ic-sound'), icMuted = document.getElementById('ic-muted');
+function setMuted(m) { TWEAKS.muted = m ? 1 : 0; icSound.style.display = m ? 'none' : 'block'; icMuted.style.display = m ? 'block' : 'none'; PinkAudio.setMuted(!!m); persist(); }
+function scrubAt(cx, commit) {
+  const r = scrub.getBoundingClientRect(), f = Math.max(0, Math.min(1, (cx - r.left) / r.width));
+  seek(f * DURATION, !!commit);
+  const pct = (videoTime / DURATION) * 100; scrubFill.style.width = pct + '%'; scrubKnob.style.left = pct + '%';
+  tcCur.textContent = ctlCur.textContent = fmt(videoTime); lastSec = Math.floor(videoTime);
+}
+let scrubbing = false;
+scrub.addEventListener('pointerdown', e => { e.preventDefault(); showHud(); scrubbing = true; scrubAt(e.clientX, true); try { scrub.setPointerCapture(e.pointerId); } catch (err) {} });
+scrub.addEventListener('pointermove', e => { if (scrubbing) scrubAt(e.clientX, false); });
+scrub.addEventListener('pointerup', () => { scrubbing = false; PinkAudio.seek(); });
+scrub.addEventListener('pointercancel', () => { scrubbing = false; });
+document.addEventListener('visibilitychange', () => { if (document.hidden && playing) setPlaying(false); if (!document.hidden) { if (playing) PinkAudio.resumeIfPending(); if (!rafPending) { rafPending = true; requestAnimationFrame(frame); } } });
+function toggleFull() { if (!document.fullscreenElement) (document.documentElement.requestFullscreen && document.documentElement.requestFullscreen()); else (document.exitFullscreen && document.exitFullscreen()); }
+let hideTimer = null;
+function showHud() { document.body.classList.remove('hud-hidden'); document.body.classList.add('show-cursor'); scheduleHide(); }
+function scheduleHide() { clearTimeout(hideTimer); if (!playing) return; hideTimer = setTimeout(() => { document.body.classList.add('hud-hidden'); document.body.classList.remove('show-cursor'); }, 2600); }
+['mousemove', 'pointerdown', 'touchstart', 'keydown'].forEach(ev => addEventListener(ev, () => { showHud(); if (playing) PinkAudio.resumeIfPending(); }, { passive: true }));
+['touchend', 'pointerup', 'click', 'keydown'].forEach(ev => addEventListener(ev, () => { PinkAudio.prime(); if (playing) PinkAudio.resumeIfPending(); }, { passive: true, capture: true }));
+// mobile fallback: if sound hasn't started within 1.5 s of playing, offer a tap that starts it inside the gesture
+const sndChip = document.getElementById('snd-chip'); let sndSince = 0;
+sndChip.addEventListener('touchend', e => { e.preventDefault(); e.stopPropagation(); PinkAudio.play(); }, { passive: false });
+sndChip.addEventListener('click', e => { e.stopPropagation(); PinkAudio.play(); });
+setInterval(() => { const ok = !playing || TWEAKS.muted || PinkAudio.isRunning(); if (ok) { sndSince = 0; sndChip.classList.remove('on'); return; } if (!sndSince) sndSince = performance.now(); if (performance.now() - sndSince > 1500) sndChip.classList.add('on'); }, 400);
+addEventListener('keydown', e => {
+  if (e.key === ' ' || e.code === 'Space') { e.preventDefault(); togglePlay(); }
+  else if (e.key === 'f' || e.key === 'F') toggleFull();
+  else if (e.key === 't' || e.key === 'T') tp.classList.toggle('open');
+  else if (e.key === 'm' || e.key === 'M') setMuted(!TWEAKS.muted);
+  else if (e.key === 'ArrowRight') seek(videoTime + 10);
+  else if (e.key === 'ArrowLeft') seek(videoTime - 10);
+});
+const P_GRID = [1,1,1,1,1,0, 1,1,0,0,1,1, 1,1,0,0,1,1, 1,1,1,1,1,1, 1,1,1,1,1,0, 1,1,0,0,0,0, 1,1,0,0,0,0, 1,1,0,0,0,0];
+function buildMark(el, fill) {
+  let d = ''; P_GRID.forEach((v, i) => { if (v) d += 'M' + (i % 6) + ' ' + Math.floor(i / 6) + 'h1v1h-1z'; });
+  el.innerHTML = '<svg viewBox="0 0 6 8" preserveAspectRatio="none" style="display:block;width:100%;height:100%" shape-rendering="crispEdges"><path d="' + d + '" fill="' + fill + '"/></svg>';
+}
+buildMark(document.getElementById('mark-tl'), 'var(--silver)');
+buildMark(document.getElementById('endmark'), 'var(--lumen)');
+const tp = document.getElementById('tp');
+document.getElementById('tp-close').addEventListener('click', () => tp.classList.remove('open'));
+const segTc = document.getElementById('seg-tc');
+[...segTc.children].forEach(b => b.addEventListener('click', () => { TWEAKS.timecode = parseInt(b.dataset.v, 10); syncTc(); persist(); }));
+function syncTc() { [...segTc.children].forEach(b => b.classList.toggle('on', parseInt(b.dataset.v, 10) === TWEAKS.timecode)); document.getElementById('tc').classList.toggle('off', !TWEAKS.timecode); }
+function bindSlider(id, key, f, on) {
+  const inp = document.getElementById(id), out = document.getElementById(id + '-v');
+  inp.value = TWEAKS[key]; out.textContent = f(TWEAKS[key]);
+  inp.addEventListener('input', () => { TWEAKS[key] = parseFloat(inp.value); out.textContent = f(TWEAKS[key]); if (on) on(); persist(); });
+}
+function syncDur() {
+  DURATION = TWEAKS.durationMin * 60; PinkAudio.setDuration(DURATION);
+  if (videoTime > DURATION) videoTime = DURATION - 0.001;
+  const tot = fmt(DURATION);
+  ['tc-tot', 'ctl-tot', 'outro-dur'].forEach(id => document.getElementById(id).textContent = tot);
+  document.getElementById('intro-dur').textContent = TWEAKS.durationMin + ' MINUTE';
+}
+bindSlider('r-sway', 'sway', v => Math.round(v * 100) + '%');
+bindSlider('r-met', 'meteors', v => Math.round(v * 100) + '%');
+bindSlider('r-dur', 'durationMin', v => v + ' MIN', () => { syncDur(); ended = false; });
+bindSlider('r-vol', 'volume', v => v + '%', () => PinkAudio.setVolume(TWEAKS.volume / 100));
+syncDur(); syncTc(); PinkAudio.setVolume(TWEAKS.volume / 100); setMuted(TWEAKS.muted);
+if (savedTime >= DURATION - 0.001) ended = true;
+setPlaying(false);
+requestAnimationFrame(frame);
+setTimeout(() => { if (playing) hint.classList.add('gone'); }, 4500);
+</script>
+
+<script>
+(function () {
+  const btn = document.getElementById('export-btn'), hud = document.getElementById('rec-hud'), elEl = document.getElementById('rec-el');
+  const stopBtn = document.getElementById('rec-stop'), note = document.getElementById('rec-note');
+  const rc = document.createElement('canvas'); rc.width = 1920; rc.height = 1080;
+  const rx = rc.getContext('2d', { alpha: false });
+  const HALO = '#FFF738', LUMEN = '#FAFAFA', SILVER = '#C9C9C8', SIGNAL = '#6B6B70';
+  const NAME = 'GJ 504 B', TITLE = 'GJ 504 b';
+  const fmtt = s => { s = Math.max(0, Math.floor(s)); const m = Math.floor(s / 60), x = s % 60; return (m < 10 ? '0' : '') + m + ':' + (x < 10 ? '0' : '') + x; };
+  function centeredLine(segs, y, font, ls) {
+    rx.font = font; rx.letterSpacing = ls; rx.textAlign = 'left'; rx.textBaseline = 'alphabetic';
+    let total = 0; for (const s of segs) total += rx.measureText(s.text).width;
+    let x = 960 - total / 2; for (const s of segs) { rx.fillStyle = s.c; rx.fillText(s.text, x, y); x += rx.measureText(s.text).width; }
+    rx.letterSpacing = '0px';
+  }
+  function fitTitle(text, maxW, px) { rx.font = "300 " + px + "px 'DM Sans', system-ui, sans-serif"; while (rx.measureText(text).width > maxW && px > 40) { px -= 4; rx.font = "300 " + px + "px 'DM Sans', system-ui, sans-serif"; } return px; }
+  const MARK = [1,1,1,1,1,0, 1,1,0,0,1,1, 1,1,0,0,1,1, 1,1,1,1,1,1, 1,1,1,1,1,0, 1,1,0,0,0,0, 1,1,0,0,0,0, 1,1,0,0,0,0];
+  function drawChrome(t) {
+    const LEFT = 40, CY = 44, MW = 15, MH = 20, cw = MW / 6, ch = MH / 8, GAP = 12;
+    rx.fillStyle = SILVER;
+    for (let r = 0; r < 8; r++) for (let c = 0; c < 6; c++) if (MARK[r * 6 + c]) rx.fillRect(LEFT + c * cw, CY - MH / 2 + r * ch, cw + 0.4, ch + 0.4);
+    rx.font = "500 11px 'JetBrains Mono', ui-monospace, monospace"; rx.letterSpacing = '3.7px'; rx.textBaseline = 'middle'; rx.textAlign = 'left';
+    let x = LEFT + MW + GAP; rx.fillStyle = SIGNAL; rx.fillText('PORTALS · FOCUSFIELD', x, CY);
+    x += rx.measureText('PORTALS · FOCUSFIELD').width + GAP; rx.fillStyle = HALO; rx.fillRect(x, CY - 2, 4, 4);
+    x += 4 + GAP; rx.fillStyle = SIGNAL; rx.fillText(NAME, x, CY);
+    if (TWEAKS.timecode) {
+      rx.font = "500 12px 'JetBrains Mono', ui-monospace, monospace"; rx.letterSpacing = '2.6px'; rx.textAlign = 'right';
+      const cur = fmtt(t), tot = fmtt(DURATION); let r = 1880;
+      rx.fillStyle = SIGNAL; rx.fillText(tot, r, CY); r -= rx.measureText(tot).width + 6;
+      rx.fillStyle = '#424348'; rx.fillText('/', r, CY); r -= rx.measureText('/').width + 6;
+      rx.fillStyle = SILVER; rx.fillText(cur, r, CY);
+    }
+    rx.letterSpacing = '0px'; rx.textAlign = 'left'; rx.textBaseline = 'alphabetic';
+  }
+  function scrim(a) { rx.save(); rx.globalAlpha = a; rx.translate(960, 540); rx.scale(1344, 648); const g = rx.createRadialGradient(0, 0, 0, 0, 0, 1); g.addColorStop(0, 'rgba(4,4,8,0.62)'); g.addColorStop(0.7, 'rgba(4,4,8,0.16)'); g.addColorStop(1, 'rgba(4,4,8,0)'); rx.fillStyle = g; rx.fillRect(-1, -1, 2, 2); rx.restore(); }
+  function drawCards(t) {
+    let io = 0; if (t < 2.5) io = t / 2.5; else if (t < 10) io = 1; else if (t < 15) io = 1 - (t - 10) / 5;
+    io = Math.max(0, Math.min(1, io));
+    if (io > 0.002) {
+      scrim(io);
+      rx.save(); rx.globalAlpha = io;
+      centeredLine([{ text: 'PORTALS · FOCUSFIELD · VOL. 003  ', c: SILVER }, { text: '·', c: HALO }, { text: '  NO. 004', c: SILVER }], 392, "500 22px 'JetBrains Mono', monospace", '6px');
+      rx.textAlign = 'center'; rx.fillStyle = LUMEN; rx.font = "300 " + fitTitle(TITLE, 1640, 124) + "px 'DM Sans', system-ui, sans-serif"; rx.fillText(TITLE, 960, 552);
+      centeredLine([{ text: TWEAKS.durationMin + ' MINUTE', c: LUMEN }, { text: '  ·  ', c: SILVER }, { text: '59 VIRGINIS · 57 LIGHT-YEARS', c: HALO }, { text: '  ·  DEEP FOCUS', c: SILVER }], 618, "500 22px 'JetBrains Mono', monospace", '5px');
+      rx.restore();
+    }
+    const toEnd = DURATION - t; let oo = toEnd < 7 ? Math.min(1, (7 - toEnd) / 2) : 0; oo = Math.max(0, Math.min(1, oo));
+    if (oo > 0.002) {
+      scrim(oo);
+      rx.save(); rx.globalAlpha = oo;
+      rx.fillStyle = LUMEN; const MW2 = 56, cw2 = MW2 / 6, ch2 = (MW2 * 8 / 6) / 8;
+      for (let r = 0; r < 8; r++) for (let c = 0; c < 6; c++) if (MARK[r * 6 + c]) rx.fillRect(960 - MW2 / 2 + c * cw2, 300 + r * ch2, cw2 + 0.4, ch2 + 0.4);
+      centeredLine([{ text: 'FOCUSFIELD  ', c: SILVER }, { text: '·', c: HALO }, { text: '  ' + NAME, c: SILVER }], 452, "500 22px 'JetBrains Mono', monospace", '6px');
+      rx.textAlign = 'center'; rx.fillStyle = LUMEN; rx.font = "300 72px 'DM Sans', system-ui, sans-serif"; rx.fillText('Mission Complete', 960, 548);
+      centeredLine([{ text: 'RUNTIME ', c: SILVER }, { text: fmtt(DURATION), c: HALO }, { text: '  ·  THANK YOU FOR FOCUSING', c: SILVER }], 606, "500 22px 'JetBrains Mono', monospace", '4px');
+      rx.restore();
+    }
+  }
+  function renderFrameAt(t) {
+    renderScene(t, 2);
+    const I = dimFor(t);
+    if (I < 1) { ctx.fillStyle = 'rgba(0,0,0,' + (1 - I).toFixed(3) + ')'; ctx.fillRect(0, 0, 1920, 1080); }
+    rx.drawImage(canvas, 0, 0, 1920, 1080);
+    drawChrome(t); drawCards(t);
+  }
+
+  const FAST = !!(window.VideoEncoder && window.AudioEncoder && window.VideoFrame && window.AudioData);
+  const FORMATS = {
+    '4k60': { w: 3840, h: 2160, fps: 60, codec: 'avc1.640034', bitrate: 56000000, label: '4K60' },
+    '4k30': { w: 3840, h: 2160, fps: 30, codec: 'avc1.640033', bitrate: 40000000, label: '4K30' },
+    'hd60': { w: 1920, h: 1080, fps: 60, codec: 'avc1.64002A', bitrate: 18000000, label: '1080p60' },
+  };
+  let pick = '4k60', renderingMP4 = false, cancelMP4 = false;
+  const fmtBox = document.getElementById('exp-fmt');
+  [...fmtBox.children].forEach(b => b.addEventListener('click', () => { pick = b.dataset.f; [...fmtBox.children].forEach(x => x.classList.toggle('on', x === b)); }));
+
+  function cleanupMP4(wasMuted) {
+    window.__offlineRendering = false; renderingMP4 = false; cancelMP4 = false;
+    document.body.classList.remove('recording'); hud.classList.remove('on'); btn.disabled = false;
+    setMuted(wasMuted); seek(0); setPlaying(false);
+  }
+  const withTimeout = (p, ms, label) => { let to; const tm = new Promise((_, rej) => { to = setTimeout(() => rej(new Error('Timed out: ' + label)), ms); }); return Promise.race([p, tm]).finally(() => clearTimeout(to)); };
+
+  async function renderMP4() {
+    if (renderingMP4) return;
+    const wasMuted = TWEAKS.muted;
+    let RES = FORMATS[pick];
+    try { const sup = await VideoEncoder.isConfigSupported({ codec: RES.codec, width: RES.w, height: RES.h, bitrate: RES.bitrate, framerate: RES.fps }); if (!sup || !sup.supported) throw 0; }
+    catch (e) { const fb = pick === 'hd60' ? null : (pick === '4k60' ? FORMATS['4k30'] : FORMATS['hd60']); if (!fb) { alert('This browser can’t encode that format. Try Chrome or Edge.'); return; } alert(RES.label + ' isn’t supported by this browser’s encoder — rendering ' + fb.label + ' instead.'); RES = fb; }
+    const fps = RES.fps, total = DURATION, N = Math.round(total * fps), SX = RES.w / 1920, SY = RES.h / 1080;
+    const fname = 'Portals-GJ-504-b-' + TWEAKS.durationMin + 'min-' + RES.label + '.mp4';
+    let Mux;
+    try { Mux = await import('https://cdn.jsdelivr.net/npm/mp4-muxer@5/+esm'); } catch (e) { alert('Could not load the MP4 encoder (needs internet for the first render).'); return; }
+    let writable = null, target; const blobParts = [];
+    try {
+      if (window.showSaveFilePicker && window.self === window.top) {
+        const h = await window.showSaveFilePicker({ suggestedName: fname, types: [{ description: 'MP4 video', accept: { 'video/mp4': ['.mp4'] } }] });
+        writable = await h.createWritable(); target = new Mux.FileSystemWritableFileStreamTarget(writable);
+      }
+    } catch (e) { if (e && e.name === 'AbortError') return; writable = null; }
+    if (!writable) target = new Mux.StreamTarget({ chunked: true, onData: (d, _position) => blobParts.push(d.slice()) });
+
+    renderingMP4 = true; cancelMP4 = false;
+    if (playing) setPlaying(false);
+    document.body.classList.add('recording'); hud.classList.add('on'); btn.disabled = true; elEl.textContent = '0%';
+    note.textContent = 'Preparing the scene…';
+    await sceneReady;
+
+    let muxer, venc, aenc, encErr = null;
+    try {
+      rc.width = RES.w; rc.height = RES.h; rx.setTransform(SX, 0, 0, SY, 0, 0);
+      muxer = new Mux.Muxer({ target, video: { codec: 'avc', width: RES.w, height: RES.h, frameRate: fps }, audio: { codec: 'aac', numberOfChannels: 2, sampleRate: 48000 }, fastStart: writable ? false : 'fragmented', firstTimestampBehavior: 'offset' });
+      venc = new VideoEncoder({ output: (c, m) => muxer.addVideoChunk(c, m), error: e => { console.error('venc', e); encErr = encErr || e; } });
+      venc.configure({ codec: RES.codec, width: RES.w, height: RES.h, bitrate: RES.bitrate, framerate: fps, bitrateMode: 'variable', latencyMode: 'quality' });
+      aenc = new AudioEncoder({ output: (c, m) => muxer.addAudioChunk(c, m), error: e => { console.error('aenc', e); encErr = encErr || e; } });
+      aenc.configure({ codec: 'mp4a.40.2', numberOfChannels: 2, sampleRate: 48000, bitrate: 256000 });
+    } catch (e) { console.error(e); alert('This browser can’t hardware-encode MP4 here. Try Chrome or Edge.'); rx.setTransform(1, 0, 0, 1, 0, 0); rc.width = 1920; rc.height = 1080; cleanupMP4(wasMuted); return; }
+
+    // soundscape rendered in 20 s segments, fed straight into the encoder
+    const sr = 48000, SEG = 20, totalSamples = Math.round(total * sr), vol = 0.9;
+    let seg = null, segStart = 0, aOff = 0;
+    async function pumpAudioTo(sampleTarget) {
+      const limit = Math.min(sampleTarget, totalSamples);
+      while (aOff < limit) {
+        if (!seg || aOff >= segStart + seg.L.length) {
+          segStart = Math.floor(aOff / (SEG * sr)) * SEG * sr;
+          seg = await PinkAudio.renderSegment(segStart / sr, Math.min(SEG, (totalSamples - segStart) / sr), vol);
+        }
+        const o = aOff - segStart, len = Math.min(1024, limit - aOff, seg.L.length - o);
+        if (len <= 0) { aOff = limit; break; }
+        const data = new Float32Array(len * 2);
+        data.set(seg.L.subarray(o, o + len), 0); data.set(seg.R.subarray(o, o + len), len);
+        const ad = new AudioData({ format: 'f32-planar', sampleRate: sr, numberOfFrames: len, numberOfChannels: 2, timestamp: Math.round(aOff / sr * 1e6), data });
+        aenc.encode(ad); ad.close(); aOff += len;
+        if (aenc.encodeQueueSize > 40) await new Promise(r => setTimeout(r, 0));
+      }
+    }
+
+    window.__offlineRendering = true;
+    canvas.width = RES.w; canvas.height = RES.h; ctx.setTransform(SX, 0, 0, SY, 0, 0); PinkScene.resize(RES.w, RES.h);
+    note.textContent = 'Rendering ' + RES.label + '…';
+    const t0 = performance.now();
+    try {
+      for (let i = 0; i < N; i++) {
+        if (cancelMP4) break;
+        if (encErr) throw encErr;
+        renderFrameAt(i / fps);
+        const vf = new VideoFrame(rc, { timestamp: Math.round(i * 1e6 / fps), duration: Math.round(1e6 / fps) });
+        venc.encode(vf, { keyFrame: i % (fps * 2) === 0 }); vf.close();
+        await pumpAudioTo(Math.round((i + 1) / fps * sr));
+        if (venc.encodeQueueSize > 8) await new Promise(res => { const c = () => venc.encodeQueueSize <= 3 ? res() : setTimeout(c, 4); c(); });
+        if (i % 15 === 0) {
+          const p = i / N, el = (performance.now() - t0) / 1000, eta = p > 0.002 ? el / p - el : 0;
+          elEl.textContent = (p * 100).toFixed(1) + '%';
+          note.textContent = 'Rendering ' + RES.label + ' · frame ' + i + ' / ' + N + (eta ? ' · ~' + Math.ceil(eta / 60) + ' min left' : '');
+          if (i % 60 === 0) await new Promise(r => setTimeout(r, 0));
+        }
+      }
+      note.textContent = 'Finalizing the MP4…'; elEl.textContent = '100%';
+      if (!cancelMP4) { await pumpAudioTo(totalSamples); await withTimeout(aenc.flush(), 60000, 'the audio encoder stopped responding'); }
+      if (encErr) throw encErr;
+      await withTimeout(venc.flush(), 120000, 'the video encoder stopped responding while finishing up');
+      if (encErr) throw encErr;
+      muxer.finalize();
+      if (writable) { note.textContent = 'Saving to disk…'; await withTimeout(writable.close(), 180000, 'saving the file to disk timed out'); note.textContent = cancelMP4 ? 'Cancelled.' : 'Done — saved to the folder you chose.'; }
+      else if (!cancelMP4) {
+        note.textContent = 'Preparing download…';
+        const url = URL.createObjectURL(new Blob(blobParts, { type: 'video/mp4' }));
+        const a = document.createElement('a'); a.href = url; a.download = fname; document.body.appendChild(a); a.click(); a.remove();
+        setTimeout(() => URL.revokeObjectURL(url), 60000); note.textContent = 'Done — check your Downloads.';
+      } else note.textContent = 'Cancelled.';
+    } catch (e) {
+      console.error('render/finalize failed:', e);
+      if (writable) { try { await writable.close(); } catch (_) {} }
+      alert('The render couldn’t finish:\n\n' + ((e && e.message) ? e.message : e) + (!writable ? '\n\nTip: open this page in its own browser tab so it can save straight to a folder you pick — that handles very long videos best.' : ''));
+    }
+    canvas.width = 1920; canvas.height = 1080; ctx.setTransform(1, 0, 0, 1, 0, 0); PinkScene.resize(1920, 1080);
+    rx.setTransform(1, 0, 0, 1, 0, 0); rc.width = 1920; rc.height = 1080;
+    try { fit(); } catch (e) {}
+    cleanupMP4(wasMuted);
+  }
+
+  const modal = document.getElementById('exp-modal');
+  btn.addEventListener('click', () => {
+    document.getElementById('exp-len').textContent = Math.max(1, Math.round(DURATION / 60));
+    const canDisk = window.showSaveFilePicker && window.self === window.top;
+    document.getElementById('exp-save').innerHTML = canDisk
+      ? 'Pick a folder to save into; it streams straight to disk. <b>Keep this tab in front</b> while it works. 4K60 is a long render — the progress bar shows the time left.'
+      : 'The finished file downloads automatically when it’s done — it streams together in chunks so long videos stay within memory. <b>Keep this tab in front</b> while it works.';
+    modal.classList.add('on');
+  });
+  document.getElementById('exp-cancel').addEventListener('click', () => modal.classList.remove('on'));
+  document.getElementById('exp-start').addEventListener('click', () => { modal.classList.remove('on'); if (FAST) renderMP4(); else alert('This browser can’t render the MP4 here. Please open this page in Chrome or Edge and try Export again.'); });
+  stopBtn.addEventListener('click', () => { if (renderingMP4) cancelMP4 = true; });
+  addEventListener('keydown', e => { if (renderingMP4) { e.stopImmediatePropagation(); e.preventDefault(); } }, true);
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<script src="./kn-loader.js" data-bg="#0A0908" data-accent="#E8ECCC" data-ink="#F2EFE8" data-mute="#6E6A63" data-title="Lightsaber Customization" data-kind="3D Customizer · Kyber Lightsaber" data-variant="saber" data-wait="event" data-steps="Machining hilt|Seating Kyber crystal|Aligning lenses|Igniting"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+html,body{margin:0;padding:0;background:#0A0908;color:#E6E2DA;font-family:'Geist',Helvetica,sans-serif;overflow-x:hidden}
+a{color:#E8ECCC}a:hover{color:#fff}
+*{box-sizing:border-box}
+input[type=range]{-webkit-appearance:none;appearance:none;background:transparent;width:100%;height:24px;cursor:pointer}
+input[type=range]::-webkit-slider-runnable-track{height:1px;background:rgba(232,236,204,.35)}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;height:14px;border-radius:50%;background:#0A0908;border:1px solid #E8ECCC;margin-top:-6.5px;box-shadow:0 0 12px rgba(232,236,204,.8)}
+input[type=range]::-moz-range-track{height:1px;background:rgba(232,236,204,.35)}
+input[type=range]::-moz-range-thumb{width:14px;height:14px;border-radius:50%;background:#0A0908;border:1px solid #E8ECCC;box-shadow:0 0 12px rgba(232,236,204,.8)}
+@keyframes flicker{0%,100%{opacity:1}92%{opacity:1}93%{opacity:.6}94%{opacity:1}}
+@keyframes pulse{0%,100%{opacity:.35}50%{opacity:1}}
+</style>
+</helmet>
+
+<div ref="{{ rootRef }}" onPointerDown="{{ wake }}" style="position:relative;width:100%;background:#0A0908">
+
+  <section data-screen-label="01 Interactive 3D" style="position:relative;height:100vh;min-height:760px;overflow:hidden">
+    <div ref="{{ sceneRef }}" style="position:absolute;inset:0"></div>
+    <div style="position:absolute;inset:0;pointer-events:none;background:radial-gradient(ellipse 80% 70% at 50% 50%, rgba(10,9,8,0) 55%, rgba(10,9,8,.85) 100%)"></div>
+    <div style="position:absolute;inset:0;pointer-events:none;background:repeating-linear-gradient(0deg, rgba(255,255,255,0) 0 2px, rgba(0,0,0,.16) 2px 4px);mix-blend-mode:multiply"></div>
+    <sc-if value="{{ loading }}" hint-placeholder-val="{{ true }}">
+      <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;pointer-events:none;font-family:'Geist Mono',monospace;font-size:11px;letter-spacing:.2em;color:#E8ECCC;text-transform:uppercase;animation:pulse 1.6s ease-in-out infinite">{{ loadMsg }}</div>
+    </sc-if>
+
+    <div style="position:absolute;inset:0;pointer-events:none;display:grid;grid-template-columns:{{ hudCols }};grid-template-rows:auto auto minmax(0,1fr) auto;gap:0 24px;padding:24px 28px 20px">
+
+      <div style="grid-column:1/-1;display:flex;justify-content:space-between;align-items:flex-start;gap:24px;flex-wrap:wrap">
+        <div style="display:flex;flex-direction:column;gap:6px">
+          <a href="../../" style="pointer-events:auto;display:flex;align-items:center;gap:8px;text-decoration:none;font-family:'Geist Mono',monospace;font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:#9A958C;margin-bottom:4px" style-hover="color:#F2EFE8"><svg viewBox="0 0 100 100" width="16" height="16" aria-hidden="true" style="display:block;flex:none"><path d="M11.2 5.5h5v4.6h-5zM84 5.5h5v4.6h-5zM11.6 13h15.4v4.6h-15.4zM73.2 13h15.4v4.6h-15.4zM12.2 20.5h25.8v4.6h-25.8zM62.2 20.5h25.8v4.6h-25.8zM12.6 28h75v4.6h-75zM11.2 35.5h77.8v4.6h-77.8zM9.2 43h81.8v4.6h-81.8zM8.2 50.5h13.4v4.6h-13.4zM40.2 50.5h19.8v4.6h-19.8zM78.6 50.5h13.4v4.6h-13.4zM8.2 58h24v4.6h-24zM39.4 58h21.4v4.6h-21.4zM68 58h24v4.6h-24zM9 65.5h82.2v4.6h-82.2zM12.2 73h75.8v4.6h-75.8zM18.4 80.5h63.4v4.6h-63.4zM31.2 88h37.8v4.6h-37.8z" fill="#E8ECCC"></path></svg>The Kuroneko Company · Portfolio</a>
+          <div style="font-family:'Geist Mono',monospace;font-size:11px;letter-spacing:.18em;color:#E8ECCC;text-transform:uppercase">// Component Teardown &nbsp;·&nbsp; Jedi Lightsaber</div>
+          <h1 style="margin:0;font-weight:500;font-size:30px;line-height:1.05;letter-spacing:-.03em;color:#F2EFE8">Kyber Lightsaber <span style="font-weight:300;color:#9A958C">{{ configLabel }}</span></h1>
+        </div>
+        <div style="display:flex;flex-wrap:wrap;justify-content:flex-end;gap:10px 26px;white-space:nowrap;font-family:'Geist Mono',monospace;font-size:11px;letter-spacing:.12em;color:#9A958C;text-transform:uppercase;text-align:right">
+          <div style="display:flex;flex-direction:column;gap:4px"><span>Crystal</span><span style="color:#F2EFE8;font-size:14px">{{ kyName }}</span></div>
+          <div style="display:flex;flex-direction:column;gap:4px"><span>Blade Output</span><span style="color:#F2EFE8;font-size:14px">{{ tel.out }} <span style="color:#6E6A63">MW</span></span></div>
+          <div style="display:flex;flex-direction:column;gap:4px"><span>Core Temp</span><span style="color:{{ tel.tempColor }};font-size:14px">{{ tel.temp }} <span style="color:#6E6A63">°C</span></span></div>
+          <div style="display:flex;flex-direction:column;gap:4px"><span>Field Hum</span><span style="color:#F2EFE8;font-size:14px">{{ tel.hum }} <span style="color:#6E6A63">Hz</span></span></div>
+          <div style="display:flex;flex-direction:column;gap:4px"><span>Mode</span><span style="color:#E8ECCC;font-size:14px;animation:flicker 6s infinite">{{ modeLabel }}</span></div>
+        </div>
+      </div>
+
+      <div data-hud="top" style="grid-column:1/-1;pointer-events:auto;display:flex;justify-content:space-between;align-items:center;gap:12px 28px;flex-wrap:wrap;margin-top:16px;padding:10px 0;border-top:1px solid rgba(232,236,204,.14);border-bottom:1px solid rgba(232,236,204,.14)">
+        <div style="display:flex;align-items:center;gap:4px;flex-wrap:wrap">
+          <span style="font-family:'Geist Mono',monospace;font-size:9.5px;letter-spacing:.18em;color:#6E6A63;text-transform:uppercase;margin-right:8px">Zoom</span>
+          <sc-for list="{{ views }}" as="v" hint-placeholder-count="4">
+            <div style="display:flex;align-items:center;gap:4px">
+              <button onClick="{{ v.go }}" style="display:flex;align-items:baseline;gap:8px;padding:7px 11px;background:{{ v.bg }};border:1px solid {{ v.border }};color:{{ v.color }};font-family:'Geist Mono',monospace;font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;cursor:pointer;transition:all .25s;backdrop-filter:blur(4px)"><span style="color:{{ v.numColor }}">{{ v.num }}</span>{{ v.label }}</button>
+              <span style="font-family:'Geist Mono',monospace;font-size:11px;color:#3A3733;opacity:{{ v.sepOp }}">›</span>
+            </div>
+          </sc-for>
+        </div>
+        <div style="display:flex;align-items:center;gap:22px;flex-wrap:wrap">
+          <div style="display:flex;align-items:center;gap:4px">
+            <span style="font-family:'Geist Mono',monospace;font-size:9.5px;letter-spacing:.18em;color:#6E6A63;text-transform:uppercase;margin-right:8px">Mode</span>
+            <sc-for list="{{ modes }}" as="w" hint-placeholder-count="3">
+              <button onClick="{{ w.go }}" style="padding:6px 10px;background:{{ w.bg }};border:1px solid {{ w.border }};color:{{ w.color }};font-family:'Geist Mono',monospace;font-size:10px;letter-spacing:.14em;text-transform:uppercase;cursor:pointer;transition:all .25s">{{ w.label }}</button>
+            </sc-for>
+          </div>
+          <div style="display:flex;align-items:center;gap:4px">
+            <span style="font-family:'Geist Mono',monospace;font-size:9.5px;letter-spacing:.18em;color:#6E6A63;text-transform:uppercase;margin-right:8px">Kyber</span>
+            <button onClick="{{ kyPrev }}" aria-label="Previous crystal" style="width:26px;height:26px;padding:0;background:rgba(10,9,8,.4);border:1px solid rgba(232,236,204,.2);color:#E8ECCC;font-family:'Geist Mono',monospace;font-size:13px;cursor:pointer" style-hover="background:rgba(232,236,204,.1)">‹</button>
+            <div title="{{ kyLore }}" style="display:flex;align-items:center;gap:8px;width:156px;height:26px;padding:0 10px;border:1px solid {{ kyBorder }};background:rgba(10,9,8,.4);transition:border-color .25s"><span style="width:10px;height:10px;flex:none;background:{{ kySwatch }};box-shadow:{{ kyGlow }};outline:{{ kyOutline }}"></span><span style="font-family:'Geist Mono',monospace;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:#F2EFE8;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ kyName }}</span><span style="margin-left:auto;font-family:'Geist Mono',monospace;font-size:9.5px;color:#6E6A63">{{ kyCount }}</span></div>
+            <button onClick="{{ kyNext }}" aria-label="Next crystal" style="width:26px;height:26px;padding:0;background:rgba(10,9,8,.4);border:1px solid rgba(232,236,204,.2);color:#E8ECCC;font-family:'Geist Mono',monospace;font-size:13px;cursor:pointer" style-hover="background:rgba(232,236,204,.1)">›</button>
+          </div>
+          <div style="display:flex;align-items:center;gap:4px">
+            <span style="font-family:'Geist Mono',monospace;font-size:9.5px;letter-spacing:.18em;color:#6E6A63;text-transform:uppercase;margin-right:8px">Overlay</span>
+            <sc-for list="{{ toggles }}" as="g" hint-placeholder-count="3">
+              <button onClick="{{ g.go }}" style="display:flex;align-items:center;gap:7px;padding:6px 10px;background:{{ g.bg }};border:1px solid {{ g.border }};color:{{ g.color }};font-family:'Geist Mono',monospace;font-size:10px;letter-spacing:.14em;text-transform:uppercase;cursor:pointer;transition:all .25s"><span style="width:6px;height:6px;border-radius:50%;background:{{ g.dot }};box-shadow:{{ g.dotGlow }}"></span>{{ g.label }}</button>
+            </sc-for>
+          </div>
+        </div>
+      </div>
+
+      <sc-if value="{{ showPanel }}" hint-placeholder-val="{{ true }}">
+      <div data-hud="panel" style="grid-column:1;grid-row:3;pointer-events:auto;align-self:start;margin-top:22px;min-width:0;max-height:100%;overflow:auto">
+        <div style="position:relative;border:1px solid {{ panelBorder }};background:rgba(10,9,8,.94);padding:20px 20px 18px;backdrop-filter:blur(8px);position:relative;z-index:3;transition:border-color .35s ease">
+          <sc-if value="{{ narrow }}" hint-placeholder-val="{{ false }}"><button onClick="{{ closePanel }}" aria-label="Close details" style="position:absolute;right:8px;top:8px;width:28px;height:28px;background:transparent;border:1px solid rgba(232,236,204,.4);color:#F2EFE8;font-size:14px;cursor:pointer;z-index:4">×</button></sc-if>
+          <div style="position:absolute;left:-1px;top:-1px;width:12px;height:12px;border-left:1px solid #E8ECCC;border-top:1px solid #E8ECCC"></div>
+          <div style="position:absolute;right:-1px;bottom:-1px;width:12px;height:12px;border-right:1px solid #E8ECCC;border-bottom:1px solid #E8ECCC"></div>
+          <div style="display:flex;justify-content:space-between;align-items:center;font-family:'Geist Mono',monospace;font-size:10px;letter-spacing:.18em;color:#E8ECCC;text-transform:uppercase"><span>{{ active.id }}</span><span style="color:{{ statusColor }}">{{ status }}</span></div>
+          <h2 style="margin:12px 0 0;font-size:20px;font-weight:500;line-height:1.15;letter-spacing:-.02em;color:#F2EFE8;text-wrap:pretty">{{ active.name }}</h2>
+          <p style="margin:8px 0 0;font-size:13px;line-height:1.5;color:#A8A39A;text-wrap:pretty">{{ active.desc }}</p>
+          <sc-if value="{{ hasCustom }}" hint-placeholder-val="{{ false }}">
+            <div style="margin-top:16px;padding:12px;border:1px solid rgba(232,236,204,.22);background:rgba(232,236,204,.03);display:flex;flex-direction:column;gap:10px">
+              <div style="display:flex;justify-content:space-between;align-items:baseline;font-family:'Geist Mono',monospace;font-size:9.5px;letter-spacing:.16em;text-transform:uppercase"><span style="color:#E8ECCC">Customize · {{ customTitle }}</span><span style="color:#6E6A63">{{ customHint }}</span></div>
+              <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px">
+                <sc-for list="{{ customOpts }}" as="o" hint-placeholder-count="4">
+                  <button onClick="{{ o.go }}" title="{{ o.sub }}" style="display:flex;align-items:center;gap:7px;min-width:0;padding:7px 9px;background:{{ o.bg }};border:1px solid {{ o.border }};color:{{ o.color }};font-family:'Geist Mono',monospace;font-size:10px;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;text-align:left;transition:all .2s"><sc-if value="{{ o.swShow }}" hint-placeholder-val="{{ false }}"><span style="width:9px;height:9px;flex:none;background:{{ o.sw }};outline:1px solid rgba(255,255,255,.25)"></span></sc-if><span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ o.label }}</span></button>
+                </sc-for>
+              </div>
+            </div>
+          </sc-if>
+          <div style="margin-top:16px;height:1px;background:repeating-linear-gradient(90deg, rgba(232,236,204,.45) 0 3px, transparent 3px 7px)"></div>
+          <div style="margin-top:14px;display:grid;grid-template-columns:1fr 1fr;gap:12px 16px">
+            <sc-for list="{{ active.specs }}" as="s" hint-placeholder-count="4">
+              <div style="display:flex;flex-direction:column;gap:3px;min-width:0">
+                <span style="font-family:'Geist Mono',monospace;font-size:9.5px;letter-spacing:.14em;color:#6E6A63;text-transform:uppercase">{{ s.k }}</span>
+                <span style="font-size:15px;color:#E6E2DA;font-weight:500">{{ s.v }}</span>
+              </div>
+            </sc-for>
+          </div>
+          <div style="margin-top:16px;height:1px;background:repeating-linear-gradient(90deg, rgba(232,236,204,.45) 0 3px, transparent 3px 7px)"></div>
+          <div style="margin-top:12px;display:flex;justify-content:space-between;align-items:baseline;font-family:'Geist Mono',monospace;font-size:9.5px;letter-spacing:.16em;color:#6E6A63;text-transform:uppercase"><span>Thermal · {{ modeLabel }}</span><span style="color:{{ active.tColor }};font-size:11px;letter-spacing:.06em">{{ active.thermal }}</span></div>
+          <div style="margin-top:6px;height:3px;background:rgba(232,236,204,.1);position:relative;overflow:hidden"><div style="position:absolute;left:0;top:0;bottom:0;width:{{ active.thermalPct }}%;background:linear-gradient(90deg, rgba(232,236,204,.5), {{ active.thermalEnd }});transition:width .5s ease"></div></div>
+          <div style="margin-top:14px;display:flex;flex-direction:column;gap:5px">
+            <sc-for list="{{ active.parts }}" as="pt" hint-placeholder-count="4">
+              <div style="display:grid;grid-template-columns:34px minmax(0,1fr) auto;gap:0 8px;align-items:baseline;font-family:'Geist Mono',monospace;font-size:10.5px;line-height:1.3">
+                <span style="color:#6E6A63">{{ pt.addr }}</span>
+                <span style="color:#CFCAC0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ pt.name }}</span>
+                <span style="color:#E8ECCC;white-space:nowrap">{{ pt.v }}</span>
+              </div>
+            </sc-for>
+          </div>
+          <sc-if value="{{ hasAction }}" hint-placeholder-val="{{ false }}">
+            <button onClick="{{ action.go }}" style="margin-top:18px;width:100%;padding:10px 12px;background:rgba(232,236,204,.08);border:1px solid #E8ECCC;color:#F2EFE8;font-family:'Geist Mono',monospace;font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;cursor:pointer;text-align:left" style-hover="background:rgba(232,236,204,.16)">{{ action.label }}</button>
+          </sc-if>
+          <sc-if value="{{ hasSelection }}" hint-placeholder-val="{{ false }}">
+            <button onClick="{{ clearSelection }}" style="margin-top:8px;width:100%;padding:10px 12px;background:transparent;border:1px solid rgba(232,236,204,.3);color:#CFCAC0;font-family:'Geist Mono',monospace;font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;cursor:pointer;text-align:left" style-hover="background:rgba(232,236,204,.08)">← Clear Selection</button>
+          </sc-if>
+        </div>
+      </div>
+      </sc-if>
+      <sc-if value="{{ narrowClosed }}" hint-placeholder-val="{{ false }}">
+      <div style="grid-column:1;grid-row:3;align-self:start;margin-top:16px;pointer-events:auto"><button onClick="{{ openPanel }}" style="padding:9px 12px;background:rgba(10,9,8,.85);border:1px solid rgba(232,236,204,.4);color:#F2EFE8;font-family:'Geist Mono',monospace;font-size:10px;letter-spacing:.16em;text-transform:uppercase;cursor:pointer">Details ▾</button></div>
+      </sc-if>
+
+      <sc-if value="{{ wide }}" hint-placeholder-val="{{ true }}">
+      <div data-hud="index" style="grid-column:3;grid-row:3;pointer-events:auto;align-self:center;display:flex;flex-direction:column;gap:2px;min-width:0;background:rgba(10,9,8,.92);backdrop-filter:blur(4px);padding:10px 0;position:relative;z-index:2">
+        <div style="font-family:'Geist Mono',monospace;font-size:9.5px;letter-spacing:.18em;color:#6E6A63;text-transform:uppercase;padding:0 12px 8px">{{ indexTitle }}</div>
+        <sc-for list="{{ index }}" as="l" hint-placeholder-count="7">
+          <div onMouseEnter="{{ l.hover }}" onMouseLeave="{{ unhoverIdx }}" onClick="{{ l.select }}" style="display:grid;grid-template-columns:26px minmax(0,1fr);gap:0 8px;align-items:baseline;padding:6px 12px;border-left:1px solid {{ l.borderColor }};background:{{ l.bg }};cursor:pointer;transition:all .25s ease">
+            <span style="font-family:'Geist Mono',monospace;font-size:10.5px;color:{{ l.numColor }}">{{ l.num }}</span>
+            <span style="font-size:12.5px;font-weight:500;color:{{ l.nameColor }};line-height:1.25">{{ l.name }}</span>
+          </div>
+        </sc-for>
+      </div>
+      </sc-if>
+
+      <div data-hud="bottom" style="grid-column:1/-1;grid-row:4;pointer-events:auto;display:flex;align-items:center;gap:16px 36px;flex-wrap:wrap;padding-top:12px;border-top:1px solid rgba(232,236,204,.14)">
+        <div style="flex:1 1 380px;min-width:0;display:flex;align-items:center;gap:18px">
+          <sc-if value="{{ isHilt }}" hint-placeholder-val="{{ false }}">
+            <span style="font-family:'Geist Mono',monospace;font-size:10px;letter-spacing:.18em;color:#E8ECCC;text-transform:uppercase;white-space:nowrap">Assembled</span>
+            <input type="range" min="0" max="100" value="{{ explode }}" onChange="{{ onSlide }}" onInput="{{ onSlide }}" aria-label="Explode hilt" style="flex:1;min-width:0">
+            <span style="font-family:'Geist Mono',monospace;font-size:10px;letter-spacing:.18em;color:#E8ECCC;text-transform:uppercase;white-space:nowrap">Exploded</span>
+          </sc-if>
+          <sc-if value="{{ isSaber }}" hint-placeholder-val="{{ true }}">
+            <div style="display:flex;align-items:center;gap:12px 22px;flex-wrap:wrap">
+              <div style="display:flex;align-items:center;gap:4px">
+                <span style="font-family:'Geist Mono',monospace;font-size:9.5px;letter-spacing:.18em;color:#6E6A63;text-transform:uppercase;margin-right:8px">Blade</span>
+                <sc-for list="{{ configs }}" as="c" hint-placeholder-count="3">
+                  <button onClick="{{ c.go }}" title="{{ c.lore }}" style="padding:6px 10px;background:{{ c.bg }};border:1px solid {{ c.border }};color:{{ c.color }};font-family:'Geist Mono',monospace;font-size:10px;letter-spacing:.14em;text-transform:uppercase;cursor:pointer;transition:all .25s">{{ c.label }}</button>
+                </sc-for>
+              </div>
+              <div style="display:flex;align-items:center;gap:4px">
+                <span style="font-family:'Geist Mono',monospace;font-size:9.5px;letter-spacing:.18em;color:#6E6A63;text-transform:uppercase;margin-right:8px">Finish</span>
+                <sc-for list="{{ finishes }}" as="f" hint-placeholder-count="3">
+                  <button onClick="{{ f.go }}" style="display:flex;align-items:center;gap:7px;padding:6px 10px;background:{{ f.bg }};border:1px solid {{ f.border }};color:{{ f.color }};font-family:'Geist Mono',monospace;font-size:10px;letter-spacing:.14em;text-transform:uppercase;cursor:pointer;transition:all .25s"><span style="width:8px;height:8px;background:{{ f.sw }}"></span>{{ f.label }}</button>
+                </sc-for>
+              </div>
+            </div>
+          </sc-if>
+          <sc-if value="{{ showHint }}" hint-placeholder-val="{{ false }}">
+            <span style="font-family:'Geist Mono',monospace;font-size:10px;letter-spacing:.16em;color:#9A958C;text-transform:uppercase">{{ levelHint }}</span>
+          </sc-if>
+        </div>
+        <div style="display:flex;align-items:center;gap:6px">
+          <button onClick="{{ zoomIn }}" aria-label="Zoom in" style="width:30px;height:30px;background:transparent;border:1px solid rgba(232,236,204,.3);color:#E8ECCC;font-family:'Geist Mono',monospace;font-size:14px;cursor:pointer">+</button>
+          <button onClick="{{ zoomOut }}" aria-label="Zoom out" style="width:30px;height:30px;background:transparent;border:1px solid rgba(232,236,204,.3);color:#E8ECCC;font-family:'Geist Mono',monospace;font-size:14px;cursor:pointer">−</button>
+          <button onClick="{{ resetView }}" style="height:30px;padding:0 10px;background:transparent;border:1px solid rgba(232,236,204,.3);color:#E8ECCC;font-family:'Geist Mono',monospace;font-size:9.5px;letter-spacing:.16em;text-transform:uppercase;cursor:pointer">Reset</button>
+        </div>
+        <div style="display:flex;gap:20px;flex-wrap:wrap">
+          <sc-for list="{{ sparks }}" as="sp" hint-placeholder-count="3">
+            <div style="display:flex;flex-direction:column;gap:4px;width:140px">
+              <div style="display:flex;justify-content:space-between;align-items:baseline;font-family:'Geist Mono',monospace;font-size:9px;letter-spacing:.14em;color:#6E6A63;text-transform:uppercase"><span>{{ sp.k }}</span><span style="color:{{ sp.color }};font-size:10.5px;letter-spacing:.04em">{{ sp.v }}</span></div>
+              <svg viewBox="0 0 120 26" preserveAspectRatio="none" style="width:140px;height:24px;display:block;border-bottom:1px solid rgba(232,236,204,.2)">
+                <polyline points="{{ sp.area }}" fill="{{ sp.areaFill }}" stroke="none"></polyline>
+                <polyline points="{{ sp.pts }}" fill="none" stroke="{{ sp.color }}" stroke-width="1" vector-effect="non-scaling-stroke"></polyline>
+              </svg>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+    </div>
+    <div style="position:absolute;left:50%;bottom:92px;transform:translateX(-50%);pointer-events:none;font-family:'Geist Mono',monospace;font-size:9.5px;letter-spacing:.16em;color:#6E6A63;text-transform:uppercase;white-space:nowrap">Drag To Orbit · Ctrl/⌘ + Scroll To Zoom · Click To Inspect · Double-Click To Dive</div>
+  </section>
+
+  <section data-screen-label="02 Four Levels" style="max-width:1320px;margin:0 auto;padding:120px 28px 40px;display:flex;flex-direction:column;gap:40px">
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,420px),1fr));gap:24px 60px;align-items:end">
+      <div style="display:flex;flex-direction:column;gap:12px">
+        <span style="font-family:'Geist Mono',monospace;font-size:11px;letter-spacing:.18em;color:#E8ECCC;text-transform:uppercase">// 02 · Scale</span>
+        <h2 style="margin:0;font-size:44px;font-weight:500;line-height:1.05;letter-spacing:-.035em;color:#F2EFE8;text-wrap:balance">From the ignited blade down to the lattice of a single Kyber crystal</h2>
+      </div>
+      <p style="margin:0;font-size:16px;line-height:1.6;color:#A8A39A;max-width:520px;text-wrap:pretty">Each level above is its own 3D model. Follow one pulse of energy from the power cell, through the crystal and lenses, out of the emitter and back down the blade.</p>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px">
+      <sc-for list="{{ levelCards }}" as="c" hint-placeholder-count="4">
+        <div style="display:flex;flex-direction:column;border:1px solid rgba(232,236,204,.16);background:rgba(232,236,204,.02)">
+          <div style="position:relative;aspect-ratio:4/3;background:#0E0D0C;border-bottom:1px solid rgba(232,236,204,.16)">
+            <sc-if value="{{ c.has }}" hint-placeholder-val="{{ false }}"><img src="{{ c.src }}" alt="{{ c.name }} render" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block"></sc-if>
+            <sc-if value="{{ c.pending }}" hint-placeholder-val="{{ true }}"><div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:'Geist Mono',monospace;font-size:10px;letter-spacing:.18em;color:#6E6A63;text-transform:uppercase;animation:pulse 1.6s ease-in-out infinite">Rendering…</div></sc-if>
+            <div style="position:absolute;left:10px;top:10px;font-family:'Geist Mono',monospace;font-size:9.5px;letter-spacing:.16em;color:#E8ECCC;text-transform:uppercase;text-shadow:0 0 6px #000">{{ c.num }} · {{ c.label }}</div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:8px;padding:16px 16px 18px;flex:1">
+            <span style="font-family:'Geist Mono',monospace;font-size:10px;letter-spacing:.16em;color:#9A958C;text-transform:uppercase">{{ c.num }} · {{ c.scale }}</span>
+            <span style="font-size:18px;font-weight:500;letter-spacing:-.02em;color:#F2EFE8">{{ c.name }}</span>
+            <span style="font-size:13px;line-height:1.5;color:#9A958C;text-wrap:pretty;flex:1">{{ c.line }}</span>
+            <button onClick="{{ c.go }}" style="align-self:flex-start;margin-top:6px;padding:7px 10px;background:transparent;border:1px solid rgba(232,236,204,.4);color:#E8ECCC;font-family:'Geist Mono',monospace;font-size:9.5px;letter-spacing:.16em;text-transform:uppercase;cursor:pointer" style-hover="background:rgba(232,236,204,.1)">View In 3D ↑</button>
+          </div>
+        </div>
+      </sc-for>
+    </div>
+  </section>
+
+  <section data-screen-label="03 Ignition" style="max-width:1320px;margin:0 auto;padding:100px 28px 60px;display:flex;flex-direction:column;gap:40px">
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,420px),1fr));gap:24px 60px;align-items:end">
+      <div style="display:flex;flex-direction:column;gap:12px">
+        <span style="font-family:'Geist Mono',monospace;font-size:11px;letter-spacing:.18em;color:#E8ECCC;text-transform:uppercase">// 03 · Ignition Sequence</span>
+        <h2 style="margin:0;font-size:44px;font-weight:500;line-height:1.05;letter-spacing:-.035em;color:#F2EFE8;text-wrap:balance">Six steps from a closed stud to a stable blade</h2>
+      </div>
+      <div style="display:flex;justify-content:flex-start">
+        <button onClick="{{ runIgnite }}" style="padding:12px 16px;background:rgba(232,236,204,.08);border:1px solid #E8ECCC;color:#F2EFE8;font-family:'Geist Mono',monospace;font-size:11px;letter-spacing:.16em;text-transform:uppercase;cursor:pointer;box-shadow:0 0 18px rgba(232,236,204,.18)" style-hover="background:rgba(232,236,204,.16)">{{ igniteLabel }}</button>
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));border-top:1px solid rgba(232,236,204,.16)">
+      <sc-for list="{{ seq }}" as="q" hint-placeholder-count="6">
+        <div style="display:flex;flex-direction:column;gap:10px;padding:20px 18px 24px 0;border-top:2px solid {{ q.bar }};margin-top:-1px;transition:border-color .3s">
+          <div style="display:flex;justify-content:space-between;align-items:baseline;font-family:'Geist Mono',monospace;font-size:10px;letter-spacing:.14em;text-transform:uppercase"><span style="color:{{ q.numColor }}">{{ q.num }}</span><span style="color:#6E6A63">{{ q.t }}</span></div>
+          <span style="font-size:16px;font-weight:500;letter-spacing:-.015em;color:{{ q.nameColor }}">{{ q.name }}</span>
+          <span style="font-size:13px;line-height:1.5;color:#9A958C;text-wrap:pretty">{{ q.line }}</span>
+        </div>
+      </sc-for>
+    </div>
+  </section>
+
+  <footer style="max-width:1320px;margin:0 auto;padding:40px 28px 60px;display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap;border-top:1px solid rgba(232,236,204,.12);font-family:'Geist Mono',monospace;font-size:10px;letter-spacing:.16em;color:#6E6A63;text-transform:uppercase">
+    <span>Lightsaber Teardown · Interactive Study · The Kuroneko Company</span>
+    <span>In-Universe Components · Schematic · Values Illustrative</span>
+  </footer>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+const MOON='#E8ECCC';
+const P=rows=>rows.map(([addr,name,v])=>({addr,name,v}));
+const S=rows=>rows.map(([k,v])=>({k,v}));
+const I=(id,name,temp,desc,specs,parts,extra={})=>({id,name,temp,desc,specs:S(specs),parts:P(parts),...extra});
+const INFO={
+  saber:{
+    _:I('KN-LS','Jedi Lightsaber',48,'A hand-built hilt that turns a Kyber crystal\u2019s resonance into a contained plasma blade. The blade arcs back into the emitter, so it only spends energy when it cuts. Click a section to inspect it; double-click the hilt to open it.',
+      [['Hilt Length','28 cm'],['Blade Length','~91 cm'],['Mass','~1.1 kg'],['Crystal','1 × Kyber']],
+      [['S.00','Power Source','Diatium Cell'],['S.01','Blade Loop','Closed Arc'],['S.02','Lens Elements','3'],['S.03','Builder','Hand-Built']],{drill:'hilt'}),
+    blade:I('LS-BL','Plasma Blade',88,'Plasma leaves the emitter, runs the length of the blade inside a contained field, and arcs back to the negative pole at the tip. The loop is why the blade is weightless and silent until it meets something.',
+      [['Length','~91 cm'],['Core','Plasma'],['Return','Arc At Tip'],['Weight','None']],
+      [['B.00','Containment','Arc Field'],['B.01','Color','From Kyber'],['B.02','Hum','Field Resonance'],['B.03','Draw','On Contact Only']]),
+    emitter:I('LS-EM','Blade Emitter',62,'The flared shroud at the top of the hilt. Inside it, the emitter matrix shapes the focused beam into a blade and sets where the return arc lands.',
+      [['Shroud','Chromed Steel'],['Vents','6 × Heat Fins'],['Matrix','Annular'],['Position','Top']],
+      [['E.00','Shapes','Blade Profile'],['E.01','Guards','Hand + Lens'],['E.02','Cooling','Passive Fins'],['E.03','Next Level','Double-Click']],{drill:'hilt'}),
+    lens:I('LS-LN','Lens Housing',58,'A sealed section holding the focusing lens array. Turning the outer seam adjusts lens spacing, which changes blade length.',
+      [['Elements','3 Lenses'],['Seal','Pressure'],['Adjust','Seam Ring'],['Sets','Blade Length']],
+      [['L.00','Material','Polished Crystal'],['L.01','Mounts','Brass Rings'],['L.02','Alignment','On Axis'],['L.03','Next Level','Double-Click']],{drill:'hilt'}),
+    chamber:I('LS-CC','Crystal Chamber',66,'The heart of the hilt. A slotted frame and smoked window hold the Kyber crystal on the centre axis, between the power cell and the lenses.',
+      [['Crystal','1 × Kyber'],['Frame','6 Ribs'],['Window','Smoked Glass'],['Cradle','2 Rings']],
+      [['C.00','Axis','Centred'],['C.01','Field','Energizer Cage'],['C.02','Access','Twist-Lock'],['C.03','Next Level','Double-Click']],{drill:'chamber'}),
+    activation:I('LS-AC','Activation Matrix',44,'The control band under the thumb. The main stud closes the energy gate; the secondary switch locks the blade on or trims power.',
+      [['Stud','Main · Momentary'],['Switch','Lock / Trim'],['Gate','Energy Gate'],['Indicator','Status Pip']],
+      [['A.00','Response','Instant'],['A.01','Safety','Lock Switch'],['A.02','Finish','Polished'],['A.03','Next Level','Double-Click']],{drill:'hilt'}),
+    grip:I('LS-GR','Grip Section',36,'Ribbed rubber rings over a gunmetal sleeve. The sleeve houses the diatium power cell.',
+      [['Rings','9 × Rubber'],['Sleeve','Gunmetal'],['Houses','Power Cell'],['Hands','One Or Two']],
+      [['G.00','Texture','Ribbed'],['G.01','Insulation','Full'],['G.02','Balance','Mid-Hilt'],['G.03','Next Level','Double-Click']],{drill:'hilt'}),
+    pommel:I('LS-PM','Pommel Cap',32,'The weighted end cap. It balances the hilt and unscrews to give access to the power cell.',
+      [['Material','Steel'],['Grooves','3'],['Contact','Brass Cap'],['Role','Balance + Access']],
+      [['P.00','Threading','Fine'],['P.01','Cell Access','Yes'],['P.02','Weight','Counterbalance'],['P.03','Next Level','Double-Click']],{drill:'hilt'}),
+  },
+  hilt:{
+    _:I('KN-HT','Hilt · Exploded',46,'The hilt pulled apart along its axis. Drag the slider to separate the sections; the power cell drops out of the grip and the crystal and lenses lift out so you can see what sits inside.',
+      [['Sections','7'],['Internal Parts','3'],['Length','28 cm'],['Fasteners','Twist-Lock']],
+      [['H.00','Cell','Below Grip'],['H.01','Crystal','Above Chamber'],['H.02','Lenses','Above Housing'],['H.03','Flow','Pommel → Emitter']]),
+    emitter:INFO_ref('emitter'), lens:I('HT-LN','Focusing Lens Array',58,'Three crystal lenses in brass rings. They narrow the crystal\u2019s output into a single coherent beam and set its length.',
+      [['Elements','3'],['Mounts','Brass Rings'],['Material','Polished Crystal'],['Spacing','Adjustable']],
+      [['L.04','Lens 1','Collimator'],['L.05','Lens 2','Focus'],['L.06','Lens 3','Length Trim'],['L.07','Next Level','Double-Click']],{drill:'chamber'}),
+    chamber:null, crystal:I('HT-KY','Kyber Crystal',74,'A hexagonal crystal sitting on the chamber axis. It takes raw power from the cell and gives it back as a tuned, coherent beam in its own colour.',
+      [['Form','Hexagonal'],['Facets','6 + Terminations'],['Output','Coherent Beam'],['Colour','Attuned']],
+      [['K.00','Mount','Cradle Rings'],['K.01','Resonance','Field Hum'],['K.02','Bond','To Builder'],['K.03','Next Level','Double-Click']],{drill:'crystal'}),
+    activation:null,
+    cell:I('HT-PC','Diatium Power Cell',52,'A cylindrical cell inside the grip. It stores enough energy for years of use, because the closed blade loop returns most of what it draws.',
+      [['Type','Diatium'],['Rings','4 Charge Bands'],['Contacts','Brass Caps'],['Life','Years']],
+      [['D.00','Feeds','Energy Gate'],['D.01','Charge','Recirculated'],['D.02','Access','Via Pommel'],['D.03','Shielding','Grip Sleeve']]),
+    grip:null, pommel:null,
+  },
+  chamber:{
+    _:I('KN-CC','Crystal Chamber · Inside',66,'The chamber opened up. Power arrives through the conduit, field energizers charge the crystal in its cradle, and the lens stack focuses the beam into the emitter matrix. Double-click the crystal to go inside it.',
+      [['Energizers','4 Rods'],['Cradle','2 Rings'],['Lenses','3'],['Path','Conduit → Matrix']],
+      [['X.00','Input','Diatium Cell'],['X.01','Gain','Kyber Resonance'],['X.02','Output','Focused Beam'],['X.03','Next Level','Kyber Crystal']]),
+    crystal:null,
+    cradle:I('CC-CR','Crystal Cradle',54,'Two brass rings with three prongs each hold the crystal exactly on axis without blocking its faces.',
+      [['Rings','2'],['Prongs','3 Per Ring'],['Material','Brass'],['Tolerance','On Axis']],
+      [['R.00','Contact','Prong Tips'],['R.01','Damping','Shock-Mounted'],['R.02','Spin','Free'],['R.03','Access','Twist-Lock']]),
+    energizers:I('CC-FE','Cycling Field Energizers',70,'Four rods surround the crystal. Their glowing bands build the field that drives the crystal into resonance.',
+      [['Rods','4'],['Bands','3 Per Rod'],['Field','Cycling'],['Drives','Crystal']],
+      [['F.00','Layout','Square Cage'],['F.01','Phase','Cycling'],['F.02','Feeds From','Conduit'],['F.03','Glow','Field Strength']]),
+    conduit:I('CC-PC','Power Conduit',48,'A copper conduit carries energy from the power cell, through the energy gate, into the chamber.',
+      [['Material','Copper'],['From','Power Cell'],['Through','Energy Gate'],['To','Energizers']],
+      [['C.04','Shielding','Insulated'],['C.05','Plug','Steel Coupler'],['C.06','Flow','One-Way'],['C.07','Losses','Minimal']]),
+    lenses:null,
+    matrix:I('CC-EM','Emitter Matrix',62,'An annular ring with eight spokes that turns the focused beam into the blade and anchors the return arc.',
+      [['Form','Annular Ring'],['Spokes','8'],['Material','Chrome'],['Anchors','Return Arc']],
+      [['M.00','Shapes','Blade Profile'],['M.01','Position','Emitter Top'],['M.02','Cooling','Shroud Fins'],['M.03','Output','Blade']]),
+  },
+  crystal:{
+    _:I('KN-KY','Kyber Crystal · Lattice',74,'One crystal, enlarged. A faceted shell around an ordered lattice, a bright resonance core at the centre, and a harmonic field that pulses with the blade.',
+      [['Form','Hexagonal Bipyramid'],['Faces','12'],['Core','Resonant'],['Field','3 Rings']],
+      [['Y.00','Colour','Attuned'],['Y.01','Hum','Field Resonance'],['Y.02','Flow','Inward To Core'],['Y.03','Origin','Natural']]),
+    facets:I('KY-FS','Facet Shell',60,'Six long faces and two pointed terminations. The faces refract the core\u2019s light, which is why a crystal glows along its edges.',
+      [['Faces','6 + 6'],['Terminations','2'],['Clarity','High'],['Edges','Light-Carrying']],
+      [['F.04','Refraction','Strong'],['F.05','Symmetry','Hexagonal'],['F.06','Surface','Natural'],['F.07','Finish','Unpolished']]),
+    lattice:I('KY-LT','Crystal Lattice',72,'An ordered grid of points fills the crystal. Its regularity is what lets the crystal tune raw power into one clean frequency.',
+      [['Structure','Hexagonal Grid'],['Spacing','Uniform'],['Role','Frequency Tuning'],['Defects','None Visible']],
+      [['T.04','Layers','Stacked'],['T.05','Alignment','On Axis'],['T.06','Effect','Coherence'],['T.07','Placement Here','Illustrative']]),
+    core:I('KY-RC','Resonance Core',86,'The brightest point in the crystal. Energy spirals in from the field and leaves as the beam that becomes the blade.',
+      [['Temperature','Highest'],['Output','Coherent'],['Pulse','With Blade'],['Colour Source','Yes']],
+      [['O.00','Input','Spiral Inflow'],['O.01','Output','Axial Beam'],['O.02','Stability','High'],['O.03','Placement Here','Illustrative']]),
+    field:I('KY-HF','Harmonic Field',50,'Three rings of field energy around the crystal. They expand and contract with the blade\u2019s hum and grow stronger under load.',
+      [['Rings','3'],['Motion','Pulsing'],['Driven By','Energizers'],['Grows With','Load']],
+      [['H.04','Sound','Blade Hum'],['H.05','Range','Chamber Only'],['H.06','Shape','Toroidal'],['H.07','Placement Here','Illustrative']]),
+  },
+};
+function INFO_ref(k){ return null; }
+INFO.hilt.emitter={...INFO.saber.emitter,id:'HT-EM',name:'Emitter Shroud',drill:'chamber'};
+INFO.hilt.chamber={...INFO.saber.chamber,id:'HT-CC'};
+INFO.hilt.activation={...INFO.saber.activation,id:'HT-AC',drill:null};
+INFO.hilt.grip={...INFO.saber.grip,id:'HT-GR',drill:null};
+INFO.hilt.pommel={...INFO.saber.pommel,id:'HT-PM',drill:null};
+INFO.chamber.crystal={...INFO.hilt.crystal,id:'CC-KY'};
+INFO.chamber.lenses={...INFO.hilt.lens,id:'CC-LN',drill:null};
+const ORDER={
+  saber:['blade','emitter','lens','chamber','activation','grip','pommel'],
+  hilt:['emitter','lens','chamber','crystal','activation','cell','grip','pommel'],
+  chamber:['crystal','cradle','energizers','conduit','lenses','matrix'],
+  crystal:['facets','lattice','core','field'],
+};
+const LEVELS=[
+  {id:'saber',num:'01',label:'Saber',scale:'Weapon',name:'Ignited Lightsaber',line:'The assembled hilt and a full plasma blade, seen at working length.'},
+  {id:'hilt',num:'02',label:'Hilt',scale:'Assembly',name:'Exploded Hilt',line:'Seven sections pulled apart, with the cell, crystal and lenses lifted out.'},
+  {id:'chamber',num:'03',label:'Chamber',scale:'Module',name:'Crystal Chamber',line:'Conduit, field energizers, cradle, lenses and the emitter matrix.'},
+  {id:'crystal',num:'04',label:'Kyber',scale:'Crystal',name:'Kyber Lattice',line:'Facet shell, ordered lattice, resonance core and harmonic field.'},
+];
+const MODES=[{id:'idle',label:'Retracted',p:0},{id:'ignite',label:'Ignited',p:.7},{id:'duel',label:'Duel',p:1}];
+const KYBER=[
+  {id:'moon',name:'Moonlight',hex:'#E8ECCC',lore:'Kuroneko house crystal'},
+  {id:'blue',name:'Blue',hex:'#2F8CFF',lore:'Jedi Guardians · Obi-Wan, Anakin'},
+  {id:'green',name:'Green',hex:'#2BFF5A',lore:'Jedi Consulars · Yoda, Qui-Gon'},
+  {id:'purple',name:'Purple',hex:'#A44DFF',lore:'Mace Windu'},
+  {id:'yellow',name:'Yellow',hex:'#FFD21F',lore:'Temple Guards · Rey'},
+  {id:'white',name:'White',hex:'#F2F5FF',lore:'Purified crystal · Ahsoka Tano'},
+  {id:'red',name:'Red',hex:'#FF2424',lore:'Bled crystal · Sith'},
+  {id:'orange',name:'Orange',hex:'#FF7A1A',lore:'Baylan Skoll'},
+  {id:'cyan',name:'Cyan',hex:'#25EEFF',lore:'Cal Kestis · Jedi: Fallen Order'},
+  {id:'indigo',name:'Indigo',hex:'#5048FF',lore:'Cal Kestis · Jedi: Fallen Order'},
+  {id:'magenta',name:'Magenta',hex:'#FF38CF',lore:'Cal Kestis · Jedi: Fallen Order'},
+  {id:'dark',name:'Darksaber',hex:'#F4F4F4',lore:'Black blade, white edge · Mandalore',dark:true},
+];
+const CONFIGS=[{id:'single',label:'Single',name:'Single Blade',lore:'Standard Jedi hilt'},{id:'staff',label:'Dual',name:'Dual-Bladed Saberstaff',lore:'Double-bladed · Darth Maul, Temple Guards'},{id:'shoto',label:'Shoto',name:'Shoto',lore:'Short blade · Yoda, Ahsoka’s off-hand'},{id:'cross',label:'Crossguard',name:'Crossguard',lore:'Unstable crossguard · Kylo Ren'}];
+const CUSTOM={
+  emitter:{title:'Emitter Style',opts:[{id:'classic',label:'Flared Shroud',lore:'Classic Republic-era build'},{id:'hooded',label:'Hooded',lore:'Half-hood over the emitter, like Luke’s third saber'},{id:'crown',label:'Crown',lore:'Pronged emitter, like Ahsoka’s and Kenobi’s later hilts'},{id:'ring',label:'Ring',lore:'Low-profile ring emitter'}]},
+  lens:{title:'Lens Housing',opts:[{id:'sealed',label:'Sealed',lore:'Closed sleeve with a glowing seam'},{id:'vented',label:'Vented',lore:'Cooling slots, common on dueling sabers'},{id:'exposed',label:'Exposed',lore:'Open frame showing the lens stack'}]},
+  chamber:{title:'Crystal Chamber',opts:[{id:'caged',label:'Caged',lore:'Rib frame with a smoked window'},{id:'sealed',label:'Sealed',lore:'Solid sleeve with a single port'},{id:'window',label:'Window Slot',lore:'Gunmetal sleeve with a glass slot'}]},
+  activation:{title:'Activation',opts:[{id:'stud',label:'Box Stud',lore:'Raised box stud with a status pip'},{id:'slide',label:'Slide',lore:'Slider switch on a rail'},{id:'ring',label:'Rotary Ring',lore:'Twist ring, notched for grip'},{id:'twin',label:'Twin Studs',lore:'Main stud plus a power trim stud'}]},
+  grip:{title:'Grip',opts:[{id:'ribbed',label:'Ribbed',lore:'Rubber rings, like Vader’s and Luke’s first saber'},{id:'leather',label:'Leather Wrap',lore:'Wrapped grip, like Count Dooku’s and Kylo Ren’s'},{id:'ridged',label:'Ridged Metal',lore:'Long metal ridges, like Anakin’s Clone Wars hilt'},{id:'smooth',label:'Smooth',lore:'Plain polished sleeve'}]},
+  pommel:{title:'Pommel',opts:[{id:'rounded',label:'Rounded',lore:'Weighted rounded cap'},{id:'flat',label:'Flat Cap',lore:'Simple flat end cap'},{id:'talon',label:'Talon',lore:'Four spikes, for close fighting'},{id:'dring',label:'Belt Ring',lore:'Hanging ring for a belt clip'}]},
+};
+const PART_DEF={emitter:'classic',lens:'sealed',chamber:'caged',activation:'stud',grip:'ribbed',pommel:'rounded'};
+const FINISHES=[{id:'chrome',label:'Chrome',sw:'#D9DCDF'},{id:'black',label:'Blackened',sw:'#2A2B2E'},{id:'brass',label:'Brass',sw:'#C9A762'}];
+const SEQ=[
+  ['Activation Stud','The thumb closes the stud and opens the energy gate.','0 ms'],
+  ['Power Cell','The diatium cell discharges through the copper conduit.','~15 ms'],
+  ['Field Energizers','Four rods build a cycling field around the crystal.','~30 ms'],
+  ['Kyber Resonance','The crystal resonates and emits a coherent beam in its own colour.','~45 ms'],
+  ['Lens Array','Three lenses narrow and focus the beam; spacing sets length.','~60 ms'],
+  ['Emitter & Arc','The matrix projects the blade; the arc returns at the tip.','~90 ms'],
+];
+const KEY='kn-saber-3d';
+
+class Component extends DCLogic {
+  state={ parts:{...PART_DEF}, config:'single', finish:'chrome', sound:true, renders:{}, rootW:1400, level:'saber', explode:55, mode:'ignite', ky:'moon', heat:false, flow:true, selected:null, sHover:null, iHover:null, ready:false, err:null, tick:0, hist:{o:[],t:[],h:[]}, seq:-1 };
+  sceneRef=React.createRef(); rootRef=React.createRef();
+  componentDidMount(){
+    try{ const s=JSON.parse(localStorage.getItem(KEY)||'{}'); const k={}; ['level','explode','mode','ky','heat','flow','config','finish','sound','parts'].forEach(n=>{ if(s[n]!==undefined) k[n]=s[n]; }); if(k.parts) k.parts={...PART_DEF,...k.parts}; if(!k.mode||k.mode==='idle') k.mode='ignite'; this._pm=k.mode; this._ps=k.sound!==undefined?k.sound:true; this.setState(k); }catch(e){}
+    this.tm=setInterval(()=>this.setState(s=>{ const m=this.metrics(s.mode,s.tick+1), push=(a,v)=>[...a.slice(-47),v]; return {tick:s.tick+1,hist:{o:push(s.hist.o,m.out),t:push(s.hist.t,m.temp),h:push(s.hist.h,m.hum)}}; }),1000);
+    if(window.ResizeObserver&&this.rootRef.current){ this.ro=new ResizeObserver(([e])=>{ const w=Math.round(e.contentRect.width); if(Math.abs(w-this.state.rootW)>8) this.setState({rootW:w}); }); this.ro.observe(this.rootRef.current); }
+    const url=new URL('./lightsaber-scene.js', document.baseURI).href;
+    import(url).then(mod=>{
+      if(!this.sceneRef.current) return;
+      this.api=mod.mount(this.sceneRef.current,{
+        onHover:p=>this.setState({sHover:p}),
+        onSelect:p=>this.setState({selected:p}),
+        onMotion:v=>this.swing(v),
+        onDrill:p=>{ const d=(INFO[this.state.level][p]||{}).drill; if(d) this.go(d); },
+      });
+      this.push(); this.setState({ready:true}); window.__knReadyFired=true; window.dispatchEvent(new Event('kn-ready'));
+      setTimeout(()=>{ const renders={}; LEVELS.forEach(l=>{ try{ renders[l.id]=this.api.snapshot(l.id); }catch(e){ console.error(e); } }); this.setState({renders}); },1200);
+    }).catch(e=>{ console.error(e); this.setState({err:String(e&&e.message||e)}); });
+  }
+  componentDidUpdate(){ this.push(); const s=this.state;
+    if(this._pm!==undefined&&this._pm!==s.mode){ this.initAudio(); this.sfx(this._pm,s.mode); }
+    if(this._ps!==undefined&&this._ps!==s.sound&&this.out) this.out.gain.setTargetAtTime(s.sound?.9:0,this.ac.currentTime,.05);
+    this._pm=s.mode; this._ps=s.sound;
+  }
+  initAudio(){
+    if(this.ac){ if(this.ac.state==='suspended') this.ac.resume(); return false; }
+    const AC=window.AudioContext||window.webkitAudioContext; if(!AC) return false; const ac=this.ac=new AC();
+    const out=this.out=ac.createGain(); out.gain.value=this.state.sound?.9:0;
+    const comp=ac.createDynamicsCompressor(); out.connect(comp); comp.connect(ac.destination);
+    const b=ac.createBuffer(1,ac.sampleRate*1.5,ac.sampleRate), d=b.getChannelData(0); for(let i=0;i<d.length;i++) d[i]=Math.random()*2-1; this.noiseBuf=b;
+    const k=8, n=1024, curve=new Float32Array(n); for(let i=0;i<n;i++){ const x=i/(n-1)*2-1; curve[i]=Math.tanh(k*x)/Math.tanh(k); } this.curve=curve;
+    this.files={}; ['ignite','retract'].forEach(nm=>fetch(new URL('./audio/saber-'+nm+'.mp3',document.baseURI)).then(r=>r.ok?r.arrayBuffer():null).then(ab=>ab&&ac.decodeAudioData(ab)).then(buf=>{ if(buf) this.files[nm]=buf; }).catch(()=>{}));
+    return true;
+  }
+  sweep(on){
+    const ac=this.ac, t=ac.currentTime, dur=on?1.25:.85;
+    const file=this.files&&this.files[on?'ignite':'retract']; if(file){ const s=ac.createBufferSource(); s.buffer=file; s.connect(this.out); s.start(t); return; }
+    const bus=ac.createGain(); bus.gain.value=0; const lp=ac.createBiquadFilter(); lp.type='lowpass'; lp.Q.value=5; const ws=ac.createWaveShaper(); ws.curve=this.curve; ws.oversample='4x';
+    const pre=ac.createGain(); pre.gain.value=.6; pre.connect(ws); ws.connect(lp); lp.connect(bus); bus.connect(this.out);
+    const base=[[ 'sawtooth',1,.5],['sawtooth',1.012,.5],['square',2,.18],['sine',.5,.7]];
+    const f0=on?28:118, f1=on?140:22, fEnd=on?112:20;
+    const oscs=base.map(([ty,m,g])=>{ const o=ac.createOscillator(); o.type=ty; const og=ac.createGain(); og.gain.value=g; o.connect(og); og.connect(pre);
+      o.frequency.setValueAtTime(f0*m,t); o.frequency.exponentialRampToValueAtTime(f1*m,t+(on?.22:.12)); o.frequency.exponentialRampToValueAtTime(fEnd*m,t+(on?.55:dur)); o.start(t); o.stop(t+dur+.1); return o; });
+    const fm=ac.createOscillator(); fm.frequency.value=on?34:22; const fmg=ac.createGain(); fmg.gain.value=6; fm.connect(fmg); oscs.forEach(o=>fmg.connect(o.frequency)); fm.start(t); fm.stop(t+dur+.1);
+    if(on){ lp.frequency.setValueAtTime(220,t); lp.frequency.exponentialRampToValueAtTime(4200,t+.16); lp.frequency.exponentialRampToValueAtTime(900,t+.6); lp.frequency.exponentialRampToValueAtTime(500,t+dur);
+      bus.gain.setValueAtTime(.0001,t); bus.gain.exponentialRampToValueAtTime(.9,t+.08); bus.gain.exponentialRampToValueAtTime(.45,t+.5); bus.gain.exponentialRampToValueAtTime(.0001,t+dur); }
+    else { lp.frequency.setValueAtTime(1600,t); lp.frequency.exponentialRampToValueAtTime(160,t+dur);
+      bus.gain.setValueAtTime(.0001,t); bus.gain.exponentialRampToValueAtTime(.75,t+.05); bus.gain.exponentialRampToValueAtTime(.0001,t+dur); }
+    const nz=ac.createBufferSource(); nz.buffer=this.noiseBuf; const bp=ac.createBiquadFilter(); bp.type='bandpass'; bp.Q.value=.9; const ng=ac.createGain();
+    if(on){ bp.frequency.setValueAtTime(5200,t); bp.frequency.exponentialRampToValueAtTime(700,t+.35); ng.gain.setValueAtTime(.55,t); ng.gain.exponentialRampToValueAtTime(.0001,t+.4); }
+    else { bp.frequency.setValueAtTime(600,t); bp.frequency.exponentialRampToValueAtTime(3800,t+.4); ng.gain.setValueAtTime(.0001,t); ng.gain.exponentialRampToValueAtTime(.3,t+.08); ng.gain.exponentialRampToValueAtTime(.0001,t+.5); }
+    nz.connect(bp); bp.connect(ng); ng.connect(this.out); nz.start(t); nz.stop(t+.6);
+  }
+  sfx(from,to){ if(!this.ac) return; const on=this.pw(to)>0, was=this.pw(from)>0; if(on!==was) this.sweep(on); }
+  swing(){}
+  wake(){ this.initAudio(); }
+  customVals(key, level){
+    const s=this.state, chip=(label,sub,on,go,sw)=>({label,sub,on,go,sw:sw||'transparent',swShow:!!sw,bg:on?'rgba(232,236,204,.1)':'rgba(10,9,8,.4)',border:on?MOON:'rgba(232,236,204,.2)',color:on?'#FFFFFF':'#CFCAC0'});
+    let title='', opts=[];
+    if(key&&CUSTOM[key]){ title=CUSTOM[key].title; opts=CUSTOM[key].opts.map(o=>chip(o.label,o.lore,s.parts[key]===o.id,()=>this.set({parts:{...s.parts,[key]:o.id}}))); }
+    else if(key==='blade'){ title='Blade'; opts=CONFIGS.map(c=>chip(c.label,c.lore,s.config===c.id,()=>this.set({config:c.id}))); }
+    else if(key==='crystal'||(key==='chamber'&&level==='chamber')){ title='Kyber Crystal'; opts=KYBER.map(k=>chip(k.name,k.lore,s.ky===k.id,()=>this.set({ky:k.id}),k.dark?'#000000':k.hex)); }
+    if(key==='blade') opts=opts.concat(KYBER.map(k=>chip(k.name,k.lore,s.ky===k.id,()=>this.set({ky:k.id}),k.dark?'#000000':k.hex)));
+    return { hasCustom:opts.length>0, customTitle:title, customOpts:opts, customHint:s.selected?'':'Click to lock and customize' };
+  }
+  kyStep(d){ const i=KYBER.findIndex(k=>k.id===this.state.ky); this.set({ky:KYBER[(i+d+KYBER.length)%KYBER.length].id}); }
+  componentWillUnmount(){ this.ac&&this.ac.close(); clearInterval(this.tm); clearInterval(this.sq); this.ro&&this.ro.disconnect(); this.api&&this.api.dispose(); }
+  pw(id){ return (MODES.find(m=>m.id===id)||MODES[1]).p; }
+  kyHex(){ return (KYBER.find(k=>k.id===this.state.ky)||KYBER[0]).hex; }
+  temps(level,mode){ const o={}; Object.keys(INFO[level]).forEach(k=>{ if(INFO[level][k]) o[k]=this.sT(INFO[level][k].temp,mode,0,0); }); return o; }
+  push(){ if(!this.api) return; const s=this.state; this.api.set({safe:this.safeRect(), level:s.level, explode:s.explode/100, heat:s.heat, flow:s.flow, power:this.pw(s.mode), color:this.kyHex(), dark:!!(KYBER.find(k=>k.id===s.ky)||{}).dark, config:s.config, finish:s.finish, parts:s.parts, selected:s.selected, hover:s.iHover, temps:this.temps(s.level,s.mode)}); }
+  safeRect(){ const sc=this.sceneRef.current, R=this.rootRef.current; if(!sc||!R) return {l:0,t:0,r:0,b:0}; const b=sc.getBoundingClientRect(), q=n=>R.querySelector('[data-hud="'+n+'"]'), rc=n=>{ const e=q(n); return e?e.getBoundingClientRect():null; };
+    const pn=rc('panel'), tb=rc('top'), bb=rc('bottom'), ix=rc('index');
+    return { l:pn?Math.max(0,Math.round(pn.right-b.left)):0, t:tb?Math.max(0,Math.round(tb.bottom-b.top)):0, b:bb?Math.max(0,Math.round(b.bottom-bb.top)+30):0, r:ix&&ix.width?Math.max(0,Math.round(b.right-ix.left)):0 }; }
+  persist(){ const s=this.state; localStorage.setItem(KEY, JSON.stringify({level:s.level,explode:s.explode,mode:s.mode,ky:s.ky,heat:s.heat,flow:s.flow,config:s.config,finish:s.finish,sound:s.sound,parts:s.parts})); }
+  set(o){ this.setState(o,()=>this.persist()); }
+  go(level){ this.set({level, selected:null, sHover:null, iHover:null}); }
+  sT(t,mode,tick,i){ const p=this.pw(mode); return 24+(t-24)*(.35+.65*p)+Math.sin(tick*.9+i)*.7*(.3+p); }
+  metrics(mode,tick){ const p=this.pw(mode); return { out:p?(p*3.4+Math.sin(tick*1.2)*.08*(1+p)):0.01, temp:this.sT(74,mode,tick,0), hum:p?(96+p*14+Math.sin(tick*1.7)*1.4):0 }; }
+  spark(arr,lo,hi){ if(arr.length<2) arr=[lo,lo]; const n=arr.length; const pts=arr.map((v,i)=>`${(i/(n-1)*120).toFixed(1)},${(25-Math.max(0,Math.min(1,(v-lo)/(hi-lo)))*23).toFixed(1)}`).join(' '); return {pts, area:`0,26 ${pts} 120,26`}; }
+  ignite(){
+    clearInterval(this.sq); window.scrollTo({top:0,behavior:'smooth'});
+    this.set({level:'saber',mode:'idle',selected:null}); this.setState({seq:0}); let i=0;
+    this.sq=setInterval(()=>{ i++; if(i===5) this.set({mode:'ignite'}); if(i>=SEQ.length){ clearInterval(this.sq); this.setState({seq:SEQ.length}); return; } this.setState({seq:i}); },420);
+  }
+  renderVals(){
+    const s=this.state, {level,mode,tick}=s, m=this.metrics(mode,tick), hot=m.temp>=70;
+    const tbl=INFO[level], key=s.selected||s.sHover||s.iHover, info=(key&&tbl[key])||tbl._;
+    const t=this.sT(info.temp,mode,tick,3);
+    const active={...info, thermal:`${t.toFixed(1)} °C`, thermalPct:Math.round(Math.max(0,Math.min(100,(t-20)/70*100))), thermalEnd:t>=70?'rgba(255,138,76,.9)':'rgba(232,236,204,.95)', tColor:t>=70?'#ffb287':'#F2EFE8'};
+    const drill=info.drill, lvlIdx=LEVELS.findIndex(l=>l.id===level);
+    let action=null;
+    if(drill) action={label:`Open ${LEVELS.find(l=>l.id===drill).label} →`, go:()=>this.go(drill)};
+    else if(!key&&lvlIdx>0) action={label:`← Back To ${LEVELS[lvlIdx-1].label}`, go:()=>this.go(LEVELS[lvlIdx-1].id)};
+    const index=ORDER[level].map((k,i)=>{ const on=key===k, sel=s.selected===k; return { num:String(i+1).padStart(2,'0'), name:tbl[k].name,
+      hover:()=>this.setState({iHover:k}), select:()=>this.setState({selected:sel?null:k}),
+      borderColor:on?MOON:'rgba(232,236,204,.16)', bg:on?'rgba(232,236,204,.07)':'transparent', numColor:on?MOON:'#6E6A63', nameColor:on?'#FFFFFF':(s.selected&&!sel?'#6E6A63':'#CFCAC0') }; });
+    const sp=(k,v,arr,lo,hi,col)=>({k,v,color:col,areaFill:col==='#ffb287'?'rgba(255,178,135,.12)':'rgba(232,236,204,.1)',...this.spark(arr,lo,hi)});
+    const wide=s.rootW>=1100, ky=KYBER.find(k=>k.id===s.ky)||KYBER[0];
+    return {
+      narrow:s.rootW<720, showPanel:s.rootW>=720||!!s.panelOpen||!!s.selected, narrowClosed:s.rootW<720&&!s.panelOpen&&!s.selected, openPanel:()=>this.setState({panelOpen:true}), closePanel:()=>this.setState({panelOpen:false,selected:null}),
+      wide, hudCols:s.rootW<720?'minmax(0,1fr) 0px 0px': wide?'minmax(250px,300px) minmax(0,1fr) minmax(200px,250px)':'minmax(230px,270px) minmax(0,1fr) 0px',
+      rootRef:this.rootRef, sceneRef:this.sceneRef,
+      loading:!s.ready, loadMsg:s.err?('Render Error · '+s.err):'Igniting Render Engine…',
+      kyName:ky.name,
+      tel:{ out:m.out.toFixed(2), temp:m.temp.toFixed(1), tempColor:hot?'#ffb287':'#F2EFE8', hum:m.hum.toFixed(1) },
+      modeLabel:(MODES.find(x=>x.id===mode)||MODES[1]).label,
+      views:LEVELS.map((v,i)=>{ const on=v.id===level; return {...v, go:()=>this.go(v.id), bg:on?'rgba(232,236,204,.1)':'rgba(10,9,8,.4)', border:on?MOON:'rgba(232,236,204,.2)', color:on?'#FFFFFF':'#9A958C', numColor:on?MOON:'#6E6A63', sepOp:i<LEVELS.length-1?1:0}; }),
+      modes:MODES.map(x=>{ const on=x.id===mode; return {...x, go:()=>this.set({mode:x.id}), bg:on?(x.id==='duel'?'rgba(255,138,76,.12)':'rgba(232,236,204,.1)'):'rgba(10,9,8,.4)', border:on?(x.id==='duel'?'rgba(255,138,76,.9)':MOON):'rgba(232,236,204,.2)', color:on?'#FFFFFF':'#9A958C'}; }),
+      kyPrev:()=>this.kyStep(-1), kyNext:()=>this.kyStep(1), kyLore:ky.lore, kyBorder:ky.hex, kySwatch:ky.dark?'#000000':ky.hex, kyOutline:ky.dark?'1px solid #F4F4F4':'none', kyGlow:`0 0 10px ${ky.hex}`, kyCount:`${KYBER.indexOf(ky)+1}/${KYBER.length}`,
+      wake:()=>this.wake(), configLabel:(CONFIGS.find(c=>c.id===s.config)||CONFIGS[0]).name, isSaber:level==='saber', showHint:level!=='saber'&&level!=='hilt',
+      configs:CONFIGS.map(c=>{ const on=c.id===s.config; return {...c, go:()=>this.set({config:c.id}), bg:on?'rgba(232,236,204,.1)':'rgba(10,9,8,.4)', border:on?MOON:'rgba(232,236,204,.2)', color:on?'#FFFFFF':'#9A958C'}; }),
+      finishes:FINISHES.map(f=>{ const on=f.id===s.finish; return {...f, go:()=>this.set({finish:f.id}), bg:on?'rgba(232,236,204,.1)':'rgba(10,9,8,.4)', border:on?MOON:'rgba(232,236,204,.2)', color:on?'#FFFFFF':'#9A958C'}; }),
+      toggles:[['heat','Heatmap',s.heat,'#ffb287'],['flow','Energy Flow',s.flow,ky.hex],['sound','Sound',s.sound,MOON]].map(([k,label,on,c])=>({label, go:()=>this.set({[k]:!on}), bg:on?'rgba(232,236,204,.07)':'rgba(10,9,8,.4)', border:on?'rgba(232,236,204,.6)':'rgba(232,236,204,.2)', color:on?'#FFFFFF':'#9A958C', dot:on?c:'#3A3733', dotGlow:on?'0 0 8px '+c:'none'})),
+      ...this.customVals(key, level),
+      active, status:s.selected?'Locked':(key?'Inspect':'Overview'), statusColor:s.selected?MOON:'#6E6A63',
+      panelBorder:key?'rgba(232,236,204,.55)':'rgba(232,236,204,.22)',
+      hasAction:!!action, action:action||{label:'',go:()=>{}},
+      hasSelection:!!s.selected, clearSelection:()=>this.setState({selected:null}),
+      index, indexTitle:LEVELS[lvlIdx].label+' · Components', unhoverIdx:()=>this.setState({iHover:null}),
+      isHilt:level==='hilt', notHilt:level!=='hilt', explode:s.explode,
+      onSlide:e=>this.set({explode:+e.target.value}),
+      levelHint:{saber:'Zoom 01 · Double-click the hilt to open it',chamber:'Zoom 03 · Double-click the crystal to go inside it',crystal:'Zoom 04 · Energy spirals into the resonance core'}[level]||'',
+      zoomIn:()=>this.api&&this.api.zoom(.8), zoomOut:()=>this.api&&this.api.zoom(1.25), resetView:()=>this.api&&this.api.reset(),
+      sparks:[ sp('Output',m.out.toFixed(2)+' MW',s.hist.o,0,3.8,MOON), sp('Core Temp',m.temp.toFixed(1)+' °C',s.hist.t,20,90,hot?'#ffb287':MOON), sp('Hum',m.hum.toFixed(1)+' Hz',s.hist.h,0,120,MOON) ],
+      levelCards:LEVELS.map(l=>({...l, src:s.renders[l.id]||'', has:!!s.renders[l.id], pending:!s.renders[l.id], go:()=>{ this.go(l.id); window.scrollTo({top:0,behavior:'smooth'}); }})),
+      runIgnite:()=>this.ignite(), igniteLabel:s.seq>=0&&s.seq<SEQ.length?'Igniting…':'Run Ignition ↑',
+      seq:SEQ.map(([name,line,tt],i)=>{ const done=s.seq>i||s.seq>=SEQ.length, on=s.seq===i; return { num:String(i+1).padStart(2,'0'), name, line, t:tt, bar:on?'#FFFFFF':(done?MOON:'rgba(232,236,204,.16)'), numColor:on||done?MOON:'#6E6A63', nameColor:on?'#FFFFFF':'#F2EFE8' }; }),
+    };
+  }
+}
+</script>
+</body>
+</html>

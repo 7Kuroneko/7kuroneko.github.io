@@ -1,0 +1,755 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<script src="./kn-loader.js" data-variant="campus" data-min="3200" data-wait="event" data-max="12000" data-bg="#101214" data-accent="#FF8A22" data-accent2="#45D8FF" data-ink="#F4F6F8" data-mute="#9CA6B2" data-font="'IBM Plex Sans',sans-serif" data-mono="'IBM Plex Mono',ui-monospace,monospace" data-title="Related Digital · Cheyenne Campus" data-kind="Interactive 3D Atlas · Under Construction" data-steps="Survey &amp; grading|Foundations poured|Steel erected|Data halls enclosed|Generator yard set|Substation energized|Fiber lit|Commissioning"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+  <script type="module" src="./campus-stage.js"></script>
+  <script type="module" src="./projectFacts.js"></script>
+  <style>
+    html, body { overscroll-behavior: none; -webkit-tap-highlight-color: transparent; -webkit-text-size-adjust: 100%; } html, body { margin: 0; padding: 0; height: 100%; background: #F2F3F1; font-family: 'IBM Plex Sans', system-ui, sans-serif; -webkit-font-smoothing: antialiased; }
+    * { box-sizing: border-box; }
+    a { color: #0E7C9B; text-decoration: none; }
+    a:hover { color: #101214; text-decoration: underline; }
+    button { font-family: inherit; cursor: pointer; }
+    button:focus-visible, input:focus-visible, canvas:focus-visible, a:focus-visible { outline: 2px solid #45D8FF; outline-offset: 2px; }
+    input[type=range] { accent-color: #45D8FF; }
+    ::-webkit-scrollbar { width: 8px; height: 8px; } nav::-webkit-scrollbar { display: none; } ::-webkit-scrollbar-thumb { background: rgba(124,135,151,0.4); border-radius: 4px; }
+    @keyframes fadeUp { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+    @media (prefers-reduced-motion: reduce) { * { transition-duration: 0.01ms !important; animation-duration: 0.01ms !important; } }
+    @keyframes splashLine { 0% { transform: scaleX(0); } 100% { transform: scaleX(1); } }
+    @keyframes splashIn { 0% { opacity: 0; transform: translateY(6px); } 100% { opacity: 1; transform: none; } }
+    @keyframes bpDraw { 0% { stroke-dashoffset: 1600; opacity: .2; } 60% { opacity: 1; } 100% { stroke-dashoffset: 0; opacity: 1; } }
+    @keyframes bpPulse { 0% { offset-distance: 0%; opacity: 0; } 8% { opacity: 1; } 92% { opacity: 1; } 100% { offset-distance: 100%; opacity: 0; } }
+    @keyframes bpBreath { 0%, 100% { opacity: .35; } 50% { opacity: .9; } }
+    @keyframes bpScan { 0% { transform: translateX(-20%); } 100% { transform: translateX(120%); } }
+  </style>
+  <title>Related Digital · Cheyenne, WY Campus · The Kuroneko Company</title>
+  <meta name="description" content="Interactive 3D atlas of the Related Digital CYS01 data center campus in Cheyenne, Wyoming, built from the Level 1 plan: data halls, galleries, POD rooms, chillers, power, cooling, construction and community.">
+  <meta property="og:title" content="Related Digital · Cheyenne, WY Campus">
+  <meta property="og:description" content="Interactive 3D infrastructure atlas of the Cheyenne data center campus.">
+  <meta name="theme-color" content="#F2F3F1">
+  <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@600&display=swap" rel="stylesheet">
+</helmet>
+<template id="__bundler_thumbnail"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect width="100" height="100" fill="#101214"/><rect x="30" y="30" width="40" height="40" fill="none" stroke="#F2F3F1" stroke-width="3" transform="rotate(45 50 50)"/></svg></template>
+
+<sc-if value="{{ splashOn }}" hint-placeholder-val="{{ true }}">
+<div style="position:fixed;inset:0;z-index:100;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:22px;background:#07090C;background-image:linear-gradient(rgba(127,212,255,0.10) 1px, transparent 1px),linear-gradient(90deg, rgba(127,212,255,0.10) 1px, transparent 1px),linear-gradient(rgba(127,212,255,0.04) 1px, transparent 1px),linear-gradient(90deg, rgba(127,212,255,0.04) 1px, transparent 1px);background-size:96px 96px,96px 96px,16px 16px,16px 16px;color:#F2F3F1;opacity:{{ splashOpacity }};transition:opacity .6s ease;pointer-events:none;overflow:hidden">
+  <div style="position:absolute;inset:0;background:radial-gradient(ellipse 70% 55% at 50% 50%, rgba(127,212,255,0.10), transparent 70%)"></div>
+  <div style="position:absolute;top:0;bottom:0;width:30%;background:linear-gradient(90deg, transparent, rgba(127,212,255,0.05), transparent);animation:bpScan 4s ease-in-out infinite"></div>
+  <div style="position:absolute;top:18px;left:22px;display:flex;flex-direction:column;gap:4px;font:400 10px/1.3 'IBM Plex Sans',sans-serif;letter-spacing:.14em;color:#5F7A8C"><span>LEVEL 1 · CONVEYANCE PLAN · OVERALL</span><span>SHEET T02-01 · 1" = 40'-0"</span></div>
+  <div style="position:absolute;top:18px;right:22px;font:400 10px/1.3 'IBM Plex Sans',sans-serif;letter-spacing:.14em;color:#5F7A8C;text-align:right"><span>CYS01</span><br><span>VENTURE DRIVE · CHEYENNE, WY</span></div>
+  <svg viewBox="0 0 600 232" style="width:min(640px,88vw);height:auto;overflow:visible;position:relative;animation:splashIn .8s ease both" aria-hidden="true">
+    <defs><filter id="bpGlow" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="2.2" result="b"></feGaussianBlur><feMerge><feMergeNode in="b"></feMergeNode><feMergeNode in="SourceGraphic"></feMergeNode></feMerge></filter></defs>
+    <g stroke="#3B5566" stroke-width="1" fill="none" opacity=".7">
+      <line x1="60" y1="30" x2="60" y2="180" stroke-dasharray="3 5"></line><line x1="120" y1="30" x2="120" y2="180" stroke-dasharray="3 5"></line><line x1="180" y1="30" x2="180" y2="180" stroke-dasharray="3 5"></line><line x1="240" y1="30" x2="240" y2="180" stroke-dasharray="3 5"></line><line x1="300" y1="30" x2="300" y2="180" stroke-dasharray="3 5"></line><line x1="360" y1="30" x2="360" y2="180" stroke-dasharray="3 5"></line><line x1="420" y1="30" x2="420" y2="180" stroke-dasharray="3 5"></line><line x1="480" y1="30" x2="480" y2="180" stroke-dasharray="3 5"></line><line x1="540" y1="30" x2="540" y2="180" stroke-dasharray="3 5"></line>
+      <circle cx="60" cy="22" r="6"></circle><circle cx="120" cy="22" r="6"></circle><circle cx="180" cy="22" r="6"></circle><circle cx="240" cy="22" r="6"></circle><circle cx="300" cy="22" r="6"></circle><circle cx="360" cy="22" r="6"></circle><circle cx="420" cy="22" r="6"></circle><circle cx="480" cy="22" r="6"></circle><circle cx="540" cy="22" r="6"></circle>
+    </g>
+    <g fill="none" stroke-linecap="butt" style="stroke-dasharray:1600;animation:bpDraw 2.6s cubic-bezier(.4,0,.2,1) both">
+      <line x1="66" y1="58" x2="534" y2="58" stroke="#7FD4FF" stroke-width="7" stroke-dasharray="9 7" opacity=".32"></line>
+      <line x1="74" y1="69" x2="526" y2="69" stroke="#7FD4FF" stroke-width="7" stroke-dasharray="9 7" opacity=".32"></line>
+      <rect x="60" y="80" width="480" height="60" stroke="#CDD4E6" stroke-width="1.4"></rect>
+      <line x1="62" y1="88" x2="538" y2="88" stroke="#CDD4E6" stroke-width=".8" opacity=".4"></line>
+      <rect x="80" y="94" width="200" height="32" stroke="#7FD4FF" stroke-width="1.2"></rect>
+      <rect x="320" y="94" width="200" height="32" stroke="#7FD4FF" stroke-width="1.2"></rect>
+      <line x1="86" y1="103" x2="274" y2="103" stroke="#7765FF" stroke-width="6" stroke-dasharray="10 5" opacity=".55"></line>
+      <line x1="86" y1="117" x2="274" y2="117" stroke="#7765FF" stroke-width="6" stroke-dasharray="10 5" opacity=".55"></line>
+      <line x1="326" y1="103" x2="514" y2="103" stroke="#7765FF" stroke-width="6" stroke-dasharray="10 5" opacity=".55"></line>
+      <line x1="326" y1="117" x2="514" y2="117" stroke="#7765FF" stroke-width="6" stroke-dasharray="10 5" opacity=".55"></line>
+      <rect x="288" y="96" width="24" height="28" stroke="#CDD4E6" stroke-width=".9" opacity=".6"></rect>
+      <line x1="80" y1="133" x2="280" y2="133" stroke="#FF8A22" stroke-width="1" stroke-dasharray="6 4" opacity=".7"></line>
+      <line x1="320" y1="133" x2="520" y2="133" stroke="#FF8A22" stroke-width="1" stroke-dasharray="6 4" opacity=".7"></line>
+      <line x1="86" y1="149" x2="274" y2="149" stroke="#FF8A22" stroke-width="14" stroke-dasharray="8 7" opacity=".3"></line>
+      <line x1="326" y1="149" x2="514" y2="149" stroke="#FF8A22" stroke-width="14" stroke-dasharray="8 7" opacity=".3"></line>
+      <line x1="86" y1="170" x2="274" y2="170" stroke="#FF8A22" stroke-width="6" stroke-dasharray="8 7" opacity=".22"></line>
+      <line x1="326" y1="170" x2="514" y2="170" stroke="#FF8A22" stroke-width="6" stroke-dasharray="8 7" opacity=".22"></line>
+      <rect x="286" y="144" width="28" height="20" stroke="#FF8A22" stroke-width="1" opacity=".8"></rect>
+      <line x1="300" y1="164" x2="300" y2="200" stroke="#FF8A22" stroke-width="1" stroke-dasharray="4 3" opacity=".8"></line>
+      <rect x="290" y="200" width="20" height="14" stroke="#FF8A22" stroke-width="1"></rect>
+      <rect x="540" y="86" width="36" height="48" stroke="#CDD4E6" stroke-width=".9" opacity=".5"></rect>
+    </g>
+    <path d="M300,207 L300,164 L300,149 L120,149 L120,133 L120,110" fill="none" stroke="#FF8A22" stroke-width="1" opacity=".25"></path>
+    <path d="M300,207 L300,164 L300,149 L480,149 L480,133 L480,110" fill="none" stroke="#FF8A22" stroke-width="1" opacity=".25"></path>
+    <circle r="2.6" fill="#FF8A22" filter="url(#bpGlow)" style="offset-path:path('M300,207 L300,164 L300,149 L120,149 L120,133 L120,110');animation:bpPulse 3.2s linear infinite"></circle>
+    <circle r="2.6" fill="#FF8A22" filter="url(#bpGlow)" style="offset-path:path('M300,207 L300,164 L300,149 L480,149 L480,133 L480,110');animation:bpPulse 3.2s linear .9s infinite"></circle>
+    <circle r="2.6" fill="#7FD4FF" filter="url(#bpGlow)" style="offset-path:path('M180,110 L180,80 L180,69 L420,69 L420,80 L420,110');animation:bpPulse 3.6s linear .4s infinite"></circle>
+    <circle r="2.6" fill="#7FD4FF" filter="url(#bpGlow)" style="offset-path:path('M420,110 L420,80 L420,58 L180,58 L180,80 L180,110');animation:bpPulse 3.6s linear 2.2s infinite"></circle>
+    <circle r="2.6" fill="#7765FF" filter="url(#bpGlow)" style="offset-path:path('M300,232 L300,226 L556,226 L556,133 L536,133 L536,88 L300,88 L70,88');animation:bpPulse 4.2s linear 1.4s infinite"></circle>
+    <g style="animation:bpBreath 2.4s ease-in-out infinite"><rect x="80" y="94" width="200" height="32" fill="#7FD4FF" opacity=".05"></rect><rect x="320" y="94" width="200" height="32" fill="#7FD4FF" opacity=".05"></rect></g>
+  </svg>
+  <div style="display:flex;align-items:center;gap:16px;position:relative;animation:splashIn .7s ease .3s both">
+    <svg viewBox="28 26 44 48" width="30" height="33" style="flex:none;display:block"><path d="M30 48A20 20 0 0 1 70 48V67a5 5 0 0 1-5 5H35a5 5 0 0 1-5-5Z" fill="#CDD4E6"></path><rect x="36" y="48" width="28" height="8" rx="4" fill="#07090C"></rect><circle cx="44" cy="52" r="2.2" fill="#CDD4E6"></circle><circle cx="56" cy="52" r="2.2" fill="#CDD4E6"></circle></svg>
+    <span style="width:1px;height:28px;background:rgba(205,212,230,0.25)"></span>
+    <div style="display:flex;flex-direction:column;gap:6px">
+      <span style="font:600 16px/1 'Chakra Petch',sans-serif;letter-spacing:.18em">The Kuroneko Company</span>
+      <span style="font:400 12px/1.3 'IBM Plex Sans',sans-serif;letter-spacing:.04em;color:#8A9BAA">Related Digital · CYS01 · Cheyenne, WY</span>
+    </div>
+  </div>
+  <div style="display:flex;flex-direction:column;align-items:center;gap:8px;position:relative;animation:splashIn .7s ease .5s both">
+    <span style="width:220px;height:2px;border-radius:2px;background:rgba(127,212,255,0.12);position:relative;overflow:hidden;display:block"><span style="position:absolute;inset:0;background:#7FD4FF;box-shadow:0 0 12px rgba(127,212,255,0.7);transform-origin:left;animation:splashLine 1.8s ease-in-out infinite"></span></span>
+    <span style="font:400 10px/1 'IBM Plex Sans',sans-serif;letter-spacing:.16em;color:#5F7A8C">RASTERIZING LEVEL 1 PLAN</span>
+  </div>
+</div>
+</sc-if>
+
+<!-- ============ STORY MODE ============ -->
+<sc-if value="{{ isStory }}" hint-placeholder-val="{{ true }}">
+<div style="position:fixed;inset:0;display:flex;flex-direction:column;background:#F2F3F1;color:#101214;background-image:linear-gradient(rgba(16,18,20,0.045) 1px, transparent 1px),linear-gradient(90deg, rgba(16,18,20,0.045) 1px, transparent 1px);background-size:48px 48px">
+  <header data-header style="min-height:52px;flex:none;display:flex;flex-wrap:wrap;align-items:center;gap:8px 16px;padding:8px {{ hPadX }};border-bottom:1px solid rgba(16,18,20,0.12);background:rgba(242,243,241,0.9);backdrop-filter:blur(6px);position:relative;z-index:5">
+    <div style="display:flex;align-items:center;gap:12px;flex:1 1 auto;min-width:{{ brandMinW }}">
+      <a href="../../" title="The Kuroneko Company · Portfolio" style="display:flex;align-items:center;gap:8px;text-decoration:none;color:#101214;font:600 12.5px/1 'IBM Plex Sans',sans-serif;white-space:nowrap;padding-right:12px;border-right:1px solid rgba(16,18,20,.14)"><svg viewBox="0 0 100 100" width="18" height="18" aria-hidden="true" style="display:block;flex:none"><path d="M11.2 5.5h5v4.6h-5zM84 5.5h5v4.6h-5zM11.6 13h15.4v4.6h-15.4zM73.2 13h15.4v4.6h-15.4zM12.2 20.5h25.8v4.6h-25.8zM62.2 20.5h25.8v4.6h-25.8zM12.6 28h75v4.6h-75zM11.2 35.5h77.8v4.6h-77.8zM9.2 43h81.8v4.6h-81.8zM8.2 50.5h13.4v4.6h-13.4zM40.2 50.5h19.8v4.6h-19.8zM78.6 50.5h13.4v4.6h-13.4zM8.2 58h24v4.6h-24zM39.4 58h21.4v4.6h-21.4zM68 58h24v4.6h-24zM9 65.5h82.2v4.6h-82.2zM12.2 73h75.8v4.6h-75.8zM18.4 80.5h63.4v4.6h-63.4zM31.2 88h37.8v4.6h-37.8z" fill="#101214"></path></svg><sc-if value="{{ notMobile }}" hint-placeholder-val="{{ true }}">The Kuroneko Company</sc-if><sc-if value="{{ isMobile }}" hint-placeholder-val="{{ false }}">Kuroneko</sc-if></a>
+      <span style="font:500 12px/1.2 'IBM Plex Sans',sans-serif;letter-spacing:.12em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0"><sc-if value="{{ notMobile }}" hint-placeholder-val="{{ true }}">Related Digital Cheyenne Campus</sc-if><sc-if value="{{ isMobile }}" hint-placeholder-val="{{ false }}">Related Digital · Cheyenne</sc-if></span>
+      <sc-if value="{{ notMobile }}" hint-placeholder-val="{{ true }}"><span style="font:400 10px/1 'IBM Plex Sans',sans-serif;letter-spacing:.1em;padding:5px 8px;border:1px solid rgba(16,18,20,0.25);color:#5B6470;white-space:nowrap;flex:none">Under Construction</span></sc-if>
+    </div>
+    <div role="group" aria-label="Experience mode" style="display:flex;border:1px solid rgba(16,18,20,0.2);padding:2px;gap:2px">
+      <button aria-pressed="true" style="font:500 11px/1 'IBM Plex Sans',sans-serif;letter-spacing:.1em;padding:8px 14px;border:0;background:#101214;color:#F4F6F8">Story</button>
+      <button aria-pressed="false" onClick="{{ setExplore }}" style="font:500 11px/1 'IBM Plex Sans',sans-serif;letter-spacing:.1em;padding:8px 14px;border:0;background:transparent;color:#5B6470" style-hover="color:#101214">Explore</button>
+    </div>
+    <button onClick="{{ openSources }}" style="font:500 11px/1 'IBM Plex Sans',sans-serif;letter-spacing:.1em;padding:9px 14px;border:1px solid rgba(16,18,20,0.2);background:transparent;color:#101214" style-hover="background:#101214;color:#F4F6F8">Sources</button>
+    <sc-if value="{{ notMobile }}" hint-placeholder-val="{{ true }}"><span style="font:400 10px/1 'IBM Plex Sans',sans-serif;letter-spacing:.1em;padding:6px 9px;border:1px solid #30D187;color:#101214;display:flex;align-items:center;gap:6px;white-space:nowrap"><span style="width:6px;height:6px;border-radius:50%;background:#30D187"></span>Public Information Model</span></sc-if>
+  </header>
+  <div aria-hidden="true" style="height:2px;flex:none;background:rgba(16,18,20,0.06);position:relative;z-index:5"><div style="height:100%;width:{{ progressPct }}%;background:{{ curSys }};transition:width .15s linear, background .4s ease"></div></div>
+
+  <sc-if value="{{ narrow }}" hint-placeholder-val="{{ false }}">
+    <nav aria-label="Sections" style="flex:none;display:flex;gap:0;overflow-x:auto;scrollbar-width:none;padding:6px 8px;border-bottom:1px solid rgba(16,18,20,0.12);background:rgba(242,243,241,0.9)">
+      <sc-for list="{{ nav }}" as="n" hint-placeholder-count="10">
+        <button onClick="{{ n.go }}" data-active="{{ n.activeStr }}" style="flex:none;display:flex;align-items:center;gap:8px;padding:13px 11px;border:0;border-bottom:2px solid {{ n.tabBorder }};background:transparent;color:{{ n.colorL }};font:{{ n.weight }} 12px/1 'IBM Plex Sans',sans-serif;white-space:nowrap"><span style="font:400 9px/1 'IBM Plex Sans',sans-serif;color:#9CA6B2">{{ n.num }}</span>{{ n.label }}</button>
+      </sc-for>
+    </nav>
+  </sc-if>
+  <div data-scroller onScroll="{{ onStoryScroll }}" style="flex:1;min-height:0;overflow:auto;display:flex;align-items:flex-start">
+    <nav aria-label="Sections" style="position:sticky;top:0;width:188px;flex:none;padding:28px 12px 28px 12px;display:{{ railDisplay }};flex-direction:column;gap:2px">
+      <sc-for list="{{ nav }}" as="n" hint-placeholder-count="10">
+        <button onClick="{{ n.go }}" style="display:flex;align-items:center;gap:10px;padding:8px 10px;border:0;background:transparent;text-align:left;color:{{ n.colorL }};font:{{ n.weight }} 13px/1 'IBM Plex Sans',sans-serif" style-hover="color:#101214">
+          <span style="font:400 10px/1 'IBM Plex Sans',sans-serif;letter-spacing:.08em;color:#9CA6B2;width:18px">{{ n.num }}</span>
+          <span>{{ n.label }}</span>
+          <span style="margin-left:auto;width:5px;height:5px;border-radius:50%;background:#45D8FF;opacity:{{ n.dot }}"></span>
+        </button>
+      </sc-for>
+    </nav>
+
+    <div style="flex:1;min-width:0;display:grid;grid-template-columns:{{ storyCols }};align-items:start">
+      <div style="min-width:0;order:{{ textOrder }};background:#FFFFFF;border-left:1px solid rgba(16,18,20,0.12)">
+        <sc-for list="{{ stories }}" as="s" hint-placeholder-count="9">
+          <section data-sec="{{ s.id }}" data-screen-label="{{ s.label }}" style="padding:{{ secPad }};border-bottom:1px solid rgba(16,18,20,0.12);min-height:{{ secMinH }};display:flex;flex-direction:column;align-items:{{ secAlign }};text-align:{{ secText }};gap:{{ secGap }}">
+            <div style="display:flex;flex-direction:column;align-items:{{ secAlign }};gap:12px;font:400 11px/1 'IBM Plex Sans',sans-serif;letter-spacing:.12em;color:#5B6470;width:100%;max-width:640px">
+              <div style="display:flex;align-items:center;justify-content:{{ secAlign }};gap:12px"><span style="display:flex;align-items:center;gap:8px;padding:5px 8px;border:1px solid rgba(16,18,20,0.22);font:600 12px/1 'Chakra Petch',sans-serif;letter-spacing:.14em;color:#101214"><span style="width:6px;height:6px;background:{{ s.sysL }}"></span>{{ s.num }}</span><span style="width:24px;height:1px;background:rgba(16,18,20,0.3)"></span><span>{{ s.label }}</span></div>
+              <span style="color:#5B6470">{{ s.question }}</span>
+            </div>
+            <h2 style="margin:0;font:500 clamp(30px,3.4vw,46px)/1.05 'IBM Plex Sans',sans-serif;letter-spacing:-.02em;text-wrap:balance;max-width:18ch">{{ s.title }}</h2>
+            <p style="margin:0;font:400 17px/1.5 'IBM Plex Sans',sans-serif;color:#2A3038;max-width:52ch;text-wrap:pretty">{{ s.lede }}</p>
+
+            <sc-if value="{{ s.hasFacts }}" hint-placeholder-val="{{ true }}">
+            <div style="width:100%;max-width:640px;display:grid;grid-template-columns:repeat(auto-fit,minmax({{ factMin }},1fr));border-top:1px solid rgba(16,18,20,0.2);border-left:1px solid rgba(16,18,20,0.2)">
+              <sc-for list="{{ s.facts }}" as="f" hint-placeholder-count="4">
+                <button onClick="{{ f.open }}" title="{{ f.caveat }}" style="display:flex;flex-direction:column;align-items:center;gap:8px;padding:16px 14px 14px;border:0;border-right:1px solid rgba(16,18,20,0.2);border-bottom:1px solid rgba(16,18,20,0.2);background:transparent;text-align:center;color:#101214;min-width:0;overflow-wrap:anywhere;text-wrap:balance" style-hover="background:rgba(69,216,255,0.08)">
+                  <span style="font:500 {{ f.valueSizeL }}/1.1 'IBM Plex Sans',sans-serif;letter-spacing:-.02em;color:{{ f.accent }}">{{ f.value }}</span>
+                  <span style="font:400 11px/1.3 'IBM Plex Sans',sans-serif;color:#5B6470;letter-spacing:.02em">{{ f.unit }}</span>
+                  <span style="font:400 12px/1.35 'IBM Plex Sans',sans-serif;color:#2A3038;margin-top:4px">{{ f.label }}</span>
+                  <span style="display:flex;align-items:center;gap:6px;font:500 9px/1 'IBM Plex Sans',sans-serif;letter-spacing:.12em;color:#101214;margin-top:2px"><span style="width:6px;height:6px;border-radius:50%;background:{{ f.badgeColor }}"></span>{{ f.statusLabel }}</span>
+                </button>
+              </sc-for>
+            </div>
+            </sc-if>
+
+            <sc-if value="{{ s.hasParts }}" hint-placeholder-val="{{ false }}">
+            <div style="width:100%;max-width:640px;display:flex;flex-direction:column;gap:14px;text-align:left">
+              <div role="tablist" aria-label="Components" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:6px">
+                <sc-for list="{{ parts }}" as="pt" hint-placeholder-count="14">
+                  <button role="tab" aria-selected="{{ pt.activeStr }}" onClick="{{ pt.select }}" style="display:flex;align-items:center;gap:8px;min-height:44px;padding:8px 10px;border:1px solid {{ pt.borderL }};background:{{ pt.bgL }};color:{{ pt.fgL }};font:500 12px/1.25 'IBM Plex Sans',sans-serif;text-align:left" style-hover="border-color:#101214"><span style="font:600 10px/1 'Chakra Petch',sans-serif;letter-spacing:.1em;color:{{ pt.numColorL }};flex:none">{{ pt.num }}</span><span style="width:6px;height:6px;flex:none;background:{{ pt.color }}"></span><span style="min-width:0">{{ pt.name }}</span></button>
+                </sc-for>
+              </div>
+              <article aria-live="polite" style="border:1px solid #101214;background:#FFFFFF;display:flex;flex-direction:column">
+                <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 16px;background:#101214;color:#F4F6F8">
+                  <span style="display:flex;align-items:center;gap:10px;font:600 11px/1 'Chakra Petch',sans-serif;letter-spacing:.14em"><span style="width:8px;height:8px;background:{{ part.color }}"></span>{{ part.group }}</span>
+                  <span style="font:600 11px/1 'Chakra Petch',sans-serif;letter-spacing:.14em;color:#9CA6B2">{{ part.pos }}</span>
+                </div>
+                <div style="padding:20px 16px;display:flex;flex-direction:column;gap:18px">
+                  <h3 style="margin:0;font:500 24px/1.15 'IBM Plex Sans',sans-serif;letter-spacing:-.01em;text-wrap:balance">{{ part.name }}</h3>
+                  <div style="display:grid;grid-template-columns:{{ partCols }};gap:18px 24px">
+                    <div style="display:flex;flex-direction:column;gap:8px"><span style="font:500 10px/1 'IBM Plex Sans',sans-serif;letter-spacing:.12em;color:#5B6470;text-transform:uppercase">{{ part.whatLabel }}</span><p style="margin:0;font:400 14px/1.55 'IBM Plex Sans',sans-serif;color:#2A3038;text-wrap:pretty">{{ part.what }}</p></div>
+                    <div style="display:flex;flex-direction:column;gap:8px"><span style="font:500 10px/1 'IBM Plex Sans',sans-serif;letter-spacing:.12em;color:#5B6470">AT THIS SITE</span><p style="margin:0;font:400 14px/1.55 'IBM Plex Sans',sans-serif;color:#101214;text-wrap:pretty">{{ part.here }}</p></div>
+                  </div>
+                  <sc-if value="{{ part.hasFacts }}" hint-placeholder-val="{{ true }}">
+                  <div style="display:flex;flex-direction:column;border-top:1px solid rgba(16,18,20,0.2)">
+                    <span style="padding:12px 0 4px;font:500 10px/1 'IBM Plex Sans',sans-serif;letter-spacing:.12em;color:#5B6470">ON THE RECORD · TAP FOR SOURCE</span>
+                    <sc-for list="{{ part.facts }}" as="f" hint-placeholder-count="3">
+                      <button onClick="{{ f.open }}" title="{{ f.caveat }}" style="display:grid;grid-template-columns:minmax(0,1fr) auto;gap:4px 16px;align-items:baseline;padding:10px 0;border:0;border-bottom:1px solid rgba(16,18,20,0.12);background:transparent;text-align:left;color:#101214" style-hover="background:rgba(69,216,255,0.08)">
+                        <span style="font:500 18px/1.2 'IBM Plex Sans',sans-serif;letter-spacing:-.01em;overflow-wrap:anywhere">{{ f.value }} <span style="font:400 12px/1.3 'IBM Plex Sans',sans-serif;color:#5B6470">{{ f.unit }}</span></span>
+                        <span style="display:flex;align-items:center;gap:6px;font:500 9px/1 'IBM Plex Sans',sans-serif;letter-spacing:.12em"><span style="width:6px;height:6px;border-radius:50%;background:{{ f.badgeColor }}"></span>{{ f.statusLabel }}</span>
+                        <span style="grid-column:1 / -1;font:400 12px/1.35 'IBM Plex Sans',sans-serif;color:#2A3038">{{ f.label }}</span>
+                      </button>
+                    </sc-for>
+                  </div>
+                  </sc-if>
+                  <sc-if value="{{ part.hasUnknown }}" hint-placeholder-val="{{ true }}">
+                    <div role="note" style="display:flex;gap:12px;padding:12px 14px;border:1px solid rgba(122,135,151,0.6);background:rgba(122,135,151,0.08)"><span style="font:500 9px/1.6 'IBM Plex Sans',sans-serif;letter-spacing:.12em;color:#5B6470;flex:none">NOT PUBLIC</span><span style="font:400 13px/1.5 'IBM Plex Sans',sans-serif;color:#2A3038">{{ part.unknown }}</span></div>
+                  </sc-if>
+                </div>
+                <div style="display:grid;grid-template-columns:52px minmax(0,1fr) 52px;border-top:1px solid #101214">
+                  <button onClick="{{ part.prev }}" aria-label="Previous component" style="min-height:52px;border:0;border-right:1px solid rgba(16,18,20,0.2);background:#FFFFFF;color:#101214;font:500 16px/1 'IBM Plex Sans',sans-serif" style-hover="background:#F4F6F8">←</button>
+                  <button onClick="{{ part.show }}" style="min-height:52px;padding:0 12px;border:0;background:#FFFFFF;color:#101214;font:500 12px/1.2 'IBM Plex Sans',sans-serif;letter-spacing:.06em" style-hover="background:#F4F6F8">{{ part.showLabel }} ↗</button>
+                  <button onClick="{{ part.next }}" aria-label="Next component" style="min-height:52px;border:0;border-left:1px solid rgba(16,18,20,0.2);background:#FFFFFF;color:#101214;font:500 16px/1 'IBM Plex Sans',sans-serif" style-hover="background:#F4F6F8">→</button>
+                </div>
+              </article>
+            </div>
+            </sc-if>
+
+            <sc-if value="{{ s.hasNote }}" hint-placeholder-val="{{ false }}">
+              <button onClick="{{ s.noteOpen }}" style="display:flex;gap:12px;align-items:baseline;justify-content:flex-start;width:100%;max-width:640px;padding:12px 14px;border:1px dashed rgba(16,18,20,0.35);background:transparent;text-align:left;color:#101214;font:400 13px/1.45 'IBM Plex Sans',sans-serif;text-wrap:pretty" style-hover="border-color:#101214">
+                <span style="font:600 11px/1.45 'Chakra Petch',sans-serif;letter-spacing:.14em;color:#5B6470;flex:none">NOTE</span><span style="min-width:0;flex:1">{{ s.note }}</span><span style="flex:none;color:#5B6470">↗</span>
+              </button>
+            </sc-if>
+
+            <sc-for list="{{ s.paras }}" as="p" hint-placeholder-count="1">
+              <p style="margin:0;font:400 15px/1.6 'IBM Plex Sans',sans-serif;color:#2A3038;max-width:58ch;text-wrap:pretty">{{ p }}</p>
+            </sc-for>
+
+            <sc-if value="{{ s.hasSteps }}" hint-placeholder-val="{{ false }}">
+            <ol aria-label="System flow" style="margin:0;padding:0;list-style:none;display:flex;flex-direction:column;border-top:1px solid rgba(16,18,20,0.2);width:100%;max-width:640px;text-align:left">
+              <sc-for list="{{ s.steps }}" as="st" hint-placeholder-count="5">
+                <li style="display:grid;grid-template-columns:28px minmax(0,1fr) auto;gap:14px;align-items:center;padding:12px 0;border-bottom:1px solid rgba(16,18,20,0.12)">
+                  <span style="font:400 11px/1 'IBM Plex Sans',sans-serif;color:#9CA6B2">{{ st.num }}</span>
+                  <span style="display:flex;align-items:center;gap:10px;font:500 14px/1.3 'IBM Plex Sans',sans-serif;color:#101214;min-width:0"><span style="width:8px;height:8px;flex:none;border:1.5px solid {{ st.color }};background:{{ st.fill }}"></span><span>{{ st.label }}</span></span>
+                  <span style="display:flex;align-items:center;gap:6px;font:500 9px/1 'IBM Plex Sans',sans-serif;letter-spacing:.12em;color:#101214"><span style="width:6px;height:6px;border-radius:50%;background:{{ st.badgeColor }}"></span>{{ st.statusLabel }}</span>
+                </li>
+              </sc-for>
+            </ol>
+            </sc-if>
+
+            <sc-if value="{{ s.hasMilestones }}" hint-placeholder-val="{{ false }}">
+            <ol aria-label="Construction milestones" style="margin:0;padding:0;list-style:none;display:flex;flex-direction:column;border-top:1px solid rgba(16,18,20,0.2);width:100%;max-width:640px;text-align:left">
+              <sc-for list="{{ milestones }}" as="m" hint-placeholder-count="9">
+                <li>
+                  <button onClick="{{ m.go }}" style="width:100%;display:grid;grid-template-columns:28px minmax(0,1fr) auto;gap:14px;align-items:center;padding:12px 0;border:0;border-bottom:1px solid rgba(16,18,20,0.12);background:transparent;text-align:left;color:#101214" style-hover="background:rgba(246,183,60,0.08)">
+                    <span style="font:400 11px/1 'IBM Plex Sans',sans-serif;color:{{ m.numColor }}">{{ m.numLabel }}</span>
+                    <span style="display:flex;flex-direction:column;gap:3px;min-width:0"><span style="font:{{ m.weight }} 14px/1.3 'IBM Plex Sans',sans-serif">{{ m.label }}</span><span style="font:400 11px/1.3 'IBM Plex Sans',sans-serif;color:#5B6470">{{ m.date }}</span></span>
+                    <span style="display:flex;align-items:center;gap:6px;font:500 9px/1 'IBM Plex Sans',sans-serif;letter-spacing:.12em"><span style="width:6px;height:6px;border-radius:50%;background:{{ m.badgeColor }}"></span>{{ m.statusLabel }}</span>
+                  </button>
+                </li>
+              </sc-for>
+            </ol>
+            </sc-if>
+
+            <sc-if value="{{ s.hasNotice }}" hint-placeholder-val="{{ false }}">
+              <div role="note" style="display:flex;gap:12px;padding:14px 16px;border:1px solid rgba(122,135,151,0.6);background:rgba(122,135,151,0.08);max-width:64ch;text-align:left">
+                <span style="font:500 9px/1.6 'IBM Plex Sans',sans-serif;letter-spacing:.12em;color:#5B6470;flex:none">Not Public</span>
+                <span style="font:400 13px/1.5 'IBM Plex Sans',sans-serif;color:#2A3038">{{ s.notice }}</span>
+              </div>
+            </sc-if>
+            <sc-if value="{{ s.showNext }}" hint-placeholder-val="{{ false }}">
+              <button onClick="{{ s.goNext }}" style="align-self:stretch;display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:52px;padding:14px 16px;border:1px solid #101214;background:#101214;color:#F4F6F8;font:500 12px/1.2 'IBM Plex Sans',sans-serif;letter-spacing:.08em;text-align:left" style-active="background:#2A3038"><span style="display:flex;align-items:center;gap:12px"><span style="font:400 10px/1 'IBM Plex Sans',sans-serif;letter-spacing:.14em;color:#9CA6B2">NEXT</span><span style="font:600 12px/1 'Chakra Petch',sans-serif;letter-spacing:.14em;color:#45D8FF">{{ s.nextNum }}</span><span>{{ s.nextLabel }}</span></span><span aria-hidden="true">↓</span></button>
+            </sc-if>
+          </section>
+        </sc-for>
+        <section data-sec="sources" data-screen-label="Sources" style="padding:{{ srcPad }};display:flex;flex-direction:column;align-items:center;text-align:center;gap:24px">
+          <div style="display:flex;align-items:center;gap:12px;font:400 11px/1 'IBM Plex Sans',sans-serif;letter-spacing:.12em;color:#5B6470"><span>11</span><span style="width:24px;height:1px;background:rgba(16,18,20,0.3)"></span><span>Sources</span></div>
+          <h2 style="margin:0;font:500 clamp(30px,3.4vw,46px)/1.05 'IBM Plex Sans',sans-serif;letter-spacing:-.02em">Every Number Has a Source</h2>
+          <span style="font:400 11px/1 'IBM Plex Sans',sans-serif;letter-spacing:.1em;color:#5B6470">REGISTRY LAST CHECKED AGAINST PUBLIC SOURCES · {{ verified }}</span>
+          <p style="margin:0;font:400 15px/1.6 'IBM Plex Sans',sans-serif;color:#2A3038;max-width:58ch">Each figure in this atlas resolves to one public statement, or to the Level 1 conveyance plan (T02-01) for room-level layout, with its exact wording, date, and display caveat. Nothing here is live, measured, or inferred from operations.</p>
+          <div style="display:flex;flex-direction:column;border-top:1px solid rgba(16,18,20,0.2);width:100%;max-width:640px;text-align:left">
+            <sc-for list="{{ sourcesList }}" as="src" hint-placeholder-count="5">
+              <a href="{{ src.url }}" target="_blank" rel="noopener" style="display:grid;grid-template-columns:minmax(0,1fr) auto;gap:16px;padding:14px 0;border-bottom:1px solid rgba(16,18,20,0.12);color:#101214;font:500 14px/1.3 'IBM Plex Sans',sans-serif" style-hover="color:#0E7C9B">
+                <span>{{ src.name }}</span><span style="font:400 11px/1.3 'IBM Plex Sans',sans-serif;color:#5B6470">{{ src.date }}</span>
+              </a>
+            </sc-for>
+          </div>
+          <button onClick="{{ openSources }}" style="font:500 11px/1 'IBM Plex Sans',sans-serif;letter-spacing:.1em;padding:12px 18px;border:1px solid #101214;background:#101214;color:#F4F6F8" style-hover="background:transparent;color:#101214">Open Full Fact Registry</button>
+        </section>
+      </div>
+
+      <div style="position:sticky;top:0;height:{{ stageHeight }};min-width:0;order:{{ stageOrder }};border-left:1px solid rgba(16,18,20,0.12);background:rgba(242,243,241,0.6);display:flex;flex-direction:column">
+        <div style="position:relative;flex:1;min-height:0">
+          <x-import component-from-global-scope="campus-stage" theme="light" hint-size="100%,100%" style="position:absolute;inset:0"></x-import>
+          <div data-hud style="position:absolute;left:16px;top:16px;display:flex;flex-direction:column;gap:6px;pointer-events:none">
+            <span style="font:500 10px/1 'IBM Plex Sans',sans-serif;letter-spacing:.12em;color:#5B6470">{{ stageCaption }}</span>
+            <sc-if value="{{ notMobile }}" hint-placeholder-val="{{ true }}"><span style="font:400 10px/1 'IBM Plex Sans',sans-serif;letter-spacing:.06em;color:#9CA6B2">Level 1 Plan Layout · No Live Data · Drag To Orbit</span></sc-if>
+          </div>
+          <div style="position:absolute;right:12px;bottom:12px;left:{{ ctrlLeft }};max-width:calc(100% - 24px);display:flex;flex-wrap:{{ ctrlWrap }};justify-content:flex-end;gap:6px;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch">
+            <button onClick="{{ toggleTour }}" aria-pressed="{{ tourOn }}" style="font:500 10px/1 'IBM Plex Sans',sans-serif;letter-spacing:.1em;padding:8px 10px;min-height:{{ ctrlH }};flex:none;white-space:nowrap;border:1px solid #101214;background:#101214;color:#F4F6F8" style-hover="background:#2A3038">{{ tourLabel }}</button>
+            <button onClick="{{ toggleRoof }}" style="font:500 10px/1 'IBM Plex Sans',sans-serif;letter-spacing:.1em;padding:8px 10px;min-height:{{ ctrlH }};flex:none;white-space:nowrap;border:1px solid rgba(16,18,20,0.25);background:rgba(242,243,241,0.85);color:#101214" style-hover="border-color:#101214">{{ roofLabel }}</button>
+            <button onClick="{{ toggleExplode }}" style="font:500 10px/1 'IBM Plex Sans',sans-serif;letter-spacing:.1em;padding:8px 10px;min-height:{{ ctrlH }};flex:none;white-space:nowrap;border:1px solid rgba(16,18,20,0.25);background:rgba(242,243,241,0.85);color:#101214" style-hover="border-color:#101214">{{ explodeLabel }}</button>
+            <button onClick="{{ resetCamera }}" aria-label="Reset camera" style="font:500 10px/1 'IBM Plex Sans',sans-serif;letter-spacing:.1em;padding:8px 10px;min-height:{{ ctrlH }};flex:none;white-space:nowrap;border:1px solid rgba(16,18,20,0.25);background:rgba(242,243,241,0.85);color:#101214" style-hover="border-color:#101214">Reset</button>
+          </div>
+        </div>
+        <div style="flex:none;display:flex;gap:18px;flex-wrap:wrap;padding:10px 16px;border-top:1px solid rgba(16,18,20,0.12);font:400 10px/1 'IBM Plex Sans',sans-serif;letter-spacing:.06em;color:#5B6470">
+          <sc-for list="{{ legend }}" as="lg" hint-placeholder-count="5">
+            <span style="display:flex;align-items:center;gap:6px"><span style="width:10px;height:3px;background:{{ lg.color }}"></span>{{ lg.label }}</span>
+          </sc-for>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</sc-if>
+
+<!-- ============ EXPLORE MODE ============ -->
+<sc-if value="{{ isExplore }}" hint-placeholder-val="{{ false }}">
+<div style="position:fixed;inset:0;display:flex;flex-direction:column;background:#080A0D;color:#F4F6F8;background-image:linear-gradient(rgba(255,255,255,0.035) 1px, transparent 1px),linear-gradient(90deg, rgba(255,255,255,0.035) 1px, transparent 1px);background-size:48px 48px">
+  <header data-header style="min-height:52px;flex:none;display:flex;flex-wrap:wrap;align-items:center;gap:8px 16px;padding:8px {{ hPadX }};border-bottom:1px solid rgba(255,255,255,0.10);background:rgba(8,10,13,0.85);backdrop-filter:blur(6px);position:relative;z-index:5">
+    <div style="display:flex;align-items:center;gap:12px;flex:1 1 auto;min-width:{{ brandMinW }}">
+      <a href="../../" title="The Kuroneko Company · Portfolio" style="display:flex;align-items:center;gap:8px;text-decoration:none;color:#F4F6F8;font:600 12.5px/1 'IBM Plex Sans',sans-serif;white-space:nowrap;padding-right:12px;border-right:1px solid rgba(255,255,255,.14)"><svg viewBox="0 0 100 100" width="18" height="18" aria-hidden="true" style="display:block;flex:none"><path d="M11.2 5.5h5v4.6h-5zM84 5.5h5v4.6h-5zM11.6 13h15.4v4.6h-15.4zM73.2 13h15.4v4.6h-15.4zM12.2 20.5h25.8v4.6h-25.8zM62.2 20.5h25.8v4.6h-25.8zM12.6 28h75v4.6h-75zM11.2 35.5h77.8v4.6h-77.8zM9.2 43h81.8v4.6h-81.8zM8.2 50.5h13.4v4.6h-13.4zM40.2 50.5h19.8v4.6h-19.8zM78.6 50.5h13.4v4.6h-13.4zM8.2 58h24v4.6h-24zM39.4 58h21.4v4.6h-21.4zM68 58h24v4.6h-24zM9 65.5h82.2v4.6h-82.2zM12.2 73h75.8v4.6h-75.8zM18.4 80.5h63.4v4.6h-63.4zM31.2 88h37.8v4.6h-37.8z" fill="#E8ECCC"></path></svg><sc-if value="{{ notMobile }}" hint-placeholder-val="{{ true }}">The Kuroneko Company</sc-if><sc-if value="{{ isMobile }}" hint-placeholder-val="{{ false }}">Kuroneko</sc-if></a>
+      <span style="font:500 12px/1.2 'IBM Plex Sans',sans-serif;letter-spacing:.12em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0"><sc-if value="{{ notMobile }}" hint-placeholder-val="{{ true }}">Related Digital Cheyenne Campus</sc-if><sc-if value="{{ isMobile }}" hint-placeholder-val="{{ false }}">Related Digital · Cheyenne</sc-if></span>
+      <sc-if value="{{ notMobile }}" hint-placeholder-val="{{ true }}"><span style="font:400 10px/1 'IBM Plex Sans',sans-serif;letter-spacing:.1em;padding:5px 8px;border:1px solid rgba(255,255,255,0.22);color:#9CA6B2;white-space:nowrap;flex:none">Under Construction</span></sc-if>
+    </div>
+    <div role="group" aria-label="Experience mode" style="display:flex;border:1px solid rgba(255,255,255,0.2);padding:2px;gap:2px">
+      <button aria-pressed="false" onClick="{{ setStory }}" style="font:500 11px/1 'IBM Plex Sans',sans-serif;letter-spacing:.1em;padding:8px 14px;border:0;background:transparent;color:#9CA6B2" style-hover="color:#F4F6F8">Story</button>
+      <button aria-pressed="true" style="font:500 11px/1 'IBM Plex Sans',sans-serif;letter-spacing:.1em;padding:8px 14px;border:0;background:#F4F6F8;color:#101214">Explore</button>
+    </div>
+    <button onClick="{{ openSources }}" style="font:500 11px/1 'IBM Plex Sans',sans-serif;letter-spacing:.1em;padding:9px 14px;border:1px solid rgba(255,255,255,0.2);background:transparent;color:#F4F6F8" style-hover="background:#F4F6F8;color:#101214">Sources</button>
+    <sc-if value="{{ notMobile }}" hint-placeholder-val="{{ true }}"><span style="font:400 10px/1 'IBM Plex Sans',sans-serif;letter-spacing:.1em;padding:6px 9px;border:1px solid #30D187;color:#F4F6F8;display:flex;align-items:center;gap:6px;white-space:nowrap"><span style="width:6px;height:6px;border-radius:50%;background:#30D187"></span>Public Information Model</span></sc-if>
+  </header>
+
+  <div style="flex:1;min-height:0;display:flex;flex-direction:{{ exploreDir }}">
+    <nav aria-label="Sections" style="width:188px;flex:none;padding:24px 0 24px 16px;display:{{ railDisplay }};flex-direction:column;gap:2px;border-right:1px solid rgba(255,255,255,0.08)">
+      <sc-for list="{{ nav }}" as="n" hint-placeholder-count="10">
+        <button onClick="{{ n.go }}" style="display:flex;align-items:center;gap:10px;padding:8px 10px;border:0;background:transparent;text-align:left;color:{{ n.colorD }};font:{{ n.weight }} 13px/1 'IBM Plex Sans',sans-serif" style-hover="color:#F4F6F8">
+          <span style="font:400 10px/1 'IBM Plex Sans',sans-serif;letter-spacing:.08em;color:#5B6470;width:18px">{{ n.num }}</span>
+          <span>{{ n.label }}</span>
+          <span style="margin-left:auto;width:5px;height:5px;border-radius:50%;background:{{ n.sysColor }};opacity:{{ n.dot }}"></span>
+        </button>
+      </sc-for>
+    </nav>
+
+    <div style="flex:{{ exMainFlex }};min-width:0;min-height:0;display:flex;flex-direction:column;position:relative">
+      <sc-if value="{{ narrow }}" hint-placeholder-val="{{ false }}">
+        <nav aria-label="Sections" style="flex:none;display:flex;gap:0;overflow-x:auto;scrollbar-width:none;padding:6px 8px;border-bottom:1px solid rgba(255,255,255,0.08)">
+          <sc-for list="{{ nav }}" as="n" hint-placeholder-count="10">
+            <button onClick="{{ n.go }}" data-active="{{ n.activeStr }}" style="flex:none;display:flex;align-items:center;gap:8px;padding:13px 11px;border:0;border-bottom:2px solid {{ n.tabBorder }};background:transparent;color:{{ n.colorD }};font:{{ n.weight }} 12px/1 'IBM Plex Sans',sans-serif;white-space:nowrap"><span style="font:400 9px/1 'IBM Plex Sans',sans-serif;color:#5B6470">{{ n.num }}</span>{{ n.label }}</button>
+          </sc-for>
+        </nav>
+      </sc-if>
+      <div style="flex:{{ exStageFlex }};min-height:0;position:relative">
+        <x-import component-from-global-scope="campus-stage" theme="dark" hint-size="100%,100%" style="position:absolute;inset:0"></x-import>
+        <div data-hud style="position:absolute;left:{{ hudX }};top:{{ hudX }};right:{{ hudX }};display:flex;flex-direction:column;gap:8px;pointer-events:none">
+          <span style="font:400 11px/1 'IBM Plex Sans',sans-serif;letter-spacing:.12em;color:#9CA6B2">{{ cur.num }} · {{ cur.label }}</span>
+          <span style="font:500 clamp(20px,2vw,28px)/1.1 'IBM Plex Sans',sans-serif;letter-spacing:-.02em;max-width:22ch;text-wrap:balance">{{ cur.title }}</span>
+          <sc-if value="{{ notMobile }}" hint-placeholder-val="{{ true }}"><span style="font:400 10px/1 'IBM Plex Sans',sans-serif;letter-spacing:.06em;color:#5B6470">Level 1 Plan Layout · No Live Data · Drag To Orbit · Click A Room To Focus</span></sc-if>
+        </div>
+        <sc-if value="{{ notMobile }}" hint-placeholder-val="{{ true }}"><div style="position:absolute;right:20px;top:18px;display:flex;flex-direction:column;gap:6px;pointer-events:none;align-items:flex-end">
+          <sc-for list="{{ legend }}" as="lg" hint-placeholder-count="4">
+            <span style="display:flex;align-items:center;gap:8px;font:400 10px/1 'IBM Plex Sans',sans-serif;letter-spacing:.06em;color:#9CA6B2"><span>{{ lg.label }}</span><span style="width:14px;height:3px;background:{{ lg.color }}"></span></span>
+          </sc-for>
+        </div></sc-if>
+      </div>
+
+      <!-- bottom control strip -->
+      <div style="flex:none;display:flex;flex-wrap:nowrap;gap:28px;align-items:flex-end;padding:12px {{ hPadX }} 14px;border-top:1px solid rgba(255,255,255,0.10);background:rgba(20,24,31,0.86);backdrop-filter:blur(6px);overflow-x:auto;white-space:nowrap;scrollbar-width:none;-webkit-overflow-scrolling:touch">
+        <sc-if value="{{ isPower }}" hint-placeholder-val="{{ false }}">
+          <div style="display:flex;flex-direction:column;gap:8px;flex:none">
+            <span style="font:400 9px/1 'IBM Plex Sans',sans-serif;letter-spacing:.14em;color:#9CA6B2">Scenario · Educational</span>
+            <div role="group" style="display:flex;gap:4px">
+              <button onClick="{{ setGridNormal }}" aria-pressed="{{ isGridNormal }}" style="font:500 10px/1 'IBM Plex Sans',sans-serif;letter-spacing:.08em;padding:9px 10px;border:1px solid {{ gridNormalBorder }};background:{{ gridNormalBg }};color:{{ gridNormalColor }};min-height:{{ ctrlH }}">Grid Normal</button>
+              <button onClick="{{ setOutage }}" aria-pressed="{{ isOutage }}" style="font:500 10px/1 'IBM Plex Sans',sans-serif;letter-spacing:.08em;padding:9px 10px;border:1px solid {{ outageBorder }};background:{{ outageBg }};color:{{ outageColor }};min-height:{{ ctrlH }}">Grid Unavailable</button>
+            </div>
+          </div>
+        </sc-if>
+        <sc-if value="{{ isCampus }}" hint-placeholder-val="{{ false }}">
+          <div style="display:flex;flex-direction:column;gap:8px;flex:none">
+            <span style="font:400 9px/1 'IBM Plex Sans',sans-serif;letter-spacing:.14em;color:#9CA6B2">Campus View</span>
+            <div role="group" style="display:flex;gap:4px;flex-wrap:nowrap">
+              <sc-for list="{{ campusViews }}" as="v" hint-placeholder-count="3">
+                <button onClick="{{ v.go }}" aria-pressed="{{ v.active }}" style="font:500 10px/1 'IBM Plex Sans',sans-serif;letter-spacing:.08em;padding:9px 10px;border:1px solid {{ v.border }};background:{{ v.bg }};color:{{ v.color }};min-height:{{ ctrlH }}">{{ v.label }}</button>
+              </sc-for>
+            </div>
+          </div>
+        </sc-if>
+        <sc-if value="{{ isConstruction }}" hint-placeholder-val="{{ false }}">
+          <div style="display:flex;flex-direction:column;gap:8px;flex:none;min-width:320px">
+            <span style="font:400 9px/1 'IBM Plex Sans',sans-serif;letter-spacing:.14em;color:#9CA6B2">MILESTONE · {{ curMilestone.numLabel }} · {{ curMilestone.label }} · {{ curMilestone.statusLabel }}</span>
+            <div role="group" aria-label="Milestone scrubber" style="display:flex;gap:3px">
+              <sc-for list="{{ milestones }}" as="m" hint-placeholder-count="9">
+                <button onClick="{{ m.go }}" aria-pressed="{{ m.active }}" aria-label="{{ m.label }}" title="{{ m.label }} — {{ m.date }}" style="flex:1;min-width:30px;height:{{ ctrlH }};border:1px solid {{ m.border }};background:{{ m.bg }};color:{{ m.color }};font:500 10px/1 'IBM Plex Sans',sans-serif" style-hover="border-color:#F6B73C">{{ m.numLabel }}</button>
+              </sc-for>
+            </div>
+          </div>
+        </sc-if>
+        <div style="display:flex;flex-direction:column;gap:8px;flex:none">
+          <span style="font:400 9px/1 'IBM Plex Sans',sans-serif;letter-spacing:.14em;color:#9CA6B2">Camera</span>
+          <div role="group" aria-label="Camera presets" style="display:flex;gap:4px;flex-wrap:nowrap">
+            <sc-for list="{{ presets }}" as="p" hint-placeholder-count="5">
+              <button onClick="{{ p.go }}" aria-pressed="{{ p.active }}" style="font:500 10px/1 'IBM Plex Sans',sans-serif;letter-spacing:.08em;padding:9px 10px;border:1px solid {{ p.border }};background:{{ p.bg }};color:{{ p.color }};min-height:{{ ctrlH }}" style-hover="border-color:#9CA6B2">{{ p.label }}</button>
+            </sc-for>
+            <button onClick="{{ resetCamera }}" style="font:500 10px/1 'IBM Plex Sans',sans-serif;letter-spacing:.08em;padding:9px 10px;border:1px solid rgba(255,255,255,0.15);background:transparent;color:#9CA6B2;min-height:{{ ctrlH }}" style-hover="color:#F4F6F8;border-color:#9CA6B2">↺ Reset</button>
+            <button onClick="{{ toggleTour }}" aria-pressed="{{ tourOn }}" style="font:500 10px/1 'IBM Plex Sans',sans-serif;letter-spacing:.08em;padding:9px 10px;border:1px solid #F4F6F8;background:#F4F6F8;color:#101214;min-height:{{ ctrlH }}" style-hover="background:#D5DAE0">{{ tourLabel }}</button>
+          </div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:8px;flex:none">
+          <span style="font:400 9px/1 'IBM Plex Sans',sans-serif;letter-spacing:.14em;color:#9CA6B2">Building</span>
+          <div role="group" aria-label="Building presets" style="display:flex;gap:4px;flex-wrap:nowrap">
+            <sc-for list="{{ bpresets }}" as="p" hint-placeholder-count="4">
+              <button onClick="{{ p.go }}" aria-pressed="{{ p.active }}" style="font:500 10px/1 'IBM Plex Sans',sans-serif;letter-spacing:.08em;padding:9px 10px;border:1px solid {{ p.border }};background:{{ p.bg }};color:{{ p.color }};min-height:{{ ctrlH }}" style-hover="border-color:#9CA6B2">{{ p.label }}</button>
+            </sc-for>
+          </div>
+        </div>
+        <div style="display:flex;gap:18px;flex:none">
+          <label style="display:flex;flex-direction:column;gap:8px;font:400 9px/1 'IBM Plex Sans',sans-serif;letter-spacing:.14em;color:#9CA6B2;white-space:nowrap;flex:none"><span>EXPLODE · {{ explodePct }}%</span>
+            <input type="range" min="0" max="100" value="{{ explodePct }}" onChange="{{ setExplode }}" style="width:120px;margin:0;height:32px">
+          </label>
+          <label style="display:flex;flex-direction:column;gap:8px;font:400 9px/1 'IBM Plex Sans',sans-serif;letter-spacing:.14em;color:#9CA6B2;white-space:nowrap;flex:none"><span>SHELL OPACITY · {{ opacityPct }}%</span>
+            <input type="range" min="5" max="100" value="{{ opacityPct }}" onChange="{{ setOpacity }}" style="width:120px;margin:0;height:32px">
+          </label>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:8px;flex:none">
+          <span style="font:400 9px/1 'IBM Plex Sans',sans-serif;letter-spacing:.14em;color:#9CA6B2">Layers</span>
+          <div role="group" aria-label="Layer visibility" style="display:flex;gap:4px;flex-wrap:nowrap">
+            <sc-for list="{{ layers }}" as="l" hint-placeholder-count="4">
+              <button onClick="{{ l.go }}" aria-pressed="{{ l.on }}" style="display:flex;align-items:center;gap:7px;font:500 10px/1 'IBM Plex Sans',sans-serif;letter-spacing:.08em;padding:9px 10px;border:1px solid rgba(255,255,255,0.15);background:transparent;color:{{ l.textColor }};min-height:{{ ctrlH }}" style-hover="border-color:#9CA6B2"><span style="width:8px;height:8px;border:1.5px solid {{ l.color }};background:{{ l.fill }}"></span>{{ l.label }}</button>
+            </sc-for>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- context drawer -->
+    <aside aria-label="Context" style="width:{{ drawerWidth }};flex:{{ asideFlex }};min-height:0;overflow:auto;-webkit-overflow-scrolling:touch;border-left:1px solid rgba(255,255,255,0.08);background:rgba(17,21,27,0.9);display:flex;flex-direction:column;gap:22px;padding:{{ asidePad }}">
+      <div style="display:flex;flex-direction:column;gap:10px">
+        <span style="font:400 10px/1 'IBM Plex Sans',sans-serif;letter-spacing:.12em;color:#9CA6B2">{{ cur.question }}</span>
+        <p style="margin:0;font:400 14px/1.55 'IBM Plex Sans',sans-serif;color:#D5DAE0;text-wrap:pretty">{{ cur.lede }}</p>
+      </div>
+      <sc-if value="{{ cur.hasParts }}" hint-placeholder-val="{{ false }}">
+      <div style="display:flex;flex-direction:column;gap:14px">
+        <div style="display:flex;flex-wrap:wrap;gap:6px">
+          <sc-for list="{{ parts }}" as="pt" hint-placeholder-count="14">
+            <button onClick="{{ pt.select }}" aria-pressed="{{ pt.activeStr }}" style="display:flex;align-items:center;gap:6px;min-height:{{ ctrlH }};padding:6px 10px;border:1px solid {{ pt.borderD }};background:{{ pt.bgD }};color:{{ pt.fgD }};font:500 11px/1.2 'IBM Plex Sans',sans-serif;text-align:left"><span style="width:6px;height:6px;flex:none;background:{{ pt.color }}"></span>{{ pt.name }}</button>
+          </sc-for>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:12px;padding:16px;border:1px solid rgba(255,255,255,0.18);background:rgba(255,255,255,0.03)">
+          <div style="display:flex;justify-content:space-between;gap:12px;font:600 10px/1 'Chakra Petch',sans-serif;letter-spacing:.14em;color:#9CA6B2"><span style="display:flex;align-items:center;gap:8px"><span style="width:7px;height:7px;background:{{ part.color }}"></span>{{ part.group }}</span><span>{{ part.pos }}</span></div>
+          <h3 style="margin:0;font:500 19px/1.2 'IBM Plex Sans',sans-serif;color:#F4F6F8">{{ part.name }}</h3>
+          <span style="font:500 9px/1 'IBM Plex Sans',sans-serif;letter-spacing:.12em;color:#9CA6B2;text-transform:uppercase">{{ part.whatLabel }}</span>
+          <p style="margin:0;font:400 13px/1.55 'IBM Plex Sans',sans-serif;color:#B8C0CA;text-wrap:pretty">{{ part.what }}</p>
+          <span style="font:500 9px/1 'IBM Plex Sans',sans-serif;letter-spacing:.12em;color:#9CA6B2">AT THIS SITE</span>
+          <p style="margin:0;font:400 13px/1.55 'IBM Plex Sans',sans-serif;color:#F4F6F8;text-wrap:pretty">{{ part.here }}</p>
+          <div style="display:flex;flex-direction:column;border-top:1px solid rgba(255,255,255,0.12)">
+            <sc-for list="{{ part.facts }}" as="f" hint-placeholder-count="3">
+              <button onClick="{{ f.open }}" title="{{ f.caveat }}" style="display:grid;grid-template-columns:minmax(0,1fr) auto;gap:4px 12px;align-items:baseline;padding:10px 0;border:0;border-bottom:1px solid rgba(255,255,255,0.08);background:transparent;text-align:left;color:#F4F6F8" style-hover="background:rgba(255,255,255,0.05)">
+                <span style="font:500 15px/1.2 'IBM Plex Sans',sans-serif;color:{{ f.accentD }};overflow-wrap:anywhere">{{ f.value }} <span style="font:400 11px/1.3 'IBM Plex Sans',sans-serif;color:#9CA6B2">{{ f.unit }}</span></span>
+                <span style="display:flex;align-items:center;gap:6px;font:500 9px/1 'IBM Plex Sans',sans-serif;letter-spacing:.12em;color:#D5DAE0"><span style="width:6px;height:6px;border-radius:50%;background:{{ f.badgeColor }}"></span>{{ f.statusLabel }}</span>
+                <span style="grid-column:1 / -1;font:400 11px/1.35 'IBM Plex Sans',sans-serif;color:#B8C0CA">{{ f.label }}</span>
+              </button>
+            </sc-for>
+          </div>
+          <div style="font:400 12px/1.5 'IBM Plex Sans',sans-serif;color:#9CA6B2"><span style="font:500 9px/1 'IBM Plex Sans',sans-serif;letter-spacing:.12em;margin-right:8px">NOT PUBLIC</span>{{ part.unknown }}</div>
+          <div style="display:grid;grid-template-columns:44px minmax(0,1fr) 44px;gap:6px">
+            <button onClick="{{ part.prev }}" aria-label="Previous component" style="min-height:40px;border:1px solid rgba(255,255,255,0.2);background:transparent;color:#F4F6F8">←</button>
+            <button onClick="{{ part.show }}" style="min-height:40px;padding:0 10px;border:1px solid rgba(255,255,255,0.2);background:transparent;color:#F4F6F8;font:500 11px/1.2 'IBM Plex Sans',sans-serif;letter-spacing:.06em">{{ part.showLabel }} ↗</button>
+            <button onClick="{{ part.next }}" aria-label="Next component" style="min-height:40px;border:1px solid rgba(255,255,255,0.2);background:transparent;color:#F4F6F8">→</button>
+          </div>
+        </div>
+      </div>
+      </sc-if>
+      <div style="display:flex;flex-direction:column;border-top:1px solid rgba(255,255,255,0.12)">
+        <sc-for list="{{ cur.facts }}" as="f" hint-placeholder-count="4">
+          <button onClick="{{ f.open }}" title="{{ f.caveat }}" style="display:grid;grid-template-columns:minmax(0,1fr) auto;gap:4px 12px;align-items:baseline;padding:12px 0;border:0;border-bottom:1px solid rgba(255,255,255,0.08);background:transparent;text-align:left;color:#F4F6F8" style-hover="background:rgba(255,255,255,0.03)">
+            <span style="font:500 {{ f.valueSize }}/1.1 'IBM Plex Sans',sans-serif;letter-spacing:-.02em;color:{{ f.accentD }}">{{ f.value }}</span>
+            <span style="display:flex;align-items:center;gap:6px;font:500 9px/1 'IBM Plex Sans',sans-serif;letter-spacing:.12em;color:#F4F6F8;justify-self:end"><span style="width:6px;height:6px;border-radius:50%;background:{{ f.badgeColor }}"></span>{{ f.statusLabel }}</span>
+            <span style="font:400 11px/1.3 'IBM Plex Sans',sans-serif;color:#9CA6B2;grid-column:1 / -1">{{ f.unit }}</span>
+            <span style="font:400 12px/1.35 'IBM Plex Sans',sans-serif;color:#D5DAE0;grid-column:1 / -1">{{ f.label }}</span>
+          </button>
+        </sc-for>
+      </div>
+      <sc-if value="{{ cur.hasNote }}" hint-placeholder-val="{{ false }}">
+        <button onClick="{{ cur.noteOpen }}" style="display:flex;gap:10px;align-items:baseline;padding:10px 12px;border:1px dashed rgba(255,255,255,0.3);background:transparent;text-align:left;color:#F4F6F8;font:400 11px/1.45 'IBM Plex Sans',sans-serif" style-hover="border-color:#F4F6F8"><span style="letter-spacing:.1em;color:#9CA6B2;flex:none">Note</span><span>{{ cur.note }}</span></button>
+      </sc-if>
+      <sc-if value="{{ cur.hasSteps }}" hint-placeholder-val="{{ false }}">
+        <ol aria-label="System flow" style="margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:0;border-top:1px solid rgba(255,255,255,0.12)">
+          <sc-for list="{{ cur.steps }}" as="st" hint-placeholder-count="5">
+            <li style="display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px;align-items:center;padding:10px 0;border-bottom:1px solid rgba(255,255,255,0.08)">
+              <span style="display:flex;align-items:center;gap:10px;font:500 13px/1.3 'IBM Plex Sans',sans-serif;color:#F4F6F8;min-width:0"><span style="font:400 10px/1 'IBM Plex Sans',sans-serif;color:#5B6470;width:16px">{{ st.num }}</span><span style="width:8px;height:8px;flex:none;border:1.5px solid {{ st.color }};background:{{ st.fill }}"></span><span>{{ st.label }}</span></span>
+              <span style="display:flex;align-items:center;gap:6px;font:500 9px/1 'IBM Plex Sans',sans-serif;letter-spacing:.12em;color:#F4F6F8"><span style="width:6px;height:6px;border-radius:50%;background:{{ st.badgeColor }}"></span>{{ st.statusLabel }}</span>
+            </li>
+          </sc-for>
+        </ol>
+      </sc-if>
+      <sc-if value="{{ isPower }}" hint-placeholder-val="{{ false }}">
+        <div style="padding:12px 14px;border:1px solid rgba(255,138,34,0.45);background:rgba(255,138,34,0.06);font:400 12px/1.5 'IBM Plex Sans',sans-serif;color:#D5DAE0">{{ scenarioText }}</div>
+      </sc-if>
+      <sc-for list="{{ cur.paras }}" as="p" hint-placeholder-count="1">
+        <p style="margin:0;font:400 13px/1.55 'IBM Plex Sans',sans-serif;color:#B8C0CA;text-wrap:pretty">{{ p }}</p>
+      </sc-for>
+      <sc-if value="{{ cur.hasNotice }}" hint-placeholder-val="{{ false }}">
+        <div role="note" style="display:flex;flex-direction:column;gap:6px;padding:12px 14px;border:1px solid rgba(122,135,151,0.5);background:rgba(122,135,151,0.08)">
+          <span style="font:500 9px/1 'IBM Plex Sans',sans-serif;letter-spacing:.12em;color:#9CA6B2">Not Public</span>
+          <span style="font:400 12px/1.5 'IBM Plex Sans',sans-serif;color:#D5DAE0">{{ cur.notice }}</span>
+        </div>
+      </sc-if>
+    </aside>
+  </div>
+</div>
+</sc-if>
+
+<!-- ============ SOURCE / FACT DRAWER ============ -->
+<sc-if value="{{ drawerOpen }}" hint-placeholder-val="{{ false }}">
+  <div onClick="{{ closeDrawer }}" style="position:fixed;inset:0;background:rgba(8,10,13,0.45);z-index:20"></div>
+  <aside role="dialog" aria-modal="true" aria-label="Sources and fact registry" style="position:fixed;top:0;right:0;bottom:0;width:min(460px,100vw);z-index:21;background:#11151B;color:#F4F6F8;border-left:1px solid rgba(255,255,255,0.12);display:flex;flex-direction:column;animation:fadeUp .25s ease-out">
+    <div style="display:flex;align-items:center;gap:12px;padding:14px 20px;border-bottom:1px solid rgba(255,255,255,0.10);flex:none">
+      <span style="font:500 11px/1 'IBM Plex Sans',sans-serif;letter-spacing:.12em">{{ drawerTitle }}</span>
+      <span style="font:400 10px/1 'IBM Plex Sans',sans-serif;letter-spacing:.08em;color:#9CA6B2">VERIFIED {{ verified }}</span>
+      <span style="flex:1"></span>
+      <sc-if value="{{ hasDrawerFact }}" hint-placeholder-val="{{ false }}">
+        <button onClick="{{ backToRegistry }}" style="font:500 10px/1 'IBM Plex Sans',sans-serif;letter-spacing:.1em;padding:8px 10px;border:1px solid rgba(255,255,255,0.2);background:transparent;color:#9CA6B2" style-hover="color:#F4F6F8">← Registry</button>
+      </sc-if>
+      <button onClick="{{ closeDrawer }}" aria-label="Close (Esc)" style="font:500 12px/1 'IBM Plex Sans',sans-serif;padding:8px 10px;border:1px solid rgba(255,255,255,0.2);background:transparent;color:#F4F6F8" style-hover="background:#F4F6F8;color:#101214">Esc</button>
+    </div>
+    <div style="flex:1;overflow:auto;padding:22px 20px 40px;display:flex;flex-direction:column;gap:22px">
+      <sc-if value="{{ hasDrawerFact }}" hint-placeholder-val="{{ false }}">
+        <div style="display:flex;flex-direction:column;gap:14px">
+          <span style="display:inline-flex;align-self:flex-start;align-items:center;gap:7px;font:500 10px/1 'IBM Plex Sans',sans-serif;letter-spacing:.12em;padding:6px 9px;border:1px solid {{ drawerFact.badgeColor }}"><span style="width:6px;height:6px;border-radius:50%;background:{{ drawerFact.badgeColor }}"></span>{{ drawerFact.statusLabel }} · {{ drawerFact.statusDesc }}</span>
+          <span style="font:500 {{ drawerFact.valueSizeXL }}/1.1 'IBM Plex Sans',sans-serif;letter-spacing:-.02em">{{ drawerFact.value }}</span>
+          <span style="font:400 13px/1.3 'IBM Plex Sans',sans-serif;color:#9CA6B2">{{ drawerFact.unit }}</span>
+          <span style="font:500 15px/1.4 'IBM Plex Sans',sans-serif">{{ drawerFact.label }}</span>
+        </div>
+        <dl style="margin:0;display:grid;grid-template-columns:110px minmax(0,1fr);gap:12px 16px;font:400 13px/1.5 'IBM Plex Sans',sans-serif;border-top:1px solid rgba(255,255,255,0.12);padding-top:16px">
+          <dt style="font:400 10px/1.6 'IBM Plex Sans',sans-serif;letter-spacing:.1em;color:#9CA6B2">Exact Wording</dt><dd style="margin:0;font-style:italic;color:#D5DAE0">“{{ drawerFact.wording }}”</dd>
+          <dt style="font:400 10px/1.6 'IBM Plex Sans',sans-serif;letter-spacing:.1em;color:#9CA6B2">Scope</dt><dd style="margin:0;font:400 12px/1.5 'IBM Plex Sans',sans-serif">{{ drawerFact.scope }}</dd>
+          <dt style="font:400 10px/1.6 'IBM Plex Sans',sans-serif;letter-spacing:.1em;color:#9CA6B2">Published</dt><dd style="margin:0;font:400 12px/1.5 'IBM Plex Sans',sans-serif">{{ drawerFact.sourceDate }}</dd>
+          <dt style="font:400 10px/1.6 'IBM Plex Sans',sans-serif;letter-spacing:.1em;color:#9CA6B2">Source</dt><dd style="margin:0"><a href="{{ drawerFact.sourceUrl }}" target="_blank" rel="noopener" style="color:#45D8FF">{{ drawerFact.sourceName }} ↗</a></dd>
+          <dt style="font:400 10px/1.6 'IBM Plex Sans',sans-serif;letter-spacing:.1em;color:#9CA6B2">Caveat</dt><dd style="margin:0;color:#D5DAE0">{{ drawerFact.caveatText }}</dd>
+        </dl>
+      </sc-if>
+      <sc-if value="{{ showRegistry }}" hint-placeholder-val="{{ true }}">
+        <div style="display:flex;flex-direction:column;gap:10px">
+          <span style="font:400 10px/1 'IBM Plex Sans',sans-serif;letter-spacing:.12em;color:#9CA6B2">Status Taxonomy</span>
+          <sc-for list="{{ taxonomy }}" as="t" hint-placeholder-count="4">
+            <div style="display:grid;grid-template-columns:110px minmax(0,1fr);gap:12px;align-items:baseline"><span style="display:flex;align-items:center;gap:6px;font:500 9px/1 'IBM Plex Sans',sans-serif;letter-spacing:.12em"><span style="width:6px;height:6px;border-radius:50%;background:{{ t.color }}"></span>{{ t.label }}</span><span style="font:400 12px/1.45 'IBM Plex Sans',sans-serif;color:#B8C0CA">{{ t.desc }}</span></div>
+          </sc-for>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:10px">
+          <span style="font:400 10px/1 'IBM Plex Sans',sans-serif;letter-spacing:.12em;color:#9CA6B2">Public Sources</span>
+          <sc-for list="{{ sourcesList }}" as="src" hint-placeholder-count="5">
+            <a href="{{ src.url }}" target="_blank" rel="noopener" style="display:grid;grid-template-columns:minmax(0,1fr) auto;gap:12px;padding:10px 0;border-bottom:1px solid rgba(255,255,255,0.08);color:#F4F6F8;font:500 13px/1.35 'IBM Plex Sans',sans-serif" style-hover="color:#45D8FF"><span>{{ src.name }} ↗</span><span style="font:400 10px/1.4 'IBM Plex Sans',sans-serif;color:#9CA6B2">{{ src.date }}</span></a>
+          </sc-for>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:10px">
+          <span style="font:400 10px/1 'IBM Plex Sans',sans-serif;letter-spacing:.12em;color:#9CA6B2">FACT REGISTRY · {{ registryCount }} ENTRIES</span>
+          <sc-for list="{{ registry }}" as="f" hint-placeholder-count="10">
+            <button onClick="{{ f.open }}" style="display:grid;grid-template-columns:minmax(0,1fr) auto;gap:2px 12px;align-items:center;padding:10px 0;border:0;border-bottom:1px solid rgba(255,255,255,0.08);background:transparent;text-align:left;color:#F4F6F8" style-hover="background:rgba(255,255,255,0.03)">
+              <span style="font:500 13px/1.3 'IBM Plex Sans',sans-serif">{{ f.label }}</span>
+              <span style="display:flex;align-items:center;gap:6px;font:500 9px/1 'IBM Plex Sans',sans-serif;letter-spacing:.12em"><span style="width:6px;height:6px;border-radius:50%;background:{{ f.badgeColor }}"></span>{{ f.statusLabel }}</span>
+              <span style="font:400 11px/1.4 'IBM Plex Sans',sans-serif;color:#9CA6B2;grid-column:1 / -1">{{ f.value }} {{ f.unit }}</span>
+            </button>
+          </sc-for>
+        </div>
+      </sc-if>
+    </div>
+  </aside>
+</sc-if>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:&quot;100%&quot;,&quot;height&quot;:&quot;100%&quot;}}">
+const STATUS = {
+  confirmed: { label: 'Confirmed', color: '#30D187', desc: 'Exact public project statement' },
+  reported: { label: 'Reported', color: '#F6B73C', desc: 'Public reporting not verified against its underlying filing' },
+  calculated: { label: 'Calculated', color: '#45D8FF', desc: 'Arithmetic derived from confirmed figures' },
+  conceptual: { label: 'Conceptual', color: '#7A8797', desc: 'Educational visualization, not project engineering' },
+  target: { label: 'Target', color: '#F6B73C', desc: 'Published target date, not a completed milestone' },
+  generalized: { label: 'Generalized', color: '#7A8797', desc: 'Symbolic placement, not a surveyed location' },
+  drawing: { label: 'Drawing', color: '#CDD4E6', desc: 'Room-level layout read from the Level 1 conveyance plan (T02-01); equipment and device positions omitted' },
+};
+const SYS = { compute: '#7765FF', cooling: '#45D8FF', heat: '#FF6747', power: '#FF8A22', construction: '#F6B73C', neutral: '#7A8797' };
+const SECTIONS = [
+  { id: 'overview', num: '01', label: 'Overview', sys: '#45D8FF', title: 'Related Digital Cheyenne Data Center Campus', question: 'What Is Being Built?',
+    lede: 'A public-information model of a 115-acre data-center campus under construction in Wyoming.',
+    factIds: ['campus-acres', 'campus-capacity-current', 'phase1-building', 'phase1-critical-it', 'status', 'target'],
+    note: 'October 2025 announcement: up to 302 MW critical IT capacity.', noteFact: 'campus-capacity-2025',
+    paras: ['Related Digital is developing the campus in Cheyenne Business Parkway. Clayco is the construction manager; Black Hills Energy is the Phase I electric service provider. The first building is leased to CoreWeave.', 'This atlas separates confirmed public statements from reported ones and from the room-level layout read off the Level 1 conveyance plan. It contains no live data, no equipment inventory, and no cable, device, or security positions.'],
+    ctrl: { preset: 'campus', roof: true, explode: 0, opacity: 1 }, caption: 'Full Campus · Generalized Plate' },
+  { id: 'campus', num: '02', label: 'Campus', sys: '#45D8FF', title: '115-acre site, Phase I under construction', question: 'How Big Is The Site?',
+    lede: 'The campus plate is a generalized rectangle scaled to 115 acres. Phase I occupies a conceptual 36-acre area; future phases appear as ghosted pads because the masterplan is not public.',
+    factIds: ['location', 'phase1-acres', 'calc-acre-share', 'future-phases'],
+    paras: ['No exact parcel outline, entrance, gate, camera, fiber route, or utility entrance is shown. Switch between the current phase, the future concept, and functional zones to read the plate differently.'],
+    notice: 'Full-buildout building count and layout are not public. Ghosted pads are placeholders, not planned structures.',
+    ctrl: { preset: 'campus', roof: true, explode: 0, opacity: 1 }, caption: 'Campus · Phase I Highlighted' },
+  { id: 'phase-one', num: '03', label: 'Phase I Building', sys: '#F4F6F8', title: 'What is inside the first building', question: 'What Are The Main Areas?',
+    lede: 'A 184,000-square-foot building delivering 88 MW of critical IT capacity. The Level 1 plan (CYS01, sheet T02-01) shows two data halls end to end — Data Hall 102 (room 180) west and Data Hall 101 (room 140) east — with a shared core between them holding the NOC, EPMS/BMS, and conference rooms. Each hall is flanked by an electrical gallery on the south and a mechanical gallery on the north; Corridor 110 runs the full length with five IDF rooms. The exploded view separates roof, shell, halls, galleries, POD rooms, and the office block.',
+    factIds: ['data-halls', 'plan-pods', 'plan-galleries', 'plan-core', 'plan-idf', 'plan-office', 'investment', 'fire', 'fire-pods'],
+    steps: [['Roof', 'generalized', SYS.neutral], ['Shell · plan grids 1–33', 'generalized', SYS.neutral], ['Data Hall 102 (rm 180) · Data Hall 101 (rm 140)', 'drawing', SYS.compute], ['Electrical Gallery 141 · 181 · south (05)', 'drawing', SYS.power], ['Mechanical Gallery 142 · 182 · north (06)', 'drawing', SYS.cooling], ['Central core · NOC 163 · EPMS/BMS 155', 'drawing', SYS.neutral], ['Corridor 110 · IDF ×5 · POE ×2', 'drawing', SYS.compute], ['POD electrical rooms · generator yard', 'drawing', SYS.power], ['ACCH chiller rows · Mechanical Yard 002 (07)', 'drawing', SYS.heat], ['Office block · east end', 'drawing', SYS.neutral]],
+    notice: 'Room outlines and names follow the Level 1 conveyance plan. Cable IDs, pathways, wireless access-point positions, and equipment inside rooms shown on that sheet are deliberately left out. Rack pods are outlines only.',
+    ctrl: { preset: 'building', roof: true, explode: 1, opacity: 1 }, caption: 'Phase I Building · Exploded · Level 1 Plan' },
+  { id: 'compute', num: '04', label: 'Compute', sys: SYS.compute, title: '88 MW of compute capacity for CoreWeave', question: 'What Does The Building Do?',
+    lede: 'CoreWeave is the Phase I tenant under a long-term lease; the first building is publicly described as fully leased. The violet halls stand in for an AI and cloud compute environment. Network enters at two points of entry — POE 124 east and POE 194 west — and distributes through five IDF rooms along Corridor 110.',
+    factIds: ['phase1-critical-it', 'tenant', 'plan-idf', 'plan-conduits', 'calc-capacity-share'],
+    steps: [['Fiber handoff at the property line', 'conceptual', SYS.compute], ['POE 124 · POE 194 · (4) 4" conduits each', 'drawing', SYS.compute], ['Corridor 110 · IDF 196 · 184 · 154 · 144 · 129', 'drawing', SYS.compute], ['Rack pods · 2 rows × 13 per hall', 'drawing', SYS.compute], ['Heat output', 'conceptual', SYS.heat]],
+    notice: 'Room positions only. No hardware model, accelerator count, server vendor, rack count, rack power, cable route, or access-point position is shown.',
+    ctrl: { preset: 'building', roof: false, explode: 0, opacity: 0.35 }, caption: 'Data Halls 101 · 102 · Level 1 Plan' },
+  { id: 'power', num: '05', label: 'Power', sys: SYS.power, title: 'Grid power from Black Hills Energy', question: 'Where Does The Power Come From?',
+    lede: 'Normal facility power is supplied from the grid by Black Hills Energy. Related Digital says it is not using behind-the-meter generation for normal supply. On the Level 1 plan, Electrical Yard 001 sits at the center of the south side; a run of POD electrical rooms (A–G series, 13 per hall) lines the south wall with a generator behind each, feeding Electrical Gallery 141 and 181 and then the halls.',
+    factIds: ['utility', 'normal-power', 'plan-electrical', 'plan-generators', 'power-path-reported', 'prefab-electrical', 'battery', 'substation-investment', 'tariff', 'backup', 'gen-permit'],
+    steps: [['Regional grid', 'confirmed', SYS.power], ['Black Hills Energy service', 'confirmed', SYS.power], ['Project utility interface', 'generalized', SYS.power], ['Buried service → Electrical Yard 001', 'drawing', SYS.power], ['POD electrical rooms · A–G series · prefab blocks', 'drawing', SYS.power], ['Generator yard · backup branch', 'drawing', SYS.power], ['Electrical Gallery 141 · 181', 'drawing', SYS.power], ['Data halls', 'drawing', SYS.compute]],
+    notice: 'Voltage, feeder count, substation arrangement, transformer ratings, switchgear, battery chemistry and quantity, transfer behavior, and redundancy level are not public and are not depicted. Rooms are outlines from the plan; what sits inside them is not modeled.',
+    ctrl: { preset: 'utility', roof: false, explode: 0, opacity: 0.3 }, caption: 'Power · Yard 001 → POD Rooms → Galleries' },
+  { id: 'liquid', num: '06', label: 'Liquid Cooling', sys: SYS.cooling, title: 'Liquid cooling inside the data halls', question: 'How Are The Servers Cooled?',
+    lede: 'Inside the halls, a closed-loop liquid system cools the chips directly and carries the heat to a heat exchanger (reported, June 2026 site tour). The exchangers sit in Mechanical Gallery 142 and 182 on the north side of each hall. Rack chimneys send the remaining hot air into a hot air containment (HAC) enclosure, and fan walls keep the halls at a reported 73°F.',
+    factIds: ['cooling-d2c', 'loop', 'plan-galleries', 'rack-chimneys', 'hac', 'setpoint', 'makeup-water'],
+    steps: [['Compute heat at the chip', 'conceptual', SYS.compute], ['Direct-to-chip cold plate · in-rack loop', 'reported', SYS.cooling], ['Hall manifolds · supply and return', 'conceptual', SYS.cooling], ['CDU / heat exchanger · Mechanical Gallery 142 · 182', 'reported', SYS.cooling], ['Rack chimneys · remaining hot air', 'reported', SYS.heat], ['Hot air containment (HAC) to fan walls', 'conceptual', SYS.heat], ['Hot liquid north to the ACCH rows (07)', 'drawing', SYS.cooling]],
+    notice: 'Direct-to-chip liquid cooling is press-reported, not developer-published. Loop temperatures, flow rates, CDU count and arrangement, and rack-level design are not public. Manifolds and fan walls are educational geometry.',
+    ctrl: { preset: 'building', roof: false, explode: 0, opacity: 0.3, layers: { compute: true, power: false, thermal: true, liquid: true, future: true } }, caption: 'Liquid Cooling · Halls To Mechanical Galleries' },
+  { id: 'thermal', num: '07', label: 'Chillers', sys: SYS.cooling, title: 'Air-cooled chillers outside the building', question: 'Where Does The Heat Go?',
+    lede: 'The heat collected inside the halls is released to the outdoor air by air-cooled chillers with magnetic-bearing compressors. The Level 1 plan places them in two rows along the north side of the building in Mechanical Yard 002, numbered ACCH-01 through about ACCH-45. Because the loop is sealed, it needs essentially no added water.',
+    factIds: ['cooling', 'plan-chillers', 'compressors', 'water'],
+    steps: [['Hot liquid from the heat exchanger', 'reported', SYS.heat], ['Closed loop north through the mechanical gallery', 'drawing', SYS.cooling], ['ACCH air-cooled chillers · two rows · Mechanical Yard 002', 'drawing', SYS.cooling], ['Heat released to outdoor air', 'conceptual', SYS.heat], ['Cooled liquid returns to the halls', 'conceptual', SYS.cooling]],
+    notice: 'Chiller count is inferred from unit numbering on the plan. Tonnage, refrigerant, and loop temperatures are not public. No evaporative equipment is shown.',
+    ctrl: { preset: 'thermal', roof: false, explode: 0, opacity: 0.3 }, caption: 'ACCH Chillers · Mechanical Yard 002' },
+  { id: 'construction', num: '08', label: 'Construction', sys: SYS.construction, title: 'Construction progress', question: 'How Far Along Is It?',
+    lede: 'Groundbreaking was October 2025. An April 2026 update reported walls complete, roofing underway, Data Hall 1 weather-tight, generators and chillers being set, and the first utility transformer approaching energization. A June 2026 site tour described the first phase as nearing completion. Target completion is late 2026.',
+    factIds: ['cm', 'milestones-2026', 'status-2026', 'pipe-quantities', 'target'],
+    notice: 'No completion percentage is published. Integration and commissioning stages are conceptual; late 2026 is a target, not a completed milestone.',
+    ctrl: { preset: 'phase1', roof: true, explode: 0, opacity: 1, milestone: 6 }, caption: 'Construction Sequence · Discrete Milestones' },
+  { id: 'community', num: '09', label: 'Community', sys: '#30D187', title: 'Local jobs, taxes, and housing', question: 'What Does Cheyenne Get?',
+    lede: 'A $1.2 billion Phase I investment. Developer projections: more than $250 million in tax revenue over the first 15 years, more than 700 construction jobs, and 40 permanent positions.',
+    factIds: ['tax', 'jobs-construction', 'workers-2026', 'jobs-permanent', 'housing'],
+    paras: ['Water use is described as nominal: mainly restrooms, pantries and sinks, humidity control, and landscaping (see 07 Chillers).'],
+    notice: 'All community figures are developer projections. No ROI, wage, tax, or water-volume calculation is derived from them.',
+    ctrl: { preset: 'community', roof: true, explode: 0, opacity: 1 }, caption: 'Campus Context' },
+  { id: 'anatomy', num: '10', label: 'Components', sys: '#F4F6F8', title: 'Every component, one at a time', question: 'What Is Each Part For?',
+    lede: 'Fourteen systems make up the Phase I building. Select one to see how that kind of equipment works in general, what the public record says about it here, and what is not disclosed. The model follows your selection, and clicking equipment in the model selects it here.',
+    factIds: [], ctrl: { preset: 'utility', roof: false, explode: 0, opacity: 0.3 }, caption: 'Components · Select A Part' },
+  { id: 'sources', num: '11', label: 'Sources', sys: '#30D187', title: 'Every number has a source', question: 'Where Does This Information Come From?',
+    lede: 'Each figure resolves to one public statement or to the Level 1 conveyance plan, with exact wording, date, and display caveat.', factIds: ['campus-capacity-current', 'campus-capacity-2025'],
+    ctrl: { preset: 'campus', roof: true, explode: 0, opacity: 1 }, caption: 'Full Campus' },
+];
+const TC = s => (s || '').replace(/[A-Za-z][A-Za-z'’]*/g, w => /^[A-Z0-9]+$/.test(w) ? w : w.charAt(0).toUpperCase() + w.slice(1));
+const DEF_CTRL = { preset: 'campus', explode: 0, opacity: 1, roof: true, layers: { compute: true, power: true, thermal: true, liquid: true, future: true }, milestone: 6, scenario: 'grid', campusView: 'current' };
+
+class Component extends DCLogic {
+  state = { mode: 'story', section: 'overview', ctrl: Object.assign({}, DEF_CTRL, SECTIONS[0].ctrl), drawer: false, factId: null, narrow: false, facts: [], sources: {}, milestones: [], verified: '', tour: false };
+  componentDidMount() {
+    this._splashT0 = Date.now();
+    const poll = () => { const el = document.querySelector('campus-stage'); if (el && el.renderer) { if (!window.__knReadyFired) { window.__knReadyFired = true; window.dispatchEvent(new Event('kn-ready')); } const wait = Math.max(0, 2600 - (Date.now() - this._splashT0)); setTimeout(() => { this.setState({ splashFade: true }); setTimeout(() => this.setState({ splashDone: true }), 650); }, wait); } else this._splashPoll = setTimeout(poll, 100); };
+    poll(); setTimeout(() => { if (!this.state.splashFade) { this.setState({ splashFade: true }); setTimeout(() => this.setState({ splashDone: true }), 650); } }, 6000);
+    const h = (location.hash || '').replace('#', '').split('/');
+    if (h[0] === 'explore' || h[0] === 'story') { const sec = SECTIONS.find(x => x.id === h[1]) || SECTIONS[0]; this.setState({ mode: h[0], section: sec.id, ctrl: Object.assign({}, DEF_CTRL, sec.ctrl) }); }
+    const loadFacts = () => { const m = window.PROJECT_FACTS; if (m) this.setState({ facts: m.FACTS, sources: m.SOURCES, milestones: m.MILESTONES, verified: m.VERIFIED }); else this._factsPoll = setTimeout(loadFacts, 80); };
+    loadFacts();
+    this._onKey = e => { if (e.key === 'Escape' && this.state.drawer) this.setState({ drawer: false }); };
+    this._onResize = () => { const n = innerWidth < 1100, m = innerWidth < 900, sc = document.querySelector('[data-scroller]'), sh = sc ? sc.clientHeight : 0; if (n !== this.state.narrow || m !== this.state.mobile || sh !== this.state.scH) this.setState({ narrow: n, mobile: m, scH: sh }); };
+    this._onReady = () => this.syncStage();
+    this._onSelect = e => this.onSelect(e.detail.id);
+    document.addEventListener('keydown', this._onKey); addEventListener('resize', this._onResize);
+    document.addEventListener('stage-ready', this._onReady); document.addEventListener('stage-select', this._onSelect);
+    this._onResize(); this.syncStage();
+  }
+  toggleTour() {
+    if (this.state.tour) { clearInterval(this._tour); this.setState({ tour: false }); return; }
+    const order = SECTIONS.filter(x => x.id !== 'sources').map(x => x.id);
+    const next = () => { const i = order.indexOf(this.state.section); this.goSection(order[(i + 1) % order.length]); };
+    this._tour = setInterval(next, 9000); this.setState({ tour: true }); next();
+  }
+  componentWillUnmount() { clearInterval(this._tour); document.removeEventListener('keydown', this._onKey); removeEventListener('resize', this._onResize); document.removeEventListener('stage-ready', this._onReady); document.removeEventListener('stage-select', this._onSelect); }
+  componentDidUpdate(pp, ps) { this.syncStage(); const sc = document.querySelector('[data-scroller]'); if (sc && sc.clientHeight && sc.clientHeight !== this.state.scH) this.setState({ scH: sc.clientHeight });
+    if (ps && (ps.section !== this.state.section || ps.mode !== this.state.mode || ps.narrow !== this.state.narrow)) requestAnimationFrame(() => document.querySelectorAll('nav [data-active="1"]').forEach(b => { const nv = b.closest('nav'), br = b.getBoundingClientRect(), nr = nv.getBoundingClientRect(); nv.scrollTo({ left: nv.scrollLeft + br.left - nr.left - (nv.clientWidth - br.width) / 2, behavior: 'auto' }); })); const h = `#${this.state.mode}/${this.state.section}`; if (location.hash !== h) try { history.replaceState(null, '', h); } catch (e) {} }
+  syncStage() {
+    const el = document.querySelector('campus-stage');
+    if (!el || !el.update || !el.renderer) { clearTimeout(this._retry); this._retry = setTimeout(() => this.syncStage(), 120); return; }
+    const s0 = this.state, pp = s0.section === 'anatomy' ? this.curPart() : null;
+    const s = pp ? Object.assign({}, s0, { section: pp.sec }) : s0, c = pp ? Object.assign({}, DEF_CTRL, { layers: s0.ctrl.layers }, (SECTIONS.find(x => x.id === pp.sec) || {}).ctrl, pp.extra || {}) : s0.ctrl;
+    el.update({ theme: s.mode === 'story' ? 'light' : 'dark', section: s.section, preset: c.preset, explode: c.explode, opacity: c.opacity, roof: c.roof, layers: c.layers, milestone: s.section === 'construction' ? c.milestone : null, scenario: c.scenario, campusView: c.campusView });
+  }
+  setCtrl(p) { this.setState(s => ({ ctrl: Object.assign({}, s.ctrl, p) })); }
+  goSection(id, extra) {
+    const sec = SECTIONS.find(x => x.id === id);
+    this.setState(s => ({ section: id, ctrl: Object.assign({}, DEF_CTRL, { layers: s.ctrl.layers }, sec.ctrl, extra || {}) }), () => {
+      if (this.state.mode === 'story') {
+        const sc = document.querySelector('[data-scroller]'), el = document.querySelector(`[data-sec="${id}"]`);
+        if (sc && el) { this._noScroll = true; sc.scrollTop = sc.scrollTop + el.getBoundingClientRect().top - sc.getBoundingClientRect().top - 8; setTimeout(() => { this._noScroll = false; }, 400); }
+      }
+    });
+  }
+  onSelect(id) {
+    if (this.state.section === 'anatomy' && id) { const hit = this.partsList().find(p => (p.picks || []).includes(id)); if (hit) return this.setState({ part: hit.id }); }
+    const map = { building: 'phase-one', compute: 'compute', electrical: 'power', thermal: 'liquid', capture: 'liquid', chiller: 'thermal', utility: 'power', backup: 'power', network: 'compute' };
+    if (id === 'future') return this.setState({ drawer: true, factId: 'future-phases' });
+    if (id === 'ops') return this.setState({ drawer: true, factId: 'plan-core' });
+    if (id === 'office') return this.setState({ drawer: true, factId: 'plan-office' });
+    if (map[id]) this.goSection(map[id], id === 'backup' ? { scenario: 'outage' } : {});
+  }
+  fact(id, dark) {
+    const f = this.state.facts.find(x => x.id === id);
+    if (!f) return { id, value: '', unit: '', label: '', statusLabel: '', badgeColor: 'transparent', accent: '#101214', accentD: '#F4F6F8', caveat: '', open: () => {} };
+    const st = STATUS[f.status] || STATUS.conceptual, src = this.state.sources[f.source] || {};
+    const accentMap = { compute: SYS.compute, power: SYS.power, thermal: SYS.cooling };
+    const long = f.value.length > 12;
+    return { id, value: TC(f.value), unit: TC(f.unit), label: TC(f.label), valueSize: long ? '15px' : '22px', valueSizeL: long ? '18px' : 'clamp(22px,2vw,30px)', valueSizeXL: long ? '24px' : '40px', wording: f.wording, scope: f.scope, statusLabel: st.label, statusDesc: st.desc, badgeColor: st.color,
+      accent: f.status === 'calculated' ? '#0E7C9B' : '#101214', accentD: accentMap[f.scope] || '#F4F6F8', caveat: f.caveat, caveatText: f.caveat || 'None.', sourceName: src.name || '', sourceUrl: src.url || '#', sourceDate: src.date || '',
+      open: () => this.setState({ drawer: true, factId: id }) };
+  }
+  partsList() { return ((window.PROJECT_FACTS || {}).PARTS) || []; }
+  curPart() { const P = this.partsList(); return P.find(p => p.id === this.state.part) || P[0] || null; }
+  partsVals() {
+    const P = this.partsList(), mobile = this.state.mobile, cp = this.curPart() || {};
+    const i = Math.max(0, P.indexOf(cp)), n = P.length, sel = id => this.setState({ part: id });
+    const parts = P.map((p, k) => { const a = p.id === cp.id; return { id: p.id, num: String(k + 1).padStart(2, '0'), name: p.name, color: p.color, activeStr: a ? 'true' : 'false', borderL: a ? '#101214' : 'rgba(16,18,20,0.18)', bgL: a ? '#101214' : '#FFFFFF', fgL: a ? '#F4F6F8' : '#101214', numColorL: a ? '#9CA6B2' : '#5B6470', borderD: a ? p.color : 'rgba(255,255,255,0.15)', bgD: a ? 'rgba(255,255,255,0.08)' : 'transparent', fgD: a ? '#F4F6F8' : '#B8C0CA', select: () => sel(p.id) }; });
+    const tg = SECTIONS.find(x => x.id === cp.sec) || {};
+    const facts = (cp.factIds || []).map(id => this.fact(id)).filter(f => f.value);
+    const part = { name: cp.name || '', group: (cp.group || '').toUpperCase(), color: cp.color || '#7A8797', pos: n ? String(i + 1).padStart(2, '0') + ' / ' + String(n).padStart(2, '0') : '', whatLabel: cp.whatLabel || 'How It Works · In General', what: cp.what || '', here: cp.here || '', unknown: cp.unknown || '', hasUnknown: !!cp.unknown, facts, hasFacts: facts.length > 0,
+      showLabel: tg.num ? 'Open Chapter ' + tg.num + ' · ' + TC(tg.label) : '', show: () => cp.sec && this.goSection(cp.sec, cp.extra), prev: () => n && sel(P[(i - 1 + n) % n].id), next: () => n && sel(P[(i + 1) % n].id) };
+    return { parts, part, partCols: 'repeat(auto-fit,minmax(240px,1fr))' };
+  }
+  section(sec) {
+    const steps = (sec.steps || []).map(([label, status, color], i) => ({ num: String(i + 1).padStart(2, '0'), label: TC(label), color, fill: status === 'confirmed' ? color : 'transparent', statusLabel: STATUS[status].label, badgeColor: STATUS[status].color }));
+    const ni = SECTIONS.indexOf(sec), nx = SECTIONS[ni + 1];
+    return Object.assign({}, sec, { sysL: sec.sys === '#F4F6F8' ? '#101214' : sec.sys, showNext: !!this.state.mobile && !!nx, nextNum: nx ? nx.num : '', nextLabel: nx ? TC(nx.label) : '', goNext: () => nx && this.goSection(nx.id), label: TC(sec.label), title: TC(sec.title), caption: TC(sec.caption), facts: sec.factIds.map(id => this.fact(id)), hasFacts: sec.factIds.length > 0, paras: sec.paras || [], steps, hasSteps: steps.length > 0, hasMilestones: sec.id === 'construction', hasParts: sec.id === 'anatomy', hasNote: !!sec.note, noteOpen: () => this.setState({ drawer: true, factId: sec.noteFact }), hasNotice: !!sec.notice, notice: sec.notice || '' });
+  }
+  renderVals() {
+    const s = this.state, c = s.ctrl, sec = SECTIONS.find(x => x.id === s.section) || SECTIONS[0];
+    const isStory = s.mode === 'story', narrow = s.narrow, mobile = s.mobile;
+    const btn = (active, color) => ({ active, border: active ? (color || '#F4F6F8') : 'rgba(255,255,255,0.15)', bg: active ? (color || '#F4F6F8') : 'transparent', color: active ? '#101214' : '#D5DAE0' });
+    const nav = SECTIONS.map(n => { const a = n.id === s.section; return { id: n.id, num: n.num, label: TC(n.label), active: a, weight: a ? 600 : 400, colorL: a ? '#101214' : '#5B6470', colorD: a ? '#F4F6F8' : '#9CA6B2', dot: a ? 1 : 0, activeStr: a ? '1' : '0', tabBorder: a ? '#45D8FF' : 'transparent', sysColor: n.sys === '#F4F6F8' ? '#45D8FF' : n.sys, go: () => this.goSection(n.id) }; });
+    const stories = SECTIONS.filter(x => x.id !== 'sources').map(x => this.section(x));
+    const cur = this.section(sec);
+    const milestones = s.milestones.map(m => { const a = m.i === c.milestone, reached = m.i <= c.milestone, st = STATUS[m.status]; return { i: m.i, numLabel: String(m.i + 1).padStart(2, '0'), label: TC(m.label), date: m.date, statusLabel: st.label, badgeColor: st.color, active: a, weight: a ? 600 : 400, numColor: reached ? '#F6B73C' : '#9CA6B2', border: a ? '#F6B73C' : (reached ? 'rgba(246,183,60,0.5)' : 'rgba(255,255,255,0.15)'), bg: a ? '#F6B73C' : (reached ? 'rgba(246,183,60,0.14)' : 'transparent'), color: a ? '#101214' : '#D5DAE0', go: () => { if (s.section !== 'construction') this.goSection('construction', { milestone: m.i }); else this.setCtrl({ milestone: m.i }); } }; });
+    const curMilestone = milestones.find(m => m.active) || { numLabel: '', label: '', statusLabel: '' };
+    const presets = [['campus', 'Campus'], ['phase1', 'Phase I'], ['building', 'Building'], ['utility', 'Utility Context'], ['thermal', 'Thermal Context']].map(([id, label]) => Object.assign({ id, label, go: () => this.setCtrl({ preset: id }) }, btn(c.preset === id)));
+    const bp = c.explode > 0.5 ? 'exploded' : (c.opacity < 0.5 ? 'xray' : (c.roof ? 'roofon' : 'roofoff'));
+    const bpresets = [['roofon', 'Roof On', { roof: true, explode: 0, opacity: 1 }], ['roofoff', 'Roof Off', { roof: false, explode: 0, opacity: 1 }], ['exploded', 'Exploded', { roof: true, explode: 1, opacity: 1 }], ['xray', 'X-Ray', { roof: true, explode: 0, opacity: 0.15 }]].map(([id, label, p]) => Object.assign({ id, label, go: () => this.setCtrl(p) }, btn(bp === id)));
+    const layers = [['compute', 'Compute', SYS.compute], ['power', 'Power', SYS.power], ['thermal', 'Thermal Loop', SYS.cooling], ['liquid', 'Liquid Cooling', SYS.cooling], ['future', 'Future Pads', SYS.neutral]].map(([id, label, color]) => ({ id, label, color, on: !!c.layers[id], fill: c.layers[id] ? color : 'transparent', textColor: c.layers[id] ? '#F4F6F8' : '#7A8797', go: () => this.setCtrl({ layers: Object.assign({}, c.layers, { [id]: !c.layers[id] }) }) }));
+    const campusViews = [['current', 'Current Phase'], ['future', 'Future Concept'], ['zones', 'Functional Zones']].map(([id, label]) => Object.assign({ id, label, go: () => this.setCtrl({ campusView: id }) }, btn(c.campusView === id, '#45D8FF')));
+    const outage = c.scenario === 'outage', gn = btn(!outage, SYS.power), og = btn(outage, SYS.power);
+    const legendBy = { compute: [['Fiber handoff · property line · symbolic', SYS.compute], ['POE · IDF · Corridor 110 · from plan', SYS.compute], ['Heat output', SYS.heat]], power: [['Normal grid path → Electrical Yard 001', SYS.power], ['POD rooms · generator yard · from plan', SYS.power], ['Emergency branch · backup-only', SYS.power]], liquid: [['Cold plate supply · conceptual', SYS.cooling], ['Hot return · conceptual', SYS.heat], ['CDU · Mechanical Gallery 142/182', '#1E8FAE'], ['HAC hood · conceptual', SYS.heat], ['Fan walls · conceptual', SYS.neutral]], thermal: [['Hot liquid to the ACCH rows', SYS.heat], ['Cooled liquid return', SYS.cooling], ['ACCH chillers · Mechanical Yard 002', SYS.cooling]], construction: [['Current milestone element', SYS.construction], ['Conceptual future stage', SYS.neutral]] };
+    const legend = (legendBy[s.section] || [['Phase I area', SYS.cooling], ['Future phases · conceptual', SYS.neutral]]).map(([label, color]) => ({ label: TC(label), color }));
+    const drawerFact = s.factId ? this.fact(s.factId) : null;
+    const sourcesList = Object.values(s.sources);
+    const registry = s.facts.map(f => this.fact(f.id));
+    const scenarioText = outage ? 'Grid unavailable (educational scenario): the normal grid path is dimmed and the generator-yard branch into the POD rooms is lit. Emergency generators are publicly described as backup-only. No transfer time, runtime, redundancy level, or uninterrupted-operation claim is made.' : 'Normal condition: grid supply from Black Hills Energy feeds the project utility interface. Only the grid → utility → project relationship is confirmed; inside the fence, room positions follow the Level 1 plan and equipment is not modeled.';
+    return {
+      ...this.partsVals(),
+      isStory, isExplore: !isStory, setStory: () => this.setState({ mode: 'story' }, () => setTimeout(() => this.goSection(this.state.section), 60)), setExplore: () => this.setState({ mode: 'explore' }),
+      nav, stories, cur, milestones, curMilestone, presets, bpresets, layers, campusViews, legend, sourcesList, registry, registryCount: registry.length,
+      narrow, mobile, notMobile: !mobile, railDisplay: narrow ? 'none' : 'flex', storyCols: mobile ? 'minmax(0,1fr)' : 'minmax(0,1fr) minmax(0,1fr)', textOrder: mobile ? 2 : 1, stageOrder: mobile ? 1 : 2, ctrlLeft: mobile ? '12px' : 'auto', ctrlWrap: mobile ? 'nowrap' : 'wrap',
+      stageHeight: mobile ? 'min(54svh, 520px)' : (s.scH ? s.scH + 'px' : 'calc(100svh - 52px)'),
+      exploreDir: mobile ? 'column' : 'row', drawerWidth: mobile ? '100%' : (narrow ? '280px' : '320px'),
+      hPadX: mobile ? '14px' : '20px', brandMinW: mobile ? '0' : 'max-content', progressPct: s.progress || 0, curSys: (nav.find(n => n.active) || {}).sysColor || '#45D8FF',
+      secPad: mobile ? '40px 20px 44px' : '64px 48px 72px 48px', srcPad: mobile ? '40px 20px 64px' : '64px 48px 96px 48px', secMinH: mobile ? '0' : '70vh', secAlign: mobile ? 'flex-start' : 'center', secText: mobile ? 'left' : 'center', secGap: mobile ? '22px' : '28px', factMin: mobile ? '140px' : '170px',
+      ctrlH: mobile ? '40px' : '32px', exMainFlex: mobile ? '0 0 auto' : '1 1 0', exStageFlex: mobile ? '0 0 min(46svh, 520px)' : '1 1 0', asideFlex: mobile ? '1 1 0' : 'none', asidePad: mobile ? '20px 18px calc(32px + env(safe-area-inset-bottom))' : '24px 22px 32px', hudX: mobile ? '14px' : '20px',
+      stageCaption: TC(sec.caption), roofLabel: c.roof ? 'Roof Off' : 'Roof On', explodeLabel: c.explode > 0.5 ? 'Assemble' : 'Explode',
+      toggleRoof: () => this.setCtrl({ roof: !c.roof }), toggleExplode: () => this.setCtrl({ explode: c.explode > 0.5 ? 0 : 1 }),
+      splashOn: false, isMobile: mobile, splashOpacity: s.splashFade ? 0 : 1,
+      tourOn: s.tour, tourLabel: s.tour ? '■ Stop Tour' : '▶ Tour', toggleTour: () => this.toggleTour(), verified: s.verified,
+      resetCamera: () => { const el = document.querySelector('campus-stage'); el && el.reset && el.reset(); },
+      explodePct: Math.round(c.explode * 100), opacityPct: Math.round(c.opacity * 100),
+      setExplode: e => this.setCtrl({ explode: Number(e.target.value) / 100 }), setOpacity: e => this.setCtrl({ opacity: Number(e.target.value) / 100 }),
+      isPower: s.section === 'power', isCampus: s.section === 'campus', isConstruction: s.section === 'construction',
+      isGridNormal: !outage, isOutage: outage, setGridNormal: () => this.setCtrl({ scenario: 'grid' }), setOutage: () => this.setCtrl({ scenario: 'outage' }),
+      gridNormalBorder: gn.border, gridNormalBg: gn.bg, gridNormalColor: gn.color, outageBorder: og.border, outageBg: og.bg, outageColor: og.color, scenarioText,
+      drawerOpen: s.drawer, hasDrawerFact: !!drawerFact, showRegistry: !drawerFact, drawerFact: drawerFact || {}, drawerTitle: drawerFact ? 'Fact · Source · Caveat' : 'Sources · Fact Registry',
+      openSources: () => this.setState({ drawer: true, factId: null }), closeDrawer: () => this.setState({ drawer: false }), backToRegistry: () => this.setState({ factId: null }),
+      taxonomy: ['confirmed', 'reported', 'drawing', 'calculated', 'conceptual'].map(k => ({ label: STATUS[k].label, color: STATUS[k].color, desc: STATUS[k].desc })),
+      onStoryScroll: e => {
+        const sc0 = e.currentTarget, pct = Math.round(sc0.scrollTop / Math.max(1, sc0.scrollHeight - sc0.clientHeight) * 200) / 2; if (pct !== this.state.progress) this.setState({ progress: pct });
+        if (this._noScroll) return; const sc = sc0, top = sc.getBoundingClientRect().top; let id = this.state.section;
+        sc.querySelectorAll('[data-sec]').forEach(el => { if (el.getBoundingClientRect().top - top <= 200) id = el.getAttribute('data-sec'); });
+        if (id !== this.state.section) { const nsec = SECTIONS.find(x => x.id === id); this.setState(st => ({ section: id, ctrl: Object.assign({}, DEF_CTRL, { layers: st.ctrl.layers }, nsec.ctrl) })); }
+      },
+    };
+  }
+}
+</script>
+</body>
+</html>

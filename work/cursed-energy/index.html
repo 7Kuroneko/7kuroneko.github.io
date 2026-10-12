@@ -1,0 +1,740 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Portals · Cursed Energy · The Kuroneko Company</title>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@500;600&family=Geist+Mono:wght@500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root{--lumen:#F3EFE6;--silver:#B9B4A8;--signal:#6E6A62;--nebula:#35332F;--meteor:#1C1B19;--void:#07080B;--halo:#6E8CFF;--mono:'JetBrains Mono',ui-monospace,"SF Mono",Menlo,monospace;--sans:'DM Sans',system-ui,sans-serif}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0;background:#000;height:100vh;width:100vw;overflow:hidden}
+body{display:flex;align-items:center;justify-content:center;cursor:none}
+body.show-cursor{cursor:default}
+a{color:var(--halo)}a:hover{color:var(--lumen)}
+#stage{position:relative;background:var(--void);display:block;overflow:hidden}
+canvas#field{display:block;width:100%;height:100%}
+.atmos{position:absolute;inset:0;z-index:4;pointer-events:none}
+.atmos.vignette{background:radial-gradient(ellipse 80% 88% at 50% 48%,transparent 44%,rgba(5,6,9,.46) 78%,rgba(3,3,6,.86) 100%)}
+.chrome{position:absolute;z-index:6;font-family:var(--mono);pointer-events:none;transition:opacity .6s ease}
+.chrome.eyebrow{top:clamp(16px,3.2vh,34px);left:clamp(18px,3.2vw,40px);display:flex;align-items:center;gap:12px;font-size:clamp(8px,.74vw,11px);letter-spacing:.34em;text-transform:uppercase;color:var(--signal)}
+.chrome.eyebrow .mark{display:block;color:var(--silver);width:clamp(11px,1vw,15px);aspect-ratio:6/8}
+.chrome.eyebrow .dot{width:4px;height:4px;background:var(--halo)}
+.chrome.timecode{top:clamp(16px,3.2vh,34px);right:clamp(18px,3.2vw,40px);display:flex;align-items:center;gap:10px;font-size:clamp(9px,.8vw,12px);letter-spacing:.22em;color:var(--signal);font-variant-numeric:tabular-nums}
+.chrome.timecode b{color:var(--silver);font-weight:400}
+.chrome.timecode .sep{color:var(--nebula)}
+body.hud-hidden .chrome.eyebrow,body.hud-hidden .chrome.timecode{opacity:0}
+.chrome.timecode.off{display:none}
+.card{position:absolute;inset:0;z-index:8;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;pointer-events:none;opacity:0}
+.card::after{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 70% 60% at 50% 50%,rgba(7,8,11,.66),rgba(7,8,11,.18) 70%,transparent);z-index:-1}
+.card .eb{font-family:var(--mono);font-size:clamp(9px,.95vw,13px);letter-spacing:.4em;text-transform:uppercase;color:#fff;margin-bottom:clamp(20px,3vh,34px);display:flex;align-items:center;gap:14px}
+.card .eb .dot{width:5px;height:5px;background:var(--halo)}
+.card h1{font-family:var(--sans);font-weight:300;font-size:clamp(40px,8.2vw,132px);letter-spacing:.04em;line-height:.92;margin:0;color:var(--lumen);text-shadow:0 4px 70px rgba(0,0,0,.6)}
+.card .sub{font-family:var(--mono);font-size:clamp(9px,.92vw,13px);letter-spacing:.32em;text-transform:uppercase;color:#fff;margin-top:clamp(22px,3.4vh,38px)}
+.card .sub b{color:var(--silver);font-weight:400}
+.card .sub i{color:var(--halo);font-style:normal}
+#oracle .mask{display:block;color:#FAFAFA;width:clamp(84px,9.6vw,168px);aspect-ratio:11/18;margin-bottom:clamp(26px,4.2vh,48px);transition:none}
+#oracle .who{font-family:var(--mono);font-size:clamp(9px,.85vw,12px);letter-spacing:.5em;text-transform:uppercase;color:var(--halo);margin-bottom:clamp(22px,3.4vh,40px)}
+#oracle p{font-family:var(--sans);font-weight:300;font-size:clamp(20px,2.6vw,44px);letter-spacing:.06em;line-height:1.5;margin:0;color:var(--lumen);max-width:28ch;text-wrap:pretty}
+#verse .who{font-family:var(--mono);font-size:clamp(9px,.85vw,12px);letter-spacing:.5em;text-transform:uppercase;color:var(--halo);margin-bottom:clamp(22px,3.4vh,40px)}
+#verse p{font-family:var(--sans);font-weight:300;font-size:clamp(16px,1.9vw,32px);letter-spacing:.04em;line-height:1.6;margin:0;color:var(--lumen);max-width:40ch;text-wrap:pretty}
+.endmark{display:block;color:var(--lumen);width:clamp(40px,5vw,70px);aspect-ratio:6/8;margin-bottom:clamp(26px,4vh,46px)}
+#replay{pointer-events:auto;margin-top:clamp(30px,4.6vh,52px);appearance:none;background:transparent;border:1px solid var(--meteor);color:var(--silver);font-family:var(--mono);font-size:clamp(9px,.82vw,12px);letter-spacing:.28em;text-transform:uppercase;padding:12px 22px;cursor:pointer;display:inline-flex;align-items:center;gap:12px;transition:border-color .15s,color .15s}
+#replay::before{content:'↻';color:var(--halo);font-size:1.2em;line-height:1}
+#replay:hover{border-color:var(--halo);color:var(--lumen)}
+#controls{position:absolute;left:0;right:0;bottom:0;z-index:7;padding:clamp(40px,6vh,70px) clamp(18px,3vw,40px) clamp(14px,2.4vh,26px);background:linear-gradient(to top,rgba(0,0,0,.72) 0%,rgba(0,0,0,.34) 55%,transparent 100%);transition:opacity .45s ease,transform .45s ease;display:flex;flex-direction:column;gap:clamp(10px,1.4vh,16px)}
+body.hud-hidden #controls{opacity:0;transform:translateY(8px);pointer-events:none}
+#scrub{position:relative;height:14px;display:flex;align-items:center;cursor:pointer}
+#scrub .track{position:relative;width:100%;height:2px;background:rgba(243,239,230,.16)}
+#scrub .fill{position:absolute;left:0;top:0;bottom:0;width:0%;background:var(--halo)}
+#scrub .knob{position:absolute;top:50%;width:9px;height:9px;background:var(--halo);transform:translate(-50%,-50%) scale(.5);opacity:0;transition:opacity .15s,transform .15s}
+#scrub:hover .knob{opacity:1;transform:translate(-50%,-50%) scale(1)}
+#scrub:hover .track{height:3px}
+.ctl-row{display:flex;align-items:center;gap:clamp(14px,1.6vw,22px);font-family:var(--mono)}
+.ctl-btn{appearance:none;background:transparent;border:none;color:var(--silver);cursor:pointer;padding:4px;display:inline-flex;align-items:center;justify-content:center;transition:color .15s}
+.ctl-btn:hover{color:var(--lumen)}
+.ctl-btn svg{display:block;width:clamp(16px,1.5vw,20px);height:clamp(16px,1.5vw,20px)}
+.ctl-time{font-size:clamp(10px,.86vw,13px);letter-spacing:.16em;color:var(--silver);font-variant-numeric:tabular-nums}
+.ctl-time .tot{color:var(--nebula)}
+.ctl-spacer{flex:1}
+.ctl-label{font-size:clamp(8px,.7vw,10px);letter-spacing:.3em;text-transform:uppercase;color:var(--signal)}
+#tp{position:fixed;top:24px;right:24px;width:256px;background:#0A0A0D;border:1px solid #232220;padding:18px 18px 22px;font-family:var(--sans);color:var(--lumen);z-index:50;display:none;box-shadow:0 30px 80px rgba(0,0,0,.5)}
+#tp.open{display:block}
+#tp .hd{display:flex;justify-content:space-between;align-items:center;font-family:var(--mono);font-size:10px;letter-spacing:.3em;color:#8a857b;padding-bottom:14px;border-bottom:1px solid #232220;margin-bottom:14px}
+#tp .hd .x{color:#5a574f;cursor:pointer;padding:4px 8px;margin:-4px -8px;border:1px solid transparent}
+#tp .hd .x:hover{border-color:#2e2c28;color:var(--silver)}
+#tp label{display:block;font-size:9px;letter-spacing:.3em;color:#8a857b;margin:16px 0 8px;text-transform:uppercase}
+#tp .seg{display:grid;grid-template-columns:1fr 1fr;gap:2px}
+#tp .seg button{text-align:left;background:transparent;border:1px solid #232220;color:#8a857b;padding:8px 10px;font-family:inherit;font-size:10px;letter-spacing:.18em;cursor:pointer;text-transform:uppercase;transition:all .12s}
+#tp .seg button:hover{color:var(--silver);border-color:#3a3833}
+#tp .seg button.on{background:#17160f;border-color:var(--halo);color:var(--lumen)}
+#tp .row{display:flex;align-items:center;gap:10px}
+#tp input[type=range]{flex:1;appearance:none;-webkit-appearance:none;background:transparent;height:14px;cursor:pointer}
+#tp input[type=range]::-webkit-slider-runnable-track{height:1px;background:#3a3833}
+#tp input[type=range]::-moz-range-track{height:1px;background:#3a3833}
+#tp input[type=range]::-webkit-slider-thumb{appearance:none;-webkit-appearance:none;width:8px;height:14px;background:var(--halo);border:0;margin-top:-7px;border-radius:0}
+#tp input[type=range]::-moz-range-thumb{width:8px;height:14px;background:var(--halo);border:0;border-radius:0}
+#tp .val{font-family:var(--mono);font-size:10px;color:#8a857b;min-width:46px;text-align:right;letter-spacing:.06em}
+#hint{position:fixed;bottom:18px;left:50%;transform:translateX(-50%);color:#5a574f;font-family:var(--sans);font-size:10px;letter-spacing:.34em;text-transform:uppercase;z-index:9;pointer-events:none;transition:opacity 1.2s ease}
+#hint.gone{opacity:0}
+</style>
+</head>
+<body>
+<script src="./kn-loader.js" data-variant="cursed" data-bg="#05060C" data-accent="#E8ECCC" data-accent2="#6E8CFF" data-ink="#F2EFE8" data-mute="#8E8980" data-title="Cursed Energy" data-kind="Portals · Video · Focus soundscape" data-steps="Opening the domain|Gathering cursed energy|Warping the field|Tuning the soundscape|Entering" data-min="3200"></script>
+<div id="stage" data-screen-label="Cursed Energy">
+<canvas id="field"></canvas>
+<div class="atmos vignette"></div>
+<div class="chrome eyebrow"><span class="mark" id="mark-tl" aria-hidden="true"></span><span>PORTALS · FOCUSFIELD</span><span class="dot"></span><span>CURSED ENERGY</span></div>
+<div class="chrome timecode" id="tc"><b id="tc-cur">00:00</b><span class="sep">/</span><span id="tc-tot">30:00</span></div>
+<div class="card" id="intro">
+<div class="eb"><span>PORTALS · FOCUSFIELD · VOL. 000</span><span class="dot"></span><span>NO. 017</span></div>
+<h1>Cursed Energy</h1>
+<div class="sub"><b id="intro-dur">30 MINUTE</b> &nbsp;·&nbsp; <i>GALATIANS 3:13–14</i> &nbsp;·&nbsp; DEEP FOCUS</div>
+</div>
+<div class="card" id="oracle">
+<span class="mask" id="oracle-mask" aria-hidden="true"></span>
+<div class="who">THE ORACLE</div>
+<p>The Curse Was Never Yours To Carry. It Was Broken For You, And What Rises In You Now Is Blessing.</p>
+</div>
+<div class="card" id="verse">
+<div class="who">GALATIANS 3:13–14</div>
+<p>Christ hath redeemed us from the curse of the law, being made a curse for us: for it is written, Cursed is every one that hangeth on a tree: That the blessing of Abraham might come on the Gentiles through Jesus Christ; that we might receive the promise of the Spirit through faith.</p>
+</div>
+<div class="card" id="outro">
+<span class="endmark" id="endmark" aria-hidden="true"></span>
+<div class="eb"><span>FOCUSFIELD</span><span class="dot"></span><span>CURSED ENERGY</span></div>
+<h1 style="font-size:clamp(28px,4.4vw,70px);">Mission Complete</h1>
+<div class="sub">RUNTIME <b id="outro-dur">30:00</b> &nbsp;·&nbsp; THANK YOU FOR FOCUSING</div>
+<button id="replay">Replay</button>
+</div>
+<div id="controls">
+<div id="scrub"><div class="track"><div class="fill" id="scrub-fill"></div></div><div class="knob" id="scrub-knob"></div></div>
+<div class="ctl-row">
+<button class="ctl-btn" id="play-btn" aria-label="Play / pause"><svg id="ic-pause" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="5" width="4" height="14"></rect><rect x="14" y="5" width="4" height="14"></rect></svg><svg id="ic-play" viewBox="0 0 24 24" fill="currentColor" style="display:none"><path d="M7 5l12 7-12 7z"></path></svg></button>
+<button class="ctl-btn" id="back-btn" aria-label="Back 60 seconds"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 5L5 11l6 6"></path><path d="M5 11h9a5 5 0 0 1 5 5v0"></path></svg></button>
+<button class="ctl-btn" id="fwd-btn" aria-label="Forward 60 seconds"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 5l6 6-6 6"></path><path d="M19 11h-9a5 5 0 0 0-5 5v0"></path></svg></button>
+<span class="ctl-time"><span id="ctl-cur">00:00</span> <span class="tot">/ <span id="ctl-tot">30:00</span></span></span>
+<span class="ctl-spacer"></span>
+<span class="ctl-label">FOCUSFIELD · CURSED ENERGY</span>
+<button class="ctl-btn" id="dl-btn" aria-label="Export video" title="Export video" onclick="document.getElementById('export-btn').click()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 4v11"></path><path d="M7 10l5 5 5-5"></path><path d="M5 20h14"></path></svg></button>
+<button class="ctl-btn" id="mute-btn" aria-label="Mute soundscape"><svg id="ic-sound" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 9v6h4l5 4V5L8 9H4z"></path><path d="M16.5 8.5a5 5 0 0 1 0 7M19 6a8 8 0 0 1 0 12"></path></svg><svg id="ic-muted" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:none"><path d="M4 9v6h4l5 4V5L8 9H4z"></path><path d="M22 9l-6 6M16 9l6 6"></path></svg></button>
+<button class="ctl-btn" id="full-btn" aria-label="Fullscreen"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"></path></svg></button>
+</div>
+</div>
+</div>
+<div id="tp" role="dialog" aria-label="Tweaks">
+<div class="hd"><span>TWEAKS · CURSED ENERGY</span><span class="x" id="tp-close">×</span></div>
+<label>Oracle</label>
+<div class="seg" id="seg-or"><button data-v="a">Original</button><button data-v="b">Variant</button></div>
+<label>Palette</label>
+<div class="seg" id="seg-pal"><button data-v="cursed">Cursed</button><button data-v="domain">Domain</button><button data-v="crimson">Crimson</button><button data-v="reverse">Reverse</button></div>
+<label>Turbulence</label>
+<div class="row"><input type="range" id="r-depth" min="0" max="2" step="0.1" /><span class="val" id="r-depth-v"></span></div>
+<label>Glow</label>
+<div class="row"><input type="range" id="r-glow" min="0.4" max="1.7" step="0.1" /><span class="val" id="r-glow-v"></span></div>
+<label>Black flash</label>
+<div class="row"><input type="range" id="r-wave" min="0" max="2" step="0.1" /><span class="val" id="r-wave-v"></span></div>
+<label>Sparks</label>
+<div class="row"><input type="range" id="r-density" min="0.4" max="1.8" step="0.1" /><span class="val" id="r-density-v"></span></div>
+<label>Seed</label>
+<div class="row"><input type="range" id="r-seed" min="1" max="99" step="1" /><span class="val" id="r-seed-v"></span></div>
+<label>Runtime · minutes</label>
+<div class="row"><input type="range" id="r-dur" min="5" max="60" step="5" /><span class="val" id="r-dur-v"></span></div>
+<label>Persistent timecode</label>
+<div class="seg" id="seg-tc"><button data-v="1">Show</button><button data-v="0">Hide</button></div>
+<label>Soundscape volume</label>
+<div class="row"><input type="range" id="r-vol" min="0" max="100" step="2" /><span class="val" id="r-vol-v"></span></div>
+</div>
+<div id="hint">SPACE&nbsp;PLAY&nbsp;·&nbsp;F&nbsp;FULLSCREEN&nbsp;·&nbsp;M&nbsp;MUTE&nbsp;·&nbsp;T&nbsp;TWEAKS</div>
+<!-- ============ Export / render to a video file ============ -->
+<style>
+  #export-btn {
+    position: fixed; right: clamp(18px, 3.2vw, 40px); top: calc(clamp(16px, 3.2vh, 34px) + 34px); z-index: 60;
+    appearance: none; background: rgba(8,10,18,0.82); border: 1px solid var(--halo);
+    color: var(--halo); font-family: var(--mono); font-size: 11px; letter-spacing: 0.22em;
+    text-transform: uppercase; padding: 10px 14px; cursor: pointer;
+    backdrop-filter: blur(8px); transition: background .14s ease, color .14s ease, opacity .6s ease;
+  }
+  #export-btn { display: none !important; }
+  body.recording #hint { display: none; }
+  #export-btn:hover { background: var(--halo); color: var(--void); }
+  #export-btn:disabled { opacity: .4; cursor: default; }
+  body.recording #export-btn { display: none; }
+
+  #rec-hud { position: fixed; inset: 0; z-index: 70; display: none;
+    align-items: flex-start; justify-content: center; pointer-events: none; }
+  #rec-hud.on { display: flex; }
+  #rec-hud .rb { margin-top: 30px; display: flex; align-items: center; gap: 14px;
+    padding: 11px 16px; background: rgba(8,10,18,0.92); border: 1px solid var(--halo);
+    font-family: var(--mono); font-size: 12px; letter-spacing: 0.18em; text-transform: uppercase;
+    color: var(--lumen); pointer-events: auto; }
+  #rec-hud b { color: var(--silver); font-weight: 400; }
+  #rec-dot2 { width: 11px; height: 11px; border-radius: 50%; background: #ff3b30;
+    animation: recblink 1s steps(2) infinite; }
+  @keyframes recblink { 50% { opacity: .15; } }
+  #rec-stop { appearance: none; background: transparent; border: 1px solid var(--halo);
+    color: var(--halo); font-family: var(--mono); font-size: 11px; letter-spacing: 0.18em;
+    text-transform: uppercase; padding: 6px 12px; cursor: pointer; }
+  #rec-stop:hover { background: var(--halo); color: var(--void); }
+  #rec-note { position: fixed; top: 76px; left: 50%; transform: translateX(-50%);
+    font-family: var(--mono); font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase;
+    color: var(--signal); pointer-events: none; }
+
+  /* lock the player chrome while capturing so nothing drifts mid-export */
+  body.recording #controls { opacity: .22 !important; pointer-events: none; }
+  body.recording #scrub, body.recording #hint, body.recording #tp { pointer-events: none; }
+
+  /* export explainer modal */
+  #exp-modal { position: fixed; inset: 0; z-index: 80; display: none;
+    align-items: center; justify-content: center; background: rgba(4,5,11,0.74); }
+  #exp-modal.on { display: flex; }
+  #exp-modal .box { width: min(560px, 90vw); background: #0a0d16; border: 1px solid var(--meteor);
+    padding: 30px 32px; font-family: var(--sans); color: var(--silver); }
+  #exp-modal .eb { font-family: var(--mono); font-size: 10px; letter-spacing: 0.28em;
+    text-transform: uppercase; color: var(--halo); margin-bottom: 14px; }
+  #exp-modal .h { font-weight: 500; font-size: 25px; color: var(--lumen); margin-bottom: 14px; letter-spacing: -0.01em; }
+  #exp-modal p { font-size: 15px; line-height: 1.6; margin: 0 0 14px; text-wrap: pretty; }
+  #exp-modal b { color: var(--lumen); font-weight: 500; }
+  #exp-modal ul { margin: 0 0 24px; padding-left: 18px; font-size: 14px; line-height: 1.75; }
+  #exp-modal .btns { display: flex; gap: 12px; justify-content: flex-end; }
+  #exp-modal button { appearance: none; font-family: var(--mono); font-size: 11px; letter-spacing: 0.2em;
+    text-transform: uppercase; padding: 12px 18px; cursor: pointer; border: 1px solid var(--meteor);
+    background: transparent; color: var(--silver); transition: all .14s ease; }
+  #exp-cancel:hover { border-color: var(--signal); color: var(--lumen); }
+  #exp-start { border-color: var(--halo); color: var(--halo); }
+  #exp-start:hover { background: var(--halo); color: var(--void); }
+</style>
+
+<button id="export-btn" title="Export this video as a downloadable file">⬇ Export Video</button>
+<div id="rec-hud">
+  <div class="rb">
+    <span id="rec-dot2"></span>
+    <span><span id="rec-verb">Recording</span> · <b id="rec-el">00:00</b> / <span id="rec-to">30:00</span></span>
+    <button id="rec-stop">Stop &amp; Save</button>
+  </div>
+  <div id="rec-note">Keep this tab in front · records in real time</div>
+</div>
+
+<div id="exp-modal">
+  <div class="box">
+    <div class="eb">Portals · FocusField · Export</div>
+    <div class="h">Render this as a video file</div>
+    <p>This renders the whole video and its sound into a finished <b>MP4</b> on your computer — the pre-made video you upload to YouTube.</p>
+    <ul>
+      <li>Renders the full <b><span id="exp-len">30</span>-minute</b> video from start to finish, at top quality.</li>
+      <li id="exp-speed">As fast as your computer allows — usually a few minutes.</li>
+      <li id="exp-save">Pick a folder to save into; it streams straight to disk. <b>Keep this tab in front</b> while it works.</li>
+    </ul>
+    <div class="btns"><button id="exp-cancel">Cancel</button><button id="exp-start">Start export</button></div>
+  </div>
+</div>
+<script src="cursed-audio.js"></script>
+<script src="cursed-render.js"></script>
+<script>
+// FOCUSFIELD · CURSED ENERGY — a 30-minute video. A stellar nursery in the
+// Webb style; protostars ignite inside the dust and the soundscape answers each birth.
+const LS_KEY = 'focusfield-cursed-energy-30min';
+const TWEAKS = { palette: 'cursed', oracle: 'a', depth: 1, glow: 1, wave: 1, density: 1, seed: 7, durationMin: 30, timecode: 1, muted: 0, volume: 80 };
+let savedTime = 0, savedPlaying = false;
+try { const s = JSON.parse(localStorage.getItem(LS_KEY) || '{}'); if (s.tweaks) Object.assign(TWEAKS, s.tweaks); if (typeof s.time === 'number') savedTime = s.time; if (typeof s.playing === 'boolean') savedPlaying = s.playing; } catch (e) {}
+
+const stage = document.getElementById('stage'), canvas = document.getElementById('field');
+const W = 1920, H = 1080; canvas.width = W; canvas.height = H;
+const ctx = canvas.getContext('2d', { alpha: false });
+function fit() { const vw = innerWidth, vh = innerHeight, r = 16 / 9; let cw, ch; if (vw / vh > r) { ch = vh; cw = Math.round(vh * r); } else { cw = vw; ch = Math.round(vw / r); } stage.style.width = cw + 'px'; stage.style.height = ch + 'px'; }
+fit(); addEventListener('resize', fit); if (window.ResizeObserver) new ResizeObserver(fit).observe(document.body);
+
+let DURATION = TWEAKS.durationMin * 60;
+function rebuild() { CursedScene.build(TWEAKS.seed, TWEAKS.density, DURATION + 5); try { CursedAudio.setFlashes(CursedScene.events()); } catch (e) {} }
+rebuild();
+function renderScene(t) { CursedScene.draw(ctx, t, TWEAKS); }
+
+let videoTime = Math.min(savedTime, DURATION - .001), playing = false, lastFrame = performance.now(), ended = false;
+const INTRO_IN = 2.5, INTRO_HOLD_END = 10, INTRO_OUT_END = 14, OR_IN = 15, OR_FULL = 18.5, OR_HOLD = 27, OR_OUT = 30.5, VE_IN = 32, VE_FULL = 35.5, VE_HOLD = 47, VE_OUT = 50.5, OUT_DIM = 9, OUT_CARD = 7;
+const intro = document.getElementById('intro'), oracle = document.getElementById('oracle'), outro = document.getElementById('outro');
+function fmt(sec) { sec = Math.max(0, Math.floor(sec)); const m = Math.floor(sec / 60), s = sec % 60; return (m < 10 ? '0' : '') + m + ':' + (s < 10 ? '0' : '') + s; }
+function oracleAlpha(t) { if (t < OR_IN || t > OR_OUT) return 0; if (t < OR_FULL) return (t - OR_IN) / (OR_FULL - OR_IN); if (t < OR_HOLD) return 1; return 1 - (t - OR_HOLD) / (OR_OUT - OR_HOLD); }
+const verseCard = document.getElementById('verse');
+function verseAlpha(t) { if (t < VE_IN || t > VE_OUT) return 0; if (t < VE_FULL) return (t - VE_IN) / (VE_FULL - VE_IN); if (t < VE_HOLD) return 1; return 1 - (t - VE_HOLD) / (VE_OUT - VE_HOLD); }
+function introAlpha(t) { if (t < INTRO_IN) return t / INTRO_IN; if (t < INTRO_HOLD_END) return 1; if (t < INTRO_OUT_END) return 1 - (t - INTRO_HOLD_END) / (INTRO_OUT_END - INTRO_HOLD_END); return 0; }
+function dimAt(t) { let i = 1; if (t < 13) { const b = Math.min(1, t / 13); i = .03 + .97 * b * b * (3 - 2 * b); } const toEnd = DURATION - t; if (toEnd < OUT_DIM) i = Math.min(i, Math.max(0, toEnd / OUT_DIM)); return i; }
+
+let lastFrameTick = 0, rafPending = false, persistThrottle = 0;
+function frame(now) {
+  rafPending = false;
+  if (window.__offlineRendering) { rafPending = true; lastFrameTick = performance.now(); requestAnimationFrame(frame); return; }
+  if (now == null) now = performance.now();
+  try {
+    let dt = (now - lastFrame) / 1000; lastFrame = now; if (dt < 0) dt = 0; if (dt > .25) dt = .25;
+    if (playing && !ended) {
+      videoTime += dt;
+      const ap = CursedAudio.position(); if (ap != null && Math.abs(ap - videoTime) < 1) videoTime += (ap - videoTime) * .25;
+      if (videoTime >= DURATION) { videoTime = DURATION; setPlaying(false); ended = true; }
+    }
+    if (!stage.offsetWidth) fit();
+    renderScene(videoTime);
+    const inten = dimAt(videoTime);
+    if (inten < 1) { ctx.fillStyle = 'rgba(7,8,11,' + (1 - inten).toFixed(3) + ')'; ctx.fillRect(0, 0, W, H); }
+    intro.style.opacity = introAlpha(videoTime).toFixed(3);
+    oracle.style.opacity = oracleAlpha(videoTime).toFixed(3);
+    verseCard.style.opacity = verseAlpha(videoTime).toFixed(3);
+    const toEnd = DURATION - videoTime; let oo = 0; if (toEnd < OUT_CARD) oo = Math.min(1, (OUT_CARD - toEnd) / 2);
+    outro.style.opacity = oo.toFixed(3); outro.style.pointerEvents = 'none';
+    const pct = (videoTime / DURATION) * 100; scrubFill.style.width = pct + '%'; scrubKnob.style.left = pct + '%';
+    const cur = fmt(videoTime); tcCur.textContent = cur; ctlCur.textContent = cur;
+    persistThrottle += dt; if (persistThrottle > 2) { persist(); persistThrottle = 0; }
+  } catch (e) { if (!frame._warned) { console.error('frame() error (loop continues):', e && (e.stack || e.message) || e); frame._warned = true; } }
+  finally { lastFrameTick = performance.now(); rafPending = true; requestAnimationFrame(frame); }
+}
+setInterval(() => { if (document.hidden) return; if (rafPending && performance.now() - lastFrameTick < 1500) return; rafPending = true; requestAnimationFrame(frame); }, 1000);
+document.addEventListener('visibilitychange', () => { if (!document.hidden && !rafPending) { rafPending = true; requestAnimationFrame(frame); } if (document.hidden && playing) setPlaying(false); });
+
+function persist() { try { localStorage.setItem(LS_KEY, JSON.stringify({ tweaks: TWEAKS, time: videoTime, playing })); } catch (e) {} }
+const icPlay = document.getElementById('ic-play'), icPause = document.getElementById('ic-pause');
+function setPlaying(p) {
+  playing = p; icPlay.style.display = p ? 'none' : 'block'; icPause.style.display = p ? 'block' : 'none';
+  if (p) { hint.classList.add('gone'); scheduleHide(); CursedAudio.start({ at: videoTime, endAt: DURATION }); } else { showHud(); CursedAudio.stop(); }
+  persist();
+}
+function togglePlay() { if (ended && !playing) { restart(); return; } setPlaying(!playing); }
+function restart() { videoTime = 0; ended = false; setPlaying(true); }
+function seek(sec) {
+  if (sec >= DURATION - .05) { videoTime = DURATION; ended = true; if (playing) setPlaying(false); else showHud(); persist(); return; }
+  videoTime = Math.max(0, sec); ended = false; showHud(); persist(); if (!scrubbing) syncAudio();
+}
+let syncTimer = null;
+function syncAudio() { clearTimeout(syncTimer); syncTimer = setTimeout(() => { if (playing && !ended) CursedAudio.start({ at: videoTime, endAt: DURATION }); }, 90); }
+
+const scrub = document.getElementById('scrub'), scrubFill = document.getElementById('scrub-fill'), scrubKnob = document.getElementById('scrub-knob');
+const tcCur = document.getElementById('tc-cur'), ctlCur = document.getElementById('ctl-cur'), hint = document.getElementById('hint');
+document.getElementById('play-btn').addEventListener('click', togglePlay);
+document.getElementById('back-btn').addEventListener('click', () => seek(videoTime - 60));
+document.getElementById('fwd-btn').addEventListener('click', () => seek(videoTime + 60));
+document.getElementById('replay').addEventListener('click', restart);
+canvas.addEventListener('click', togglePlay); canvas.style.cursor = 'pointer';
+document.getElementById('full-btn').addEventListener('click', toggleFull);
+document.getElementById('mute-btn').addEventListener('click', () => setMuted(!TWEAKS.muted));
+const icSound = document.getElementById('ic-sound'), icMuted = document.getElementById('ic-muted');
+function setMuted(m) { TWEAKS.muted = m ? 1 : 0; icSound.style.display = m ? 'none' : 'block'; icMuted.style.display = m ? 'block' : 'none'; CursedAudio.setMuted(!!m); persist(); }
+function scrubAt(x) { const r = scrub.getBoundingClientRect(); let f = Math.max(0, Math.min(1, (x - r.left) / r.width)); seek(f * DURATION); }
+let scrubbing = false;
+scrub.addEventListener('pointerdown', e => { scrubbing = true; scrub.setPointerCapture(e.pointerId); scrubAt(e.clientX); });
+scrub.addEventListener('pointermove', e => { if (scrubbing) scrubAt(e.clientX); });
+const endScrub = () => { if (!scrubbing) return; scrubbing = false; syncAudio(); };
+['pointerup', 'pointercancel', 'lostpointercapture'].forEach(ev => scrub.addEventListener(ev, endScrub));
+function toggleFull() { if (!document.fullscreenElement) document.documentElement.requestFullscreen && document.documentElement.requestFullscreen(); else document.exitFullscreen && document.exitFullscreen(); }
+
+let hideTimer = null;
+function showHud() { document.body.classList.remove('hud-hidden'); document.body.classList.add('show-cursor'); scheduleHide(); }
+function scheduleHide() { clearTimeout(hideTimer); if (!playing) return; hideTimer = setTimeout(() => { document.body.classList.add('hud-hidden'); document.body.classList.remove('show-cursor'); }, 2600); }
+['mousemove', 'pointerdown', 'touchstart', 'keydown'].forEach(ev => addEventListener(ev, () => { showHud(); if (playing) CursedAudio.resumeIfPending(videoTime); }, { passive: true }));
+addEventListener('keydown', e => {
+  if (e.key === ' ' || e.code === 'Space') { e.preventDefault(); togglePlay(); }
+  else if (e.key === 'f' || e.key === 'F') toggleFull();
+  else if (e.key === 't' || e.key === 'T') tp.classList.toggle('open');
+  else if (e.key === 'm' || e.key === 'M') setMuted(!TWEAKS.muted);
+  else if (e.key === 'ArrowRight') seek(videoTime + 10);
+  else if (e.key === 'ArrowLeft') seek(videoTime - 10);
+});
+
+function buildMark(el) { el.innerHTML = '<svg viewBox="0 0 6 8" width="100%" height="100%" style="display:block" aria-hidden="true"><path fill="currentColor" fill-rule="evenodd" d="M0 0H5V1H6V4H5V5H2V8H0Z M2 1H4V3H2Z"></path></svg>'; }
+buildMark(document.getElementById('mark-tl')); buildMark(document.getElementById('endmark'));
+const segOr = document.getElementById('seg-or');
+function syncOr() { CursedScene.ORACLE = TWEAKS.oracle === 'b' ? CursedScene.ORACLE_B : CursedScene.ORACLE_A; document.getElementById('oracle-mask').innerHTML = CursedScene.oracleSVG(); [...segOr.children].forEach(b => b.classList.toggle('on', b.dataset.v === TWEAKS.oracle)); }
+[...segOr.children].forEach(b => b.addEventListener('click', () => { TWEAKS.oracle = b.dataset.v; syncOr(); persist(); }));
+syncOr();
+
+const tp = document.getElementById('tp');
+document.getElementById('tp-close').addEventListener('click', () => tp.classList.remove('open'));
+const segTc = document.getElementById('seg-tc');
+[...segTc.children].forEach(b => b.addEventListener('click', () => { TWEAKS.timecode = parseInt(b.dataset.v, 10); syncTc(); persist(); }));
+function syncTc() { [...segTc.children].forEach(b => b.classList.toggle('on', parseInt(b.dataset.v, 10) === TWEAKS.timecode)); document.getElementById('tc').classList.toggle('off', !TWEAKS.timecode); }
+function bindSlider(id, key, fmtFn, onChange) {
+  const inp = document.getElementById(id), out = document.getElementById(id + '-v');
+  inp.value = TWEAKS[key]; out.textContent = fmtFn(TWEAKS[key]);
+  inp.addEventListener('input', () => { TWEAKS[key] = parseFloat(inp.value); out.textContent = fmtFn(TWEAKS[key]); if (onChange) onChange(); persist(); });
+}
+bindSlider('r-glow', 'glow', v => Math.round(v * 100) + '%');
+bindSlider('r-depth', 'depth', v => v === 0 ? 'FLAT' : Math.round(v * 100) + '%');
+const segPal = document.getElementById('seg-pal');
+function syncPal() { [...segPal.children].forEach(b => b.classList.toggle('on', b.dataset.v === TWEAKS.palette)); }
+[...segPal.children].forEach(b => b.addEventListener('click', () => { TWEAKS.palette = b.dataset.v; syncPal(); persist(); }));
+syncPal();
+bindSlider('r-wave', 'wave', v => v === 0 ? 'OFF' : Math.round(v * 100) + '%');
+bindSlider('r-density', 'density', v => v.toFixed(1) + '×', rebuild);
+bindSlider('r-seed', 'seed', v => v + '', rebuild);
+function setLabels() { const tot = fmt(DURATION); document.getElementById('tc-tot').textContent = tot; document.getElementById('ctl-tot').textContent = tot; document.getElementById('outro-dur').textContent = tot; document.getElementById('intro-dur').textContent = TWEAKS.durationMin + ' MINUTE'; }
+bindSlider('r-dur', 'durationMin', v => v + ' MIN', () => { DURATION = TWEAKS.durationMin * 60; rebuild(); if (videoTime > DURATION) videoTime = DURATION - .001; setLabels(); ended = false; });
+bindSlider('r-vol', 'volume', v => v + '%', () => CursedAudio.setVolume(TWEAKS.volume / 100));
+
+setLabels(); syncTc(); CursedAudio.setVolume(TWEAKS.volume / 100); setMuted(TWEAKS.muted);
+if (savedTime >= DURATION - .001) ended = true;
+setPlaying(savedPlaying && !ended);
+requestAnimationFrame(frame);
+setTimeout(() => { if (playing) hint.classList.add('gone'); }, 4500);
+</script>
+<!-- ============ Video exporter: fast 1080p MP4 with the live soundscape ============ -->
+<script>
+(function () {
+  const btn     = document.getElementById('export-btn');
+  const hud     = document.getElementById('rec-hud');
+  const elEl    = document.getElementById('rec-el');
+  const elTo    = document.getElementById('rec-to');
+  const stopBtn = document.getElementById('rec-stop');
+  const note    = document.getElementById('rec-note');
+
+  // offscreen composite canvas: the field + the branded overlays (chrome +
+  // intro/outro cards) painted on, so the file matches the player exactly.
+  const rc = document.createElement('canvas'); rc.width = 1920; rc.height = 1080;
+  const rx = rc.getContext('2d', { alpha: false });
+
+  const HALO = '#6E8CFF', LUMEN = '#F3EFE6', SILVER = '#B9B4A8', SIGNAL = '#6E6A62', WHITE = '#FFFFFF';
+
+  function fmtt(s) { s = Math.max(0, Math.floor(s)); const m = Math.floor(s/60), x = s%60;
+    return (m<10?'0':'')+m+':'+(x<10?'0':'')+x; }
+
+  // centered line built from colored segments (so the verse stays halo-cyan etc.)
+  function centeredLine(segs, y, font, ls) {
+    rx.font = font; rx.letterSpacing = ls; rx.textAlign = 'left'; rx.textBaseline = 'alphabetic';
+    let total = 0; for (const s of segs) total += rx.measureText(s.text).width;
+    let x = 960 - total / 2;
+    for (const s of segs) { rx.fillStyle = s.c; rx.fillText(s.text, x, y); x += rx.measureText(s.text).width; }
+    rx.letterSpacing = '0px';
+  }
+
+  function drawChrome(t) {
+    rx.textBaseline = 'alphabetic'; rx.textAlign = 'left';
+    rx.fillStyle = HALO; rx.fillRect(44, 41, 9, 9);
+    rx.font = "500 22px 'JetBrains Mono', ui-monospace, monospace"; rx.letterSpacing = '3px';
+    rx.fillStyle = SIGNAL;
+    rx.fillText('PORTALS · FOCUSFIELD · CURSED ENERGY', 66, 50);
+    if (TWEAKS.timecode) {
+      rx.textAlign = 'right';
+      rx.fillText(fmtt(t) + '   /   ' + fmtt(DURATION), 1876, 50);
+    }
+    rx.letterSpacing = '0px'; rx.textAlign = 'left';
+  }
+
+  function drawCards(t) {
+    // intro card — in 0–2.5, hold to 10, out 10–15 (matches the live loop)
+    let io = 0;
+    io = introAlpha(t);
+    io = Math.max(0, Math.min(1, io));
+    if (io > 0.002) {
+      rx.save(); rx.globalAlpha = io;
+      centeredLine([
+        { text: 'PORTALS · FOCUSFIELD · VOL. 000  ', c: WHITE },
+        { text: '·', c: HALO },
+        { text: '  NO. 017', c: WHITE },
+      ], 389, "500 22px 'JetBrains Mono', monospace", '6px');
+      rx.textAlign = 'center';
+      rx.fillStyle = LUMEN; rx.font = "300 116px 'DM Sans', system-ui, sans-serif";
+      rx.fillText('Cursed Energy', 960, 529);
+      centeredLine([
+        { text: TWEAKS.durationMin + ' MINUTE', c: SILVER },
+        { text: '  ·  ', c: WHITE },
+        { text: 'GALATIANS 3:13–14', c: HALO },
+        { text: '  ·  DEEP FOCUS', c: WHITE },
+      ], 597, "500 22px 'JetBrains Mono', monospace", '5px');
+      rx.restore();
+    }
+    // outro card — fades in over the last 7s
+    const toEnd = DURATION - t;
+    let oo = 0; if (toEnd < 7) oo = Math.min(1, (7 - toEnd) / 2); oo = Math.max(0, Math.min(1, oo));
+    if (oo > 0.002) {
+      rx.save(); rx.globalAlpha = oo;
+      centeredLine([
+        { text: 'FOCUSFIELD  ', c: WHITE },
+        { text: '·', c: HALO },
+        { text: '  CURSED ENERGY', c: WHITE },
+      ], 452, "500 22px 'JetBrains Mono', monospace", '6px');
+      rx.textAlign = 'center'; rx.fillStyle = LUMEN;
+      rx.font = "300 72px 'DM Sans', system-ui, sans-serif";
+      rx.fillText('Mission Complete', 960, 548);
+      centeredLine([
+        { text: 'RUNTIME ', c: WHITE },
+        { text: fmtt(DURATION), c: SILVER },
+        { text: '  ·  THANK YOU FOR FOCUSING', c: WHITE },
+      ], 606, "500 22px 'JetBrains Mono', monospace", '4px');
+      rx.restore();
+    }
+  }
+
+  function drawOracle(t) {
+    const a = oracleAlpha(t); if (a < 0.002) return;
+    rx.save(); rx.globalAlpha = a;
+    const sg = rx.createRadialGradient(960, 540, 0, 960, 540, 760);
+    sg.addColorStop(0, 'rgba(7,8,11,0.66)'); sg.addColorStop(0.7, 'rgba(7,8,11,0.18)'); sg.addColorStop(1, 'rgba(7,8,11,0)');
+    rx.fillStyle = sg; rx.fillRect(0, 0, 1920, 1080);
+    CursedScene.drawOracle(rx, 960, 384, 12, 1, '#FAFAFA');
+    rx.textAlign = 'center'; rx.textBaseline = 'alphabetic';
+    rx.font = "500 22px 'JetBrains Mono', monospace"; rx.letterSpacing = '11px'; rx.fillStyle = HALO;
+    rx.fillText('THE ORACLE', 960, 530);
+    rx.font = "300 42px 'DM Sans', system-ui, sans-serif"; rx.letterSpacing = '2.5px'; rx.fillStyle = LUMEN;
+    rx.fillText('The Curse Was Never Yours To Carry.', 960, 620);
+    rx.fillText('It Was Broken For You, And What Rises In You Now Is Blessing.', 960, 684);
+    rx.letterSpacing = '0px'; rx.restore();
+  }
+
+  function drawVerse(t) {
+    const a = verseAlpha(t); if (a < 0.002) return;
+    rx.save(); rx.globalAlpha = a;
+    const sg = rx.createRadialGradient(960, 540, 0, 960, 540, 820);
+    sg.addColorStop(0, 'rgba(7,8,11,0.7)'); sg.addColorStop(0.7, 'rgba(7,8,11,0.2)'); sg.addColorStop(1, 'rgba(7,8,11,0)');
+    rx.fillStyle = sg; rx.fillRect(0, 0, 1920, 1080);
+    rx.textAlign = 'center'; rx.textBaseline = 'alphabetic';
+    rx.font = "500 22px 'JetBrains Mono', monospace"; rx.letterSpacing = '11px'; rx.fillStyle = HALO;
+    rx.fillText('GALATIANS 3:13–14', 960, 380);
+    rx.font = "300 34px 'DM Sans', system-ui, sans-serif"; rx.letterSpacing = '1.5px'; rx.fillStyle = LUMEN;
+    const words = document.querySelector('#verse p').textContent.split(' '), lines = []; let ln = '';
+    for (const w of words) { const tryL = ln ? ln + ' ' + w : w; if (rx.measureText(tryL).width > 1100 && ln) { lines.push(ln); ln = w; } else ln = tryL; }
+    if (ln) lines.push(ln);
+    lines.forEach((l, i) => rx.fillText(l, 960, 470 + i * 56));
+    rx.letterSpacing = '0px'; rx.restore();
+  }
+
+  // render scene at absolute time t, apply the same intro/outro dimming the live
+  // loop does, then composite the branded overlays — straight into rc.
+  function renderFrameAt(t) {
+    videoTime = t;
+    renderScene(t);
+    const intensity = dimAt(t);
+    if (intensity < 1) { ctx.fillStyle = 'rgba(7,8,11,' + (1 - intensity).toFixed(3) + ')'; ctx.fillRect(0, 0, W, H); }
+    rx.drawImage(canvas, 0, 0, 1920, 1080);
+    drawChrome(t);
+    drawCards(t);
+    drawOracle(t);
+    drawVerse(t);
+  }
+
+  const FAST = !!(window.VideoEncoder && window.AudioEncoder && window.VideoFrame && window.AudioData);
+  let renderingMP4 = false, cancelMP4 = false;
+
+  function cleanupMP4(wasMuted, wasVol) {
+    window.__offlineRendering = false; renderingMP4 = false; cancelMP4 = false;
+    document.body.classList.remove('recording'); hud.classList.remove('on');
+    btn.disabled = false; stopBtn.textContent = 'Stop & Save';
+    const rv = document.getElementById('rec-verb'); if (rv) rv.textContent = 'Recording';
+    setMuted(wasMuted); try { CursedAudio.setVolume(wasVol / 100); } catch (e) {}
+    rebuild(); seek(0); setPlaying(false);
+  }
+
+  async function renderMP4() {
+    if (renderingMP4) return;
+    const fps = 60, total = DURATION, N = Math.round(total * fps);
+    const wasMuted = TWEAKS.muted, wasVol = TWEAKS.volume;
+    // Race a promise against a timeout so a wedged encoder/disk write can't hang the UI forever.
+    const withTimeout = (promise, ms, label) => {
+      let to;
+      const timeout = new Promise((_, rej) => { to = setTimeout(() => rej(new Error('Timed out: ' + label)), ms); });
+      return Promise.race([promise, timeout]).finally(() => clearTimeout(to));
+    };
+
+    // ---- pick the best resolution this browser can actually hardware-encode ----
+    // 4K UHD for max YouTube quality; auto-fall back to 1080p if unsupported.
+    const RES_4K = { w: 3840, h: 2160, codec: 'avc1.640034', bitrate: 50000000, label: '4K60' };   // High@L5.2
+    const RES_HD = { w: 1920, h: 1080, codec: 'avc1.64002A', bitrate: 16000000, label: '1080p60' }; // High@L4.2
+    let RES = RES_HD;
+    try {
+      const sup = await VideoEncoder.isConfigSupported({ codec: RES_4K.codec, width: RES_4K.w, height: RES_4K.h, bitrate: RES_4K.bitrate, framerate: fps });
+      if (sup && sup.supported) RES = RES_4K;
+    } catch (e) { /* stay on 1080p */ }
+    const SX = RES.w / 1920, SY = RES.h / 1080;       // logical 1920×1080 → output scale
+    let fieldScaled = false;                          // whether we resized the field canvas
+    const fname = 'Portals-Cursed-Energy-' + TWEAKS.durationMin + 'min-' + RES.label + '.mp4';
+
+    let Mux;
+    try { Mux = await import('https://cdn.jsdelivr.net/npm/mp4-muxer@5/+esm'); }
+    catch (e) { alert('Could not load the MP4 encoder (needs internet for the first render).'); return; }
+
+    let writable = null, target;
+    const blobParts = [];                 // streamed MP4 chunks when we can't write to disk
+    // The native save-to-folder picker only works in a real top-level tab; it's blocked
+    // inside the embedded preview iframe. Only try it when we're actually top-level.
+    try {
+      if (window.showSaveFilePicker && window.self === window.top) {
+        const h = await window.showSaveFilePicker({ suggestedName: fname, types: [{ description: 'MP4 video', accept: { 'video/mp4': ['.mp4'] } }] });
+        writable = await h.createWritable();
+        target = new Mux.FileSystemWritableFileStreamTarget(writable);
+      }
+    } catch (e) {
+      // AbortError = user dismissed the picker. Anything else (e.g. picker blocked) → stream.
+      if (e && e.name === 'AbortError') return;
+      writable = null;
+    }
+    if (!writable) {
+      // No disk handle: stream the muxer's output into a disk-backed Blob in chunks,
+      // instead of one giant contiguous ArrayBuffer (which exhausts memory on long videos).
+      // chunked + fragmented ⇒ writes arrive in order, so we just append each chunk.
+      // (the muxer still requires the position param to be declared.)
+      target = new Mux.StreamTarget({ chunked: true, onData: (d, _position) => blobParts.push(d.slice()) });
+    }
+
+    renderingMP4 = true; cancelMP4 = false;
+    document.body.classList.add('recording'); hud.classList.add('on'); btn.disabled = true;
+    const rv = document.getElementById('rec-verb'); if (rv) rv.textContent = 'Rendering';
+    stopBtn.textContent = 'Cancel'; elTo.textContent = fmtt(total); elEl.textContent = '0%';
+
+    // 1) soundscape — rendered offline in chunks (responsive + cancellable)
+    note.textContent = 'Rendering soundscape…';
+    let audioBuf = null;
+    try {
+      audioBuf = await CursedAudio.renderOffline(total, 0.85, (frac) => {
+        const p = Math.round(frac * 100);
+        elEl.textContent = p + '%';
+        note.textContent = 'Rendering soundscape… ' + p + '%';
+      }, () => cancelMP4);
+    }
+    catch (e) { console.error(e); alert('Audio render failed: ' + e.message); cleanupMP4(wasMuted, wasVol); return; }
+    if (cancelMP4) { note.textContent = 'Cancelled.'; cleanupMP4(wasMuted, wasVol); if (writable) { try { await writable.close(); } catch (e) {} } return; }
+
+    // 2) muxer + hardware encoders
+    let muxer, venc, aenc, encErr = null;
+    try {
+      // size the composite canvas to the output res; scale its ctx so all the
+      // hardcoded 1920×1080 chrome/card coordinates map straight onto 4K.
+      rc.width = RES.w; rc.height = RES.h;
+      rx.setTransform(SX, 0, 0, SY, 0, 0);
+      muxer = new Mux.Muxer({
+        target,
+        video: { codec: 'avc', width: RES.w, height: RES.h, frameRate: fps },
+        audio: { codec: 'aac', numberOfChannels: 2, sampleRate: 48000 },
+        fastStart: writable ? false : 'fragmented',
+        firstTimestampBehavior: 'offset',
+      });
+      venc = new VideoEncoder({ output: (c, m) => muxer.addVideoChunk(c, m), error: e => { console.error('venc', e); encErr = encErr || e; } });
+      venc.configure({ codec: RES.codec, width: RES.w, height: RES.h, bitrate: RES.bitrate, bitrateMode: 'variable', latencyMode: 'quality', framerate: fps });
+      aenc = new AudioEncoder({ output: (c, m) => muxer.addAudioChunk(c, m), error: e => { console.error('aenc', e); encErr = encErr || e; } });
+      aenc.configure({ codec: 'mp4a.40.2', numberOfChannels: 2, sampleRate: 48000, bitrate: 320000 });
+    } catch (e) {
+      console.error(e); alert('This browser can’t hardware-encode MP4 here. Try Chrome or Edge.');
+      cleanupMP4(wasMuted, wasVol); return;
+    }
+
+    // 3) audio is encoded *interleaved* with the video below, so audio + video
+    //    timestamps stay monotonic — that keeps fragmented streaming low-memory
+    //    (the muxer flushes each fragment to disk instead of buffering the whole track).
+    const sr = audioBuf.sampleRate, ch0 = audioBuf.getChannelData(0);
+    const ch1 = audioBuf.numberOfChannels > 1 ? audioBuf.getChannelData(1) : ch0;
+    let aOff = 0;                          // next audio sample index to encode
+    async function pumpAudioTo(sampleTarget) {
+      const limit = Math.min(sampleTarget, audioBuf.length);
+      while (aOff < limit) {
+        const len = Math.min(1024, limit - aOff);
+        const data = new Float32Array(len * 2);
+        data.set(ch0.subarray(aOff, aOff + len), 0);
+        data.set(ch1.subarray(aOff, aOff + len), len);
+        const ad = new AudioData({ format: 'f32-planar', sampleRate: sr, numberOfFrames: len, numberOfChannels: 2, timestamp: Math.round(aOff / sr * 1e6), data });
+        aenc.encode(ad); ad.close();
+        aOff += len;
+        if (aenc.encodeQueueSize > 40) await new Promise(r => setTimeout(r, 0));
+      }
+    }
+
+    // 4) render + encode every video frame deterministically.
+    //    Everything from here through the file write is wrapped so a wedged encoder,
+    //    a rejected flush, or an out-of-memory finalize can NEVER leave the HUD stuck
+    //    on "Finalizing…" — we always surface the error and run cleanup.
+    window.__offlineRendering = true; rebuild();
+    // render the FIELD natively at output resolution (crisp 4K, not upscaled):
+    // grow the field canvas and scale its context so renderScene draws in the
+    // same 1920×1080 logical space but fills every 4K pixel.
+    canvas.width = RES.w; canvas.height = RES.h;
+    ctx.setTransform(SX, 0, 0, SY, 0, 0);
+    fieldScaled = true;
+    note.textContent = 'Rendering video… (' + RES.label + ')';
+    try {
+      for (let i = 0; i < N; i++) {
+        if (cancelMP4) break;
+        if (encErr) throw encErr;
+        renderFrameAt(i / fps);
+        const vf = new VideoFrame(rc, { timestamp: Math.round(i * 1e6 / fps), duration: Math.round(1e6 / fps) });
+        venc.encode(vf, { keyFrame: i % (fps * 2) === 0 });
+        vf.close();
+        await pumpAudioTo(Math.round((i + 1) / fps * sr));   // interleave this frame's audio
+        if (venc.encodeQueueSize > 10) await new Promise(res => { const c = () => venc.encodeQueueSize <= 4 ? res() : setTimeout(c, 4); c(); });
+        if (i % 6 === 0) { const p = Math.round(i / N * 100); elEl.textContent = p + '%'; note.textContent = 'Rendering video… ' + p + '%'; if (i % 30 === 0) await new Promise(r => setTimeout(r, 0)); }
+      }
+
+      note.textContent = 'Finalizing the MP4…';
+      elEl.textContent = '100%';
+      if (!cancelMP4) { await pumpAudioTo(audioBuf.length); await aenc.flush(); }   // flush remaining audio
+      await new Promise(r => setTimeout(r, 50));
+      if (encErr) throw encErr;
+      // Backpressure keeps the queue tiny, so a real flush is near-instant. The watchdog
+      // only fires if a hardware encoder genuinely wedges — then we report instead of hang.
+      await withTimeout(venc.flush(), 120000, 'the video encoder stopped responding while finishing up');
+      if (encErr) throw encErr;
+      muxer.finalize();
+
+      // 5) write the file out
+      if (writable) {
+        note.textContent = 'Saving to disk…';
+        await new Promise(r => setTimeout(r, 30));
+        await withTimeout(writable.close(), 180000, 'saving the file to disk timed out');
+        note.textContent = cancelMP4 ? 'Cancelled.' : 'Done — saved to the folder you chose.';
+      } else if (!cancelMP4) {
+        note.textContent = 'Preparing download…';
+        await new Promise(r => setTimeout(r, 30));
+        const blob = new Blob(blobParts, { type: 'video/mp4' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a'); a.href = url; a.download = fname;
+        document.body.appendChild(a); a.click(); a.remove();
+        setTimeout(() => URL.revokeObjectURL(url), 60000);
+        note.textContent = 'Done — check your Downloads.';
+      } else {
+        note.textContent = 'Cancelled.';
+      }
+    } catch (e) {
+      console.error('render/finalize failed:', e);
+      if (writable) { try { await writable.close(); } catch (_) {} }
+      const memHint = !writable
+        ? '\n\nTip: open this page in its own browser tab (outside the embedded preview) so it can save straight to a folder you pick — that handles very long videos best.'
+        : '';
+      alert('The render couldn’t finish:\n\n' + ((e && e.message) ? e.message : e) + memHint);
+      note.textContent = 'Render failed — see the message.';
+    }
+    // restore the field canvas to its normal 1080p backing store + transform
+    if (fieldScaled) {
+      canvas.width = 1920; canvas.height = 1080;
+      ctx.setTransform(1, 0, 0, 1, 0, 0);
+      try { fit(); } catch (e) {}
+    }
+    cleanupMP4(wasMuted, wasVol);
+  }
+
+  // explainer modal
+  const modal = document.getElementById('exp-modal');
+  function openModal() {
+    const m = Math.max(1, Math.round(DURATION / 60));
+    const len = document.getElementById('exp-len'); if (len) len.textContent = m;
+    const sp = document.getElementById('exp-speed');
+    if (sp) sp.textContent = FAST
+      ? 'Renders in up to 4K for best YouTube quality. As fast as your computer allows — a 4K render takes longer and makes a large file, so use a save folder when asked.'
+      : 'Your browser can’t fast-render here — please use Chrome or Edge to export.';
+    const sv = document.getElementById('exp-save');
+    const canDisk = window.showSaveFilePicker && window.self === window.top;
+    if (sv) sv.innerHTML = canDisk
+      ? 'Pick a folder to save into; it streams straight to disk. <b>Keep this tab in front</b> while it works.'
+      : 'The finished file downloads automatically when it’s done — it streams together in chunks, so even long videos stay within memory. <b>Keep this tab in front</b> while it works.';;
+    modal.classList.add('on');
+  }
+  function closeModal() { modal.classList.remove('on'); }
+
+  btn.addEventListener('click', openModal);
+  document.getElementById('exp-cancel').addEventListener('click', closeModal);
+  document.getElementById('exp-start').addEventListener('click', () => {
+    closeModal();
+    if (FAST) renderMP4();
+    else alert('This browser can’t render the MP4 here. Please open this page in Chrome or Edge and try Export again.');
+  });
+  stopBtn.addEventListener('click', () => { if (renderingMP4) cancelMP4 = true; });
+
+  window.addEventListener('keydown', (e) => {
+    if (renderingMP4) { e.stopImmediatePropagation(); e.preventDefault(); }
+  }, true);
+})();
+</script>
+</body>
+</html>
