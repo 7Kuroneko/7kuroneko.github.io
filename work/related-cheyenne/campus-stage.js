@@ -164,15 +164,15 @@ class CampusStage extends HTMLElement {
     this.o.office = new THREE.Group(); bg.add(this.o.office);
     const off = this.box(4.0, 1.0, 4.5, this.m.office, 17.0, 0.15, 0.3); off.userData.id = 'office'; this.edges(off, T.line, 0.8); this.o.office.add(off);
     const dock = this.box(1.6, 0.9, 1.3, this.m.office, 15.6, 0.15, Z.pods); dock.userData.id = 'office'; this.edges(dock, T.line, 0.8); this.o.office.add(dock);
-    // POD electrical rooms (A–G series) along the south wall — prefabricated blocks, one per rack pod
+    // POD electrical rooms along the south wall — 25 per hall (POD-A11…J13 / A21…J23 per BMS & EPMS submittal)
     this.m.pod = this.mat(T.shell, { emissive: SYS.power, emissiveIntensity: 0, transparent: true, opacity: 1 });
     this.o.pods = new THREE.Group(); bg.add(this.o.pods);
-    HX.forEach(hx => { for (let i = 0; i < 13; i++) { const p = this.box(0.55, 1.0, 1.4, this.m.pod, hx - 5.4 + i * 0.9, 0.15, Z.pods); p.userData.id = 'electrical'; this.edges(p, SYS.power, 0.45); this.o.pods.add(p); } });
+    HX.forEach(hx => { for (let i = 0; i < 25; i++) { const p = this.box(0.36, 1.0, 1.4, this.m.pod, hx - 5.4 + i * 0.45, 0.15, Z.pods); p.userData.id = 'electrical'; this.edges(p, SYS.power, 0.45); this.o.pods.add(p); } });
     // Generator yard behind the POD rooms (one per POD as drawn; engine count per permit reporting, not modeled)
     this.m.gen = this.mat(T.shell, { emissive: SYS.power, emissiveIntensity: 0, transparent: true, opacity: 1 });
-    const genPlaces = []; HX.forEach(hx => { for (let i = 0; i < 13; i++) genPlaces.push([B.x + hx - 5.4 + i * 0.9, B.z + Z.gens]); });
-    this.o.gens = this.inst(new THREE.BoxGeometry(0.6, 1.0, 1.4), this.m.gen, genPlaces, 0.12 + 0.5); this.o.gens.userData.id = 'backup'; s.add(this.o.gens);
-    this.o.genStacks = this.inst(new THREE.CylinderGeometry(0.1, 0.1, 0.5, 8), this.m.gen, genPlaces.map(([x, z]) => [x, z - 0.45]), 0.12 + 1.0 + 0.25); s.add(this.o.genStacks);
+    const genPlaces = []; HX.forEach(hx => { for (let i = 0; i < 25; i++) genPlaces.push([B.x + hx - 5.4 + i * 0.45, B.z + Z.gens]); });
+    this.o.gens = this.inst(new THREE.BoxGeometry(0.36, 1.0, 1.4), this.m.gen, genPlaces, 0.12 + 0.5); this.o.gens.userData.id = 'backup'; s.add(this.o.gens);
+    this.o.genStacks = this.inst(new THREE.CylinderGeometry(0.07, 0.07, 0.5, 8), this.m.gen, genPlaces.map(([x, z]) => [x, z - 0.45]), 0.12 + 1.0 + 0.25); s.add(this.o.genStacks);
     this.o.genPad = this.box(28, 0.06, 2.0, this.mat(T.slab), B.x, 0.12, B.z + Z.gens); s.add(this.o.genPad); this.edges(this.o.genPad, SYS.power, 0.35);
     // Electrical Yard 001 (center-south) with symbolic transformers
     this.o.yard = new THREE.Group(); s.add(this.o.yard);
@@ -181,12 +181,12 @@ class CampusStage extends HTMLElement {
     // Buried service: utility interface → Electrical Yard 001
     const trench = [new THREE.Vector3(P.utility.x, 0.16, P.utility.z - 1.6), new THREE.Vector3(P.utility.x, 0.16, P.yard.z + 1.6)];
     this.o.trench = new THREE.Line(new THREE.BufferGeometry().setFromPoints(trench), new THREE.LineDashedMaterial({ color: SYS.power, dashSize: 0.6, gapSize: 0.4, transparent: true, opacity: 0.55 })); this.o.trench.computeLineDistances(); s.add(this.o.trench);
-    // ACCH air-cooled chillers — two rows in Mechanical Yard 002 (north)
+    // ACCH air-cooled chillers — 42 per hall (ACCH-01…42), two rows of 21 per hall, Mechanical Yard 002 (north)
     this.m.chiller = this.mat(T.shell, { transparent: true, opacity: 1 });
-    const chPlaces = []; for (let i = 0; i < 23; i++) chPlaces.push([B.x - 13.75 + i * 1.25, P.chillerA.z]); for (let i = 0; i < 22; i++) chPlaces.push([B.x - 13.125 + i * 1.25, P.chillerB.z]);
+    const chPlaces = []; [P.chillerA.z, P.chillerB.z].forEach(z => { for (let i = 0; i < 42; i++) chPlaces.push([B.x - 13.75 + i * (27.5 / 41), z]); });
     this.chPlaces = chPlaces;
-    this.o.chillers = this.inst(new THREE.BoxGeometry(0.9, 1.0, 0.9), this.m.chiller, chPlaces, 0.12 + 0.5); this.o.chillers.userData.id = 'chiller'; s.add(this.o.chillers);
-    this.o.fans = this.inst(new THREE.CylinderGeometry(0.32, 0.32, 0.1, 14), this.mat(T.line, { metalness: 0.2 }), chPlaces, 0.12 + 1.0 + 0.05); s.add(this.o.fans);
+    this.o.chillers = this.inst(new THREE.BoxGeometry(0.56, 1.0, 0.9), this.m.chiller, chPlaces, 0.12 + 0.5); this.o.chillers.userData.id = 'chiller'; s.add(this.o.chillers);
+    this.o.fans = this.inst(new THREE.CylinderGeometry(0.22, 0.22, 0.1, 14), this.mat(T.line, { metalness: 0.2 }), chPlaces, 0.12 + 1.0 + 0.05); s.add(this.o.fans);
     this.o.chillerPad = this.box(30, 0.08, 3.4, this.mat(T.slab), B.x, 0.12, (P.chillerA.z + P.chillerB.z) / 2); s.add(this.o.chillerPad); this.edges(this.o.chillerPad, 0x45D8FF, 0.5);
     // Chiller ↔ mechanical gallery pipe runs (one hot/cold pair per hall)
     this.o.pipes = [];
@@ -241,9 +241,9 @@ class CampusStage extends HTMLElement {
     L('future', new THREE.Vector3(20, 1.6, -14), 'Future Phase', 'conceptual · masterplan not public', null, s => s.layers.future && s.preset !== 'building' && s.preset !== 'thermal' && s.campusView !== 'zones');
     L('util', new THREE.Vector3(P.utility.x, 0.2, P.utility.z + 3.5), 'Utility Interface', 'Black Hills Energy service · symbolic', '#FF8A22', s => (s.section === 'power' || s.preset === 'utility' || s.campusView === 'zones') && s.milestone === null);
     L('yard', new THREE.Vector3(P.yard.x, 1.2, P.yard.z), 'Electrical Yard 001', 'center-south · per plan', '#FF8A22', s => s.section === 'power' && s.milestone === null);
-    L('pods', new THREE.Vector3(P.pods102.x, 1.4, P.pods102.z), 'POD Electrical Rooms', 'A–G series · 13 per hall · prefab blocks', '#FF8A22', s => (s.section === 'power' || s.explode > 0.5) && s.milestone === null);
-    L('gen', new THREE.Vector3(P.gens101.x, 0.2, P.gens101.z + 2.4), 'Generator Yard', 'backup-only · one per POD as drawn', '#FF8A22', s => (s.section === 'power' || s.campusView === 'zones') && s.milestone === null);
-    L('chill', new THREE.Vector3(B.x + 8, 0.2, P.chillerB.z - 2.2), 'Air-Cooled Chillers · ACCH', 'Mechanical Yard 002 · two rows · ≈45 as numbered', '#45D8FF', s => ((s.section === 'thermal' || s.section === 'liquid') || s.preset === 'thermal' || s.campusView === 'zones') && s.milestone === null);
+    L('pods', new THREE.Vector3(P.pods102.x, 1.4, P.pods102.z), 'POD Electrical Rooms', '25 per hall · 50 total · prefab blocks', '#FF8A22', s => (s.section === 'power' || s.explode > 0.5) && s.milestone === null);
+    L('gen', new THREE.Vector3(P.gens101.x, 0.2, P.gens101.z + 2.4), 'Generator Yard', 'backup-only · one per POD · 50 + house gen', '#FF8A22', s => (s.section === 'power' || s.campusView === 'zones') && s.milestone === null);
+    L('chill', new THREE.Vector3(B.x + 8, 0.2, P.chillerB.z - 2.2), 'Air-Cooled Chillers · ACCH', 'Mechanical Yard 002 · 42 per hall · 84 total', '#45D8FF', s => ((s.section === 'thermal' || s.section === 'liquid') || s.preset === 'thermal' || s.campusView === 'zones') && s.milestone === null);
     L('capture', new THREE.Vector3(P.mech102.x - 3, 1.5, P.mech102.z), 'CDU · Heat Exchanger', 'Mechanical Gallery 182 · reported', '#45D8FF', s => (s.section === 'thermal' || s.section === 'liquid') && inside(s) && s.layers.liquid);
     L('mech', new THREE.Vector3(P.mech101.x, 1.4, P.mech101.z), 'Mechanical Gallery 142 · 182', 'fan walls + CDUs · north side', '#45D8FF', s => (s.explode > 0.5 || s.section === 'liquid') && inside(s));
     L('hac', new THREE.Vector3(P.hall101.x + 3, 1.9, P.hall101.z + 0.6), 'HAC · Hot Air Containment', 'rack chimneys exhaust here', '#FF6747', s => s.section === 'liquid' && inside(s));
@@ -430,7 +430,7 @@ class CampusStage extends HTMLElement {
     const hud = this.parentElement && this.parentElement.querySelector('[data-hud]');
     const placed = [];
     if (hud) { const r = hud.getBoundingClientRect(), me = this.getBoundingClientRect(); placed.push({ x: r.left - me.left, y: r.top - me.top, w: r.width, h: r.height }); } else placed.push({ x: 0, y: 0, w: Math.min(w, 340), h: 70 });
-    const vis = [];
+    const vis = []; const narrowW = w < 700; let shown = 0;
     const zoneIds = ['hall101', 'hall102', 'elec', 'mech', 'core', 'capture', 'liquid', 'hac', 'idf', 'poeE', 'poeW'];
     this.labels.forEach(l => {
       const show = l.show(s);
@@ -448,6 +448,8 @@ class CampusStage extends HTMLElement {
       const cands = [[ax - lw / 2, ay - lh - 10], [ax + 14, ay - lh / 2], [ax - lw - 14, ay - lh / 2], [ax - lw / 2, ay + 12], [ax + 14, ay - lh - 24], [ax - lw - 14, ay - lh - 24], [ax + 14, ay + 12], [ax - lw - 14, ay + 12], [ax - lw / 2, ay - lh - 60], [ax - lw / 2, ay + 60]];
       let box = null;
       for (const [cx, cy] of cands) { const x0 = Math.max(4, Math.min(w - lw - 4, cx)), y0 = Math.max(4, Math.min(h - lh - 4, cy)); if (!overlaps(x0, y0, lw, lh)) { box = [x0, y0]; break; } }
+      if (narrowW && (!box || shown >= 3)) { it.l.el.style.opacity = 0; it.l.line.setAttribute('opacity', '0'); return; }
+      shown++;
       if (!box) { const [cx, cy] = cands[0]; box = [Math.max(4, Math.min(w - lw - 4, cx)), Math.max(4, Math.min(h - lh - 4, cy))]; }
       placed.push({ x: box[0], y: box[1], w: lw, h: lh });
       it.l.el.style.opacity = 1;

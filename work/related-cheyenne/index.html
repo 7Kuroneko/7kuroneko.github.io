@@ -108,10 +108,10 @@
       <span style="font:500 12px/1.2 'IBM Plex Sans',sans-serif;letter-spacing:.12em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0"><sc-if value="{{ notMobile }}" hint-placeholder-val="{{ true }}">Related Digital Cheyenne Campus</sc-if><sc-if value="{{ isMobile }}" hint-placeholder-val="{{ false }}">Related Digital · Cheyenne</sc-if></span>
       <sc-if value="{{ notMobile }}" hint-placeholder-val="{{ true }}"><span style="font:400 10px/1 'IBM Plex Sans',sans-serif;letter-spacing:.1em;padding:5px 8px;border:1px solid rgba(16,18,20,0.25);color:#5B6470;white-space:nowrap;flex:none">Under Construction</span></sc-if>
     </div>
-    <div role="group" aria-label="Experience mode" style="display:flex;border:1px solid rgba(16,18,20,0.2);padding:2px;gap:2px">
+    <sc-if value="{{ notMobile }}" hint-placeholder-val="{{ true }}"><div role="group" aria-label="Experience mode" style="display:flex;border:1px solid rgba(16,18,20,0.2);padding:2px;gap:2px">
       <button aria-pressed="true" style="font:500 11px/1 'IBM Plex Sans',sans-serif;letter-spacing:.1em;padding:8px 14px;border:0;background:#101214;color:#F4F6F8">Story</button>
       <button aria-pressed="false" onClick="{{ setExplore }}" style="font:500 11px/1 'IBM Plex Sans',sans-serif;letter-spacing:.1em;padding:8px 14px;border:0;background:transparent;color:#5B6470" style-hover="color:#101214">Explore</button>
-    </div>
+    </div></sc-if>
     <button onClick="{{ openSources }}" style="font:500 11px/1 'IBM Plex Sans',sans-serif;letter-spacing:.1em;padding:9px 14px;border:1px solid rgba(16,18,20,0.2);background:transparent;color:#101214" style-hover="background:#101214;color:#F4F6F8">Sources</button>
     <sc-if value="{{ notMobile }}" hint-placeholder-val="{{ true }}"><span style="font:400 10px/1 'IBM Plex Sans',sans-serif;letter-spacing:.1em;padding:6px 9px;border:1px solid #30D187;color:#101214;display:flex;align-items:center;gap:6px;white-space:nowrap"><span style="width:6px;height:6px;border-radius:50%;background:#30D187"></span>Public Information Model</span></sc-if>
   </header>
@@ -124,7 +124,7 @@
       </sc-for>
     </nav>
   </sc-if>
-  <div data-scroller onScroll="{{ onStoryScroll }}" style="flex:1;min-height:0;overflow:auto;display:flex;align-items:flex-start">
+  <div data-scroller onScroll="{{ onStoryScroll }}" style="flex:1;min-height:0;overflow:auto;display:flex;align-items:flex-start;padding-bottom:{{ scrollPadB }}">
     <nav aria-label="Sections" style="position:sticky;top:0;width:188px;flex:none;padding:28px 12px 28px 12px;display:{{ railDisplay }};flex-direction:column;gap:2px">
       <sc-for list="{{ nav }}" as="n" hint-placeholder-count="10">
         <button onClick="{{ n.go }}" style="display:flex;align-items:center;gap:10px;padding:8px 10px;border:0;background:transparent;text-align:left;color:{{ n.colorL }};font:{{ n.weight }} 13px/1 'IBM Plex Sans',sans-serif" style-hover="color:#101214">
@@ -253,7 +253,7 @@
           <div style="display:flex;align-items:center;gap:12px;font:400 11px/1 'IBM Plex Sans',sans-serif;letter-spacing:.12em;color:#5B6470"><span>11</span><span style="width:24px;height:1px;background:rgba(16,18,20,0.3)"></span><span>Sources</span></div>
           <h2 style="margin:0;font:500 clamp(30px,3.4vw,46px)/1.05 'IBM Plex Sans',sans-serif;letter-spacing:-.02em">Every Number Has a Source</h2>
           <span style="font:400 11px/1 'IBM Plex Sans',sans-serif;letter-spacing:.1em;color:#5B6470">REGISTRY LAST CHECKED AGAINST PUBLIC SOURCES · {{ verified }}</span>
-          <p style="margin:0;font:400 15px/1.6 'IBM Plex Sans',sans-serif;color:#2A3038;max-width:58ch">Each figure in this atlas resolves to one public statement, or to the Level 1 conveyance plan (T02-01) for room-level layout, with its exact wording, date, and display caveat. Nothing here is live, measured, or inferred from operations.</p>
+          <p style="margin:0;font:400 15px/1.6 'IBM Plex Sans',sans-serif;color:#2A3038;max-width:58ch">Each figure in this atlas resolves to one public statement, to the Level 1 conveyance plan (T02-01) for room-level layout, or to the BMS & EPMS submittal for equipment counts, with its exact wording, date, and display caveat. Nothing here is live, measured, or inferred from operations.</p>
           <div style="display:flex;flex-direction:column;border-top:1px solid rgba(16,18,20,0.2);width:100%;max-width:640px;text-align:left">
             <sc-for list="{{ sourcesList }}" as="src" hint-placeholder-count="5">
               <a href="{{ src.url }}" target="_blank" rel="noopener" style="display:grid;grid-template-columns:minmax(0,1fr) auto;gap:16px;padding:14px 0;border-bottom:1px solid rgba(16,18,20,0.12);color:#101214;font:500 14px/1.3 'IBM Plex Sans',sans-serif" style-hover="color:#0E7C9B">
@@ -265,6 +265,7 @@
         </section>
       </div>
 
+      <sc-if value="{{ notMobile }}" hint-placeholder-val="{{ true }}">
       <div style="position:sticky;top:0;height:{{ stageHeight }};min-width:0;order:{{ stageOrder }};border-left:1px solid rgba(16,18,20,0.12);background:rgba(242,243,241,0.6);display:flex;flex-direction:column">
         <div style="position:relative;flex:1;min-height:0">
           <x-import component-from-global-scope="campus-stage" theme="light" hint-size="100%,100%" style="position:absolute;inset:0"></x-import>
@@ -285,6 +286,39 @@
           </sc-for>
         </div>
       </div>
+      </sc-if>
+    </div>
+  </div>
+</div>
+</sc-if>
+
+<sc-if value="{{ showFab }}" hint-placeholder-val="{{ false }}">
+  <button onClick="{{ open3d }}" style="position:fixed;left:50%;bottom:calc(16px + env(safe-area-inset-bottom));transform:translateX(-50%);z-index:15;display:flex;align-items:center;gap:12px;min-height:52px;padding:0 20px;border:1px solid #101214;background:#101214;color:#F4F6F8;font:500 13px/1 'IBM Plex Sans',sans-serif;letter-spacing:.06em;white-space:nowrap;box-shadow:0 10px 30px rgba(16,18,20,0.25)" style-active="background:#2A3038"><span style="width:8px;height:8px;background:{{ curSys }}"></span><span style="font:600 12px/1 'Chakra Petch',sans-serif;letter-spacing:.14em;color:#9CA6B2">{{ cur.num }}</span><span>View In 3D</span><span aria-hidden="true">↗</span></button>
+</sc-if>
+
+<sc-if value="{{ m3dOn }}" hint-placeholder-val="{{ false }}">
+<div role="dialog" aria-modal="true" aria-label="3D model" style="position:fixed;inset:0;z-index:30;display:flex;flex-direction:column;background:#F2F3F1;color:#101214;animation:fadeUp .2s ease-out">
+  <div style="flex:none;display:flex;align-items:center;gap:12px;padding:calc(10px + env(safe-area-inset-top)) 14px 10px;border-bottom:1px solid rgba(16,18,20,0.12);background:#F2F3F1">
+    <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:5px">
+      <span style="display:flex;align-items:center;gap:8px;font:600 11px/1 'Chakra Petch',sans-serif;letter-spacing:.14em;color:#5B6470"><span style="width:6px;height:6px;background:{{ curSys }}"></span>{{ cur.num }} · {{ cur.label }}</span>
+      <span style="font:500 16px/1.2 'IBM Plex Sans',sans-serif;letter-spacing:-.01em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ cur.title }}</span>
+    </div>
+    <button onClick="{{ close3d }}" aria-label="Close 3D view" style="flex:none;width:44px;height:44px;border:1px solid #101214;background:#101214;color:#F4F6F8;font:400 20px/1 'IBM Plex Sans',sans-serif">×</button>
+  </div>
+  <div style="flex:1;min-height:0;position:relative">
+    <x-import component-from-global-scope="campus-stage" theme="light" hint-size="100%,100%" style="position:absolute;inset:0"></x-import>
+    <div data-hud style="position:absolute;left:12px;top:10px;pointer-events:none;font:400 10px/1 'IBM Plex Sans',sans-serif;letter-spacing:.08em;color:#5B6470">{{ stageCaption }}</div>
+  </div>
+  <div style="flex:none;display:flex;flex-direction:column;gap:8px;padding:10px 12px calc(12px + env(safe-area-inset-bottom));border-top:1px solid rgba(16,18,20,0.12);background:#FFFFFF">
+    <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px">
+      <button onClick="{{ toggleRoof }}" style="min-height:44px;border:1px solid rgba(16,18,20,0.25);background:#FFFFFF;color:#101214;font:500 12px/1 'IBM Plex Sans',sans-serif;letter-spacing:.06em">{{ roofLabel }}</button>
+      <button onClick="{{ toggleExplode }}" style="min-height:44px;border:1px solid rgba(16,18,20,0.25);background:#FFFFFF;color:#101214;font:500 12px/1 'IBM Plex Sans',sans-serif;letter-spacing:.06em">{{ explodeLabel }}</button>
+      <button onClick="{{ resetCamera }}" style="min-height:44px;border:1px solid rgba(16,18,20,0.25);background:#FFFFFF;color:#101214;font:500 12px/1 'IBM Plex Sans',sans-serif;letter-spacing:.06em">Reset View</button>
+    </div>
+    <div style="display:grid;grid-template-columns:52px minmax(0,1fr) 52px;gap:6px">
+      <button onClick="{{ prevSec }}" aria-label="Previous chapter" style="min-height:48px;border:1px solid #101214;background:#FFFFFF;color:#101214;font:500 16px/1 'IBM Plex Sans',sans-serif">←</button>
+      <button onClick="{{ close3d }}" style="min-height:48px;border:1px solid #101214;background:#101214;color:#F4F6F8;font:500 12px/1 'IBM Plex Sans',sans-serif;letter-spacing:.08em">Back To Story</button>
+      <button onClick="{{ nextSec }}" aria-label="Next chapter" style="min-height:48px;border:1px solid #101214;background:#FFFFFF;color:#101214;font:500 16px/1 'IBM Plex Sans',sans-serif">→</button>
     </div>
   </div>
 </div>
@@ -551,7 +585,7 @@ const STATUS = {
   conceptual: { label: 'Conceptual', color: '#7A8797', desc: 'Educational visualization, not project engineering' },
   target: { label: 'Target', color: '#F6B73C', desc: 'Published target date, not a completed milestone' },
   generalized: { label: 'Generalized', color: '#7A8797', desc: 'Symbolic placement, not a surveyed location' },
-  drawing: { label: 'Drawing', color: '#CDD4E6', desc: 'Room-level layout read from the Level 1 conveyance plan (T02-01); equipment and device positions omitted' },
+  drawing: { label: 'Drawing', color: '#CDD4E6', desc: 'Read from project drawings: room layout from the Level 1 conveyance plan (T02-01), equipment counts from the BMS & EPMS submittal (Rev 0); device positions and network routes omitted' },
 };
 const SYS = { compute: '#7765FF', cooling: '#45D8FF', heat: '#FF6747', power: '#FF8A22', construction: '#F6B73C', neutral: '#7A8797' };
 const SECTIONS = [
@@ -569,7 +603,7 @@ const SECTIONS = [
     ctrl: { preset: 'campus', roof: true, explode: 0, opacity: 1 }, caption: 'Campus · Phase I Highlighted' },
   { id: 'phase-one', num: '03', label: 'Phase I Building', sys: '#F4F6F8', title: 'What is inside the first building', question: 'What Are The Main Areas?',
     lede: 'A 184,000-square-foot building delivering 88 MW of critical IT capacity. The Level 1 plan (CYS01, sheet T02-01) shows two data halls end to end — Data Hall 102 (room 180) west and Data Hall 101 (room 140) east — with a shared core between them holding the NOC, EPMS/BMS, and conference rooms. Each hall is flanked by an electrical gallery on the south and a mechanical gallery on the north; Corridor 110 runs the full length with five IDF rooms. The exploded view separates roof, shell, halls, galleries, POD rooms, and the office block.',
-    factIds: ['data-halls', 'plan-pods', 'plan-galleries', 'plan-core', 'plan-idf', 'plan-office', 'investment', 'fire', 'fire-pods'],
+    factIds: ['data-halls', 'plan-pods', 'plan-galleries', 'plan-core', 'bms-epms', 'plan-idf', 'plan-office', 'admin-hvac', 'investment', 'fire', 'fire-pods'],
     steps: [['Roof', 'generalized', SYS.neutral], ['Shell · plan grids 1–33', 'generalized', SYS.neutral], ['Data Hall 102 (rm 180) · Data Hall 101 (rm 140)', 'drawing', SYS.compute], ['Electrical Gallery 141 · 181 · south (05)', 'drawing', SYS.power], ['Mechanical Gallery 142 · 182 · north (06)', 'drawing', SYS.cooling], ['Central core · NOC 163 · EPMS/BMS 155', 'drawing', SYS.neutral], ['Corridor 110 · IDF ×5 · POE ×2', 'drawing', SYS.compute], ['POD electrical rooms · generator yard', 'drawing', SYS.power], ['ACCH chiller rows · Mechanical Yard 002 (07)', 'drawing', SYS.heat], ['Office block · east end', 'drawing', SYS.neutral]],
     notice: 'Room outlines and names follow the Level 1 conveyance plan. Cable IDs, pathways, wireless access-point positions, and equipment inside rooms shown on that sheet are deliberately left out. Rack pods are outlines only.',
     ctrl: { preset: 'building', roof: true, explode: 1, opacity: 1 }, caption: 'Phase I Building · Exploded · Level 1 Plan' },
@@ -580,22 +614,22 @@ const SECTIONS = [
     notice: 'Room positions only. No hardware model, accelerator count, server vendor, rack count, rack power, cable route, or access-point position is shown.',
     ctrl: { preset: 'building', roof: false, explode: 0, opacity: 0.35 }, caption: 'Data Halls 101 · 102 · Level 1 Plan' },
   { id: 'power', num: '05', label: 'Power', sys: SYS.power, title: 'Grid power from Black Hills Energy', question: 'Where Does The Power Come From?',
-    lede: 'Normal facility power is supplied from the grid by Black Hills Energy. Related Digital says it is not using behind-the-meter generation for normal supply. On the Level 1 plan, Electrical Yard 001 sits at the center of the south side; a run of POD electrical rooms (A–G series, 13 per hall) lines the south wall with a generator behind each, feeding Electrical Gallery 141 and 181 and then the halls.',
-    factIds: ['utility', 'normal-power', 'plan-electrical', 'plan-generators', 'power-path-reported', 'prefab-electrical', 'battery', 'substation-investment', 'tariff', 'backup', 'gen-permit'],
-    steps: [['Regional grid', 'confirmed', SYS.power], ['Black Hills Energy service', 'confirmed', SYS.power], ['Project utility interface', 'generalized', SYS.power], ['Buried service → Electrical Yard 001', 'drawing', SYS.power], ['POD electrical rooms · A–G series · prefab blocks', 'drawing', SYS.power], ['Generator yard · backup branch', 'drawing', SYS.power], ['Electrical Gallery 141 · 181', 'drawing', SYS.power], ['Data halls', 'drawing', SYS.compute]],
+    lede: 'Normal facility power is supplied from the grid by Black Hills Energy. Related Digital says it is not using behind-the-meter generation for normal supply. On the Level 1 plan, Electrical Yard 001 sits at the center of the south side; 50 POD electrical rooms (25 per hall) line the south wall, each with its own transformer and generator, feeding Electrical Gallery 141 and 181 and then the halls. Three medium-voltage switchgear lineups and a house generator and transformer serve the building itself.',
+    factIds: ['utility', 'normal-power', 'plan-electrical', 'plan-generators', 'calc-engines', 'mv-switchgear', 'power-path-reported', 'prefab-electrical', 'battery', 'substation-investment', 'tariff', 'backup', 'gen-permit'],
+    steps: [['Regional grid', 'confirmed', SYS.power], ['Black Hills Energy service', 'confirmed', SYS.power], ['Project utility interface', 'generalized', SYS.power], ['Buried service → Electrical Yard 001', 'drawing', SYS.power], ['50 POD electrical rooms · prefab blocks', 'drawing', SYS.power], ['Generator yard · 1 per POD · backup branch', 'drawing', SYS.power], ['Electrical Gallery 141 · 181', 'drawing', SYS.power], ['Data halls', 'drawing', SYS.compute]],
     notice: 'Voltage, feeder count, substation arrangement, transformer ratings, switchgear, battery chemistry and quantity, transfer behavior, and redundancy level are not public and are not depicted. Rooms are outlines from the plan; what sits inside them is not modeled.',
     ctrl: { preset: 'utility', roof: false, explode: 0, opacity: 0.3 }, caption: 'Power · Yard 001 → POD Rooms → Galleries' },
   { id: 'liquid', num: '06', label: 'Liquid Cooling', sys: SYS.cooling, title: 'Liquid cooling inside the data halls', question: 'How Are The Servers Cooled?',
-    lede: 'Inside the halls, a closed-loop liquid system cools the chips directly and carries the heat to a heat exchanger (reported, June 2026 site tour). The exchangers sit in Mechanical Gallery 142 and 182 on the north side of each hall. Rack chimneys send the remaining hot air into a hot air containment (HAC) enclosure, and fan walls keep the halls at a reported 73°F.',
-    factIds: ['cooling-d2c', 'loop', 'plan-galleries', 'rack-chimneys', 'hac', 'setpoint', 'makeup-water'],
+    lede: 'Inside the halls, a closed-loop liquid system cools the chips directly and carries the heat to a heat exchanger (reported, June 2026 site tour). The exchangers sit in Mechanical Gallery 142 and 182 on the north side of each hall. Rack chimneys send the remaining hot air into a hot air containment (HAC) enclosure, and fan walls plus 14 CRAH units per hall keep the halls at a reported 73°F.',
+    factIds: ['cooling-d2c', 'loop', 'plan-galleries', 'crah', 'fanwall-tags', 'humidifiers', 'rack-chimneys', 'hac', 'setpoint', 'makeup-water'],
     steps: [['Compute heat at the chip', 'conceptual', SYS.compute], ['Direct-to-chip cold plate · in-rack loop', 'reported', SYS.cooling], ['Hall manifolds · supply and return', 'conceptual', SYS.cooling], ['CDU / heat exchanger · Mechanical Gallery 142 · 182', 'reported', SYS.cooling], ['Rack chimneys · remaining hot air', 'reported', SYS.heat], ['Hot air containment (HAC) to fan walls', 'conceptual', SYS.heat], ['Hot liquid north to the ACCH rows (07)', 'drawing', SYS.cooling]],
     notice: 'Direct-to-chip liquid cooling is press-reported, not developer-published. Loop temperatures, flow rates, CDU count and arrangement, and rack-level design are not public. Manifolds and fan walls are educational geometry.',
     ctrl: { preset: 'building', roof: false, explode: 0, opacity: 0.3, layers: { compute: true, power: false, thermal: true, liquid: true, future: true } }, caption: 'Liquid Cooling · Halls To Mechanical Galleries' },
   { id: 'thermal', num: '07', label: 'Chillers', sys: SYS.cooling, title: 'Air-cooled chillers outside the building', question: 'Where Does The Heat Go?',
-    lede: 'The heat collected inside the halls is released to the outdoor air by air-cooled chillers with magnetic-bearing compressors. The Level 1 plan places them in two rows along the north side of the building in Mechanical Yard 002, numbered ACCH-01 through about ACCH-45. Because the loop is sealed, it needs essentially no added water.',
-    factIds: ['cooling', 'plan-chillers', 'compressors', 'water'],
-    steps: [['Hot liquid from the heat exchanger', 'reported', SYS.heat], ['Closed loop north through the mechanical gallery', 'drawing', SYS.cooling], ['ACCH air-cooled chillers · two rows · Mechanical Yard 002', 'drawing', SYS.cooling], ['Heat released to outdoor air', 'conceptual', SYS.heat], ['Cooled liquid returns to the halls', 'conceptual', SYS.cooling]],
-    notice: 'Chiller count is inferred from unit numbering on the plan. Tonnage, refrigerant, and loop temperatures are not public. No evaporative equipment is shown.',
+    lede: 'The heat collected inside the halls is released to the outdoor air by air-cooled chillers with magnetic-bearing compressors. They stand in two rows along the north side of the building in Mechanical Yard 002: 84 units, ACCH-01 through ACCH-42 for each hall. A heat-trace loop protects the outdoor piping from freezing. Because the loop is sealed, it needs essentially no added water.',
+    factIds: ['cooling', 'plan-chillers', 'heat-trace', 'compressors', 'water'],
+    steps: [['Hot liquid from the heat exchanger', 'reported', SYS.heat], ['Closed loop north through the mechanical gallery', 'drawing', SYS.cooling], ['84 ACCH air-cooled chillers · two rows · Mechanical Yard 002', 'drawing', SYS.cooling], ['Heat released to outdoor air', 'conceptual', SYS.heat], ['Cooled liquid returns to the halls', 'conceptual', SYS.cooling]],
+    notice: 'Chiller count is taken from unit tags in the BMS & EPMS submittal. Tonnage, refrigerant, and loop temperatures are not public. No evaporative equipment is shown.',
     ctrl: { preset: 'thermal', roof: false, explode: 0, opacity: 0.3 }, caption: 'ACCH Chillers · Mechanical Yard 002' },
   { id: 'construction', num: '08', label: 'Construction', sys: SYS.construction, title: 'Construction progress', question: 'How Far Along Is It?',
     lede: 'Groundbreaking was October 2025. An April 2026 update reported walls complete, roofing underway, Data Hall 1 weather-tight, generators and chillers being set, and the first utility transformer approaching energization. A June 2026 site tour described the first phase as nearing completion. Target completion is late 2026.',
@@ -622,13 +656,13 @@ class Component extends DCLogic {
   state = { mode: 'story', section: 'overview', ctrl: Object.assign({}, DEF_CTRL, SECTIONS[0].ctrl), drawer: false, factId: null, narrow: false, facts: [], sources: {}, milestones: [], verified: '', tour: false };
   componentDidMount() {
     this._splashT0 = Date.now();
-    const poll = () => { const el = document.querySelector('campus-stage'); if (el && el.renderer) { if (!window.__knReadyFired) { window.__knReadyFired = true; window.dispatchEvent(new Event('kn-ready')); } const wait = Math.max(0, 2600 - (Date.now() - this._splashT0)); setTimeout(() => { this.setState({ splashFade: true }); setTimeout(() => this.setState({ splashDone: true }), 650); }, wait); } else this._splashPoll = setTimeout(poll, 100); };
+    const poll = () => { const el = document.querySelector('campus-stage'); if ((el && el.renderer) || (!el && innerWidth < 900)) { if (!window.__knReadyFired) { window.__knReadyFired = true; window.dispatchEvent(new Event('kn-ready')); } const wait = Math.max(0, 2600 - (Date.now() - this._splashT0)); setTimeout(() => { this.setState({ splashFade: true }); setTimeout(() => this.setState({ splashDone: true }), 650); }, wait); } else this._splashPoll = setTimeout(poll, 100); };
     poll(); setTimeout(() => { if (!this.state.splashFade) { this.setState({ splashFade: true }); setTimeout(() => this.setState({ splashDone: true }), 650); } }, 6000);
     const h = (location.hash || '').replace('#', '').split('/');
     if (h[0] === 'explore' || h[0] === 'story') { const sec = SECTIONS.find(x => x.id === h[1]) || SECTIONS[0]; this.setState({ mode: h[0], section: sec.id, ctrl: Object.assign({}, DEF_CTRL, sec.ctrl) }); }
     const loadFacts = () => { const m = window.PROJECT_FACTS; if (m) this.setState({ facts: m.FACTS, sources: m.SOURCES, milestones: m.MILESTONES, verified: m.VERIFIED }); else this._factsPoll = setTimeout(loadFacts, 80); };
     loadFacts();
-    this._onKey = e => { if (e.key === 'Escape' && this.state.drawer) this.setState({ drawer: false }); };
+    this._onKey = e => { if (e.key === 'Escape' && this.state.drawer) this.setState({ drawer: false }); else if (e.key === 'Escape' && this.state.m3d) this.setState({ m3d: false }); };
     this._onResize = () => { const n = innerWidth < 1100, m = innerWidth < 900, sc = document.querySelector('[data-scroller]'), sh = sc ? sc.clientHeight : 0; if (n !== this.state.narrow || m !== this.state.mobile || sh !== this.state.scH) this.setState({ narrow: n, mobile: m, scH: sh }); };
     this._onReady = () => this.syncStage();
     this._onSelect = e => this.onSelect(e.detail.id);
@@ -647,6 +681,7 @@ class Component extends DCLogic {
     if (ps && (ps.section !== this.state.section || ps.mode !== this.state.mode || ps.narrow !== this.state.narrow)) requestAnimationFrame(() => document.querySelectorAll('nav [data-active="1"]').forEach(b => { const nv = b.closest('nav'), br = b.getBoundingClientRect(), nr = nv.getBoundingClientRect(); nv.scrollTo({ left: nv.scrollLeft + br.left - nr.left - (nv.clientWidth - br.width) / 2, behavior: 'auto' }); })); const h = `#${this.state.mode}/${this.state.section}`; if (location.hash !== h) try { history.replaceState(null, '', h); } catch (e) {} }
   syncStage() {
     const el = document.querySelector('campus-stage');
+    if (!el && this.state.mobile && !this.state.m3d) return;
     if (!el || !el.update || !el.renderer) { clearTimeout(this._retry); this._retry = setTimeout(() => this.syncStage(), 120); return; }
     const s0 = this.state, pp = s0.section === 'anatomy' ? this.curPart() : null;
     const s = pp ? Object.assign({}, s0, { section: pp.sec }) : s0, c = pp ? Object.assign({}, DEF_CTRL, { layers: s0.ctrl.layers }, (SECTIONS.find(x => x.id === pp.sec) || {}).ctrl, pp.extra || {}) : s0.ctrl;
@@ -699,7 +734,8 @@ class Component extends DCLogic {
   }
   renderVals() {
     const s = this.state, c = s.ctrl, sec = SECTIONS.find(x => x.id === s.section) || SECTIONS[0];
-    const isStory = s.mode === 'story', narrow = s.narrow, mobile = s.mobile;
+    const narrow = s.narrow, mobile = s.mobile, isStory = s.mode === 'story' || mobile;
+    const order = SECTIONS.filter(x => x.id !== 'sources' && x.id !== 'anatomy').map(x => x.id), oi = Math.max(0, order.indexOf(s.section));
     const btn = (active, color) => ({ active, border: active ? (color || '#F4F6F8') : 'rgba(255,255,255,0.15)', bg: active ? (color || '#F4F6F8') : 'transparent', color: active ? '#101214' : '#D5DAE0' });
     const nav = SECTIONS.map(n => { const a = n.id === s.section; return { id: n.id, num: n.num, label: TC(n.label), active: a, weight: a ? 600 : 400, colorL: a ? '#101214' : '#5B6470', colorD: a ? '#F4F6F8' : '#9CA6B2', dot: a ? 1 : 0, activeStr: a ? '1' : '0', tabBorder: a ? '#45D8FF' : 'transparent', sysColor: n.sys === '#F4F6F8' ? '#45D8FF' : n.sys, go: () => this.goSection(n.id) }; });
     const stories = SECTIONS.filter(x => x.id !== 'sources').map(x => this.section(x));
@@ -712,7 +748,7 @@ class Component extends DCLogic {
     const layers = [['compute', 'Compute', SYS.compute], ['power', 'Power', SYS.power], ['thermal', 'Thermal Loop', SYS.cooling], ['liquid', 'Liquid Cooling', SYS.cooling], ['future', 'Future Pads', SYS.neutral]].map(([id, label, color]) => ({ id, label, color, on: !!c.layers[id], fill: c.layers[id] ? color : 'transparent', textColor: c.layers[id] ? '#F4F6F8' : '#7A8797', go: () => this.setCtrl({ layers: Object.assign({}, c.layers, { [id]: !c.layers[id] }) }) }));
     const campusViews = [['current', 'Current Phase'], ['future', 'Future Concept'], ['zones', 'Functional Zones']].map(([id, label]) => Object.assign({ id, label, go: () => this.setCtrl({ campusView: id }) }, btn(c.campusView === id, '#45D8FF')));
     const outage = c.scenario === 'outage', gn = btn(!outage, SYS.power), og = btn(outage, SYS.power);
-    const legendBy = { compute: [['Fiber handoff · property line · symbolic', SYS.compute], ['POE · IDF · Corridor 110 · from plan', SYS.compute], ['Heat output', SYS.heat]], power: [['Normal grid path → Electrical Yard 001', SYS.power], ['POD rooms · generator yard · from plan', SYS.power], ['Emergency branch · backup-only', SYS.power]], liquid: [['Cold plate supply · conceptual', SYS.cooling], ['Hot return · conceptual', SYS.heat], ['CDU · Mechanical Gallery 142/182', '#1E8FAE'], ['HAC hood · conceptual', SYS.heat], ['Fan walls · conceptual', SYS.neutral]], thermal: [['Hot liquid to the ACCH rows', SYS.heat], ['Cooled liquid return', SYS.cooling], ['ACCH chillers · Mechanical Yard 002', SYS.cooling]], construction: [['Current milestone element', SYS.construction], ['Conceptual future stage', SYS.neutral]] };
+    const legendBy = { compute: [['Fiber handoff · property line · symbolic', SYS.compute], ['POE · IDF · Corridor 110 · from plan', SYS.compute], ['Heat output', SYS.heat]], power: [['Normal grid path → Electrical Yard 001', SYS.power], ['POD rooms · generator yard · from plan', SYS.power], ['Emergency branch · backup-only', SYS.power]], liquid: [['Cold plate supply · conceptual', SYS.cooling], ['Hot return · conceptual', SYS.heat], ['CDU · Mechanical Gallery 142/182', '#1E8FAE'], ['HAC hood · conceptual', SYS.heat], ['Fan walls · conceptual', SYS.neutral]], thermal: [['Hot liquid to the ACCH rows', SYS.heat], ['Cooled liquid return', SYS.cooling], ['84 ACCH chillers · Mechanical Yard 002', SYS.cooling]], construction: [['Current milestone element', SYS.construction], ['Conceptual future stage', SYS.neutral]] };
     const legend = (legendBy[s.section] || [['Phase I area', SYS.cooling], ['Future phases · conceptual', SYS.neutral]]).map(([label, color]) => ({ label: TC(label), color }));
     const drawerFact = s.factId ? this.fact(s.factId) : null;
     const sourcesList = Object.values(s.sources);
@@ -730,7 +766,10 @@ class Component extends DCLogic {
       ctrlH: mobile ? '40px' : '32px', exMainFlex: mobile ? '0 0 auto' : '1 1 0', exStageFlex: mobile ? '0 0 min(46svh, 520px)' : '1 1 0', asideFlex: mobile ? '1 1 0' : 'none', asidePad: mobile ? '20px 18px calc(32px + env(safe-area-inset-bottom))' : '24px 22px 32px', hudX: mobile ? '14px' : '20px',
       stageCaption: TC(sec.caption), roofLabel: c.roof ? 'Roof Off' : 'Roof On', explodeLabel: c.explode > 0.5 ? 'Assemble' : 'Explode',
       toggleRoof: () => this.setCtrl({ roof: !c.roof }), toggleExplode: () => this.setCtrl({ explode: c.explode > 0.5 ? 0 : 1 }),
-      splashOn: false, isMobile: mobile, splashOpacity: s.splashFade ? 0 : 1,
+      splashOn: false, isMobile: mobile,
+      showFab: mobile && isStory && !s.m3d && !s.drawer, m3dOn: mobile && !!s.m3d, scrollPadB: mobile ? '88px' : '0',
+      open3d: () => this.setState({ m3d: true }), close3d: () => { clearInterval(this._tour); this.setState({ m3d: false, tour: false }); },
+      prevSec: () => this.goSection(order[(oi - 1 + order.length) % order.length]), nextSec: () => this.goSection(order[(oi + 1) % order.length]), splashOpacity: s.splashFade ? 0 : 1,
       tourOn: s.tour, tourLabel: s.tour ? '■ Stop Tour' : '▶ Tour', toggleTour: () => this.toggleTour(), verified: s.verified,
       resetCamera: () => { const el = document.querySelector('campus-stage'); el && el.reset && el.reset(); },
       explodePct: Math.round(c.explode * 100), opacityPct: Math.round(c.opacity * 100),
