@@ -11,8 +11,8 @@ The gift is the vision, the work is the detail, and the standard is excellence.
 ## What's in this folder
 
 ```
-index.html          Portfolio homepage (11 projects)
-covers/             Project covers, v6-bk-01 … v6-bk-11
+index.html          Portfolio homepage (13 projects)
+covers/             Project covers, v6-bk-01 … v6-bk-13
 logo/               Cat mark, wordmark, profile pictures
 tokens/             kuroneko.css + kuroneko.json
 work/<project>/     One live page per project, each with its Kuroneko loading screen
