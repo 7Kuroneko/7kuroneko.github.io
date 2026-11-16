@@ -234,9 +234,9 @@ class Component extends DCLogic {
       ['Portals · Shinobi','A 30-minute focus session in the stillness before the strike, paired with an original generative soundscape. Put it on, go fullscreen, and work.','Enter portal','Video · Focus soundscape','portal-shinobi.mp4'],
       ['Portals · Galactic Core','A 30-minute focus session at the edge of the galaxy, watching its white heart turn, paired with an original generative soundscape. Put it on, go fullscreen, and work.','Enter portal','Video · Focus soundscape','portal-galactic.mp4'],
       ['Portals · Portal','A 30-minute focus session: radiance pours out of a single source, paired with an original generative soundscape. Put it on, go fullscreen, and work.','Enter portal','Video · Focus soundscape','portal-portal.mp4'],
-      ['hito. H-01 · Humanoid Robotics Studio','A general-purpose humanoid you can take apart and build your own: explore every part, customize the assembly, and read the specs, cost and market behind it.','Open studio','Interactive · 3D','robot-studio.3d'],
+      ['hito. H-01 · Humanoid Robotics Studio','A general-purpose humanoid you can take apart and build your own: explore every part, customize the assembly, and read the specs, cost and market behind it.','Open studio','Interactive · 3D','hito-h01.3d'],
     ];
-    const kanji = [...'一二三四五六七八九十', '十一', '十二', '十三', '十四', '十五', '十六', '十七'];
+    const kanji = [...'一二三四五六七八九十', '十一', '十二', '十三', '十四', '十五', '十六'];
     const pal = [['#1F2E5A','#F1E6CF'],['#D3D6BC','#1F2E5A'],['#E8ECCC','#0E0D0C']];
     const HIDE = ['Related Digital · Cheyenne, WY Campus', 'Microsoft Azure · Cheyenne, WY Campuses', 'Portals · Spatial Magic', 'Portals · Shinobi', 'Portals · Cursed Energy'];
     const projects = raw.map((r, oi) => [r, oi]).filter(([r]) => !HIDE.includes(r[0])).map(([r, oi], i) => ({ cid: String(oi + 1).padStart(2, '0'),
