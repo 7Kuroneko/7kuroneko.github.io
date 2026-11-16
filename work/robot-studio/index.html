@@ -628,9 +628,12 @@ const PRESETS=[
  {id:'porcelain',eyes:'ring',n:'Porcelain',style:'hybrid',weave:'mesh',face:'plate',shell:'#ecebe8',soft:'#cfd0d2',accent:'#c9cacc',hand:'#ecebe8',foot:'#9a9ca0',visor:'#e4e3e0',rim:'#d7432f',ear:'#cfd0d2',glow:'#ff6a4a',bg:'studio'},
  {id:'arctic',eyes:'ring',n:'Arctic',style:'hybrid',weave:'mesh',face:'glass',shell:'#dde4ec',soft:'#c4cdd8',accent:'#2b6be6',hand:'#dde4ec',foot:'#2b6be6',visor:'#0a0d14',rim:'#2b6be6',ear:'#c4cdd8',glow:'#59a8ff',bg:'studio'},
  {id:'obsidian',eyes:'ring',n:'Obsidian',style:'hard',weave:'rib',face:'bar',shell:'#1b1c1f',soft:'#0f1012',accent:'#2c2e33',hand:'#2c2e33',foot:'#2c2e33',visor:'#020203',rim:'#2c2e33',ear:'#1b1c1f',glow:'#ff8a3c',bg:'void'},
+ {id:'cotton',eyes:'ring',n:'Cotton Suit',style:'suit',weave:'cloth',face:'knit',shell:'#e4e0d7',soft:'#e4e0d7',accent:'#e4e0d7',hand:'#f0eee9',foot:'#dcd7cd',visor:'#0b0b0c',rim:'#e4e0d7',ear:'#ece9e2',glow:'#bfe6ff',bg:'studio'},
+ {id:'stone',eyes:'ring',n:'Stone Suit',style:'suit',weave:'cloth',face:'knit',shell:'#8e9093',soft:'#8e9093',accent:'#8e9093',hand:'#d9dadb',foot:'#8f9193',visor:'#0b0b0c',rim:'#8e9093',ear:'#b4b6b9',glow:'#cdeefe',bg:'studio'},
+ {id:'taupe',eyes:'ring',n:'Taupe Suit',style:'suit',weave:'cloth',face:'knit',shell:'#b9ab99',soft:'#b9ab99',accent:'#b9ab99',hand:'#d8d0c4',foot:'#a89a87',visor:'#0a0a0b',rim:'#b9ab99',ear:'#b9ab99',glow:'#ffffff',bg:'studio'},
  {id:'graphite',eyes:'led',n:'Graphite volt',style:'hard',weave:'perf',face:'plate',shell:'#3a3c41',soft:'#18191b',accent:'#c6f032',hand:'#2c2e33',foot:'#c6f032',visor:'#0b0c0d',rim:'#c6f032',ear:'#18191b',glow:'#c6f032',bg:'void'}
 ];
-const F=Object.assign({livery:'hito.',preset:'onyx',motor:'#30343a',metal:'#b2b7bd',wire:'#ff7a2e',cell:'#2f6fc4',pcb:'#173b2b',mode:'steady',glowI:1,active:'shell',zones:{face:true,ears:true,rim:false,seams:true,spine:true}},PRESETS.find(p=>p.id==='onyx'));
+const F=Object.assign({livery:'hito.',preset:'onyx',motor:'#30343a',metal:'#b2b7bd',wire:'#ff7a2e',cell:'#2f6fc4',pcb:'#173b2b',mode:'steady',glowI:1,active:'shell',zones:{face:true,ears:true,rim:false,seams:true,spine:true,logo:false}},PRESETS.find(p=>p.id==='onyx'));
 const state={power:true,bootT:0,sel:null,xray:false,blue:false,pins:false,spin:false,pose:'idle',explode:0,tab:'part',bg:'studio'};
 
 /* =====================================================================
@@ -692,21 +695,32 @@ function makePerf(){const c=document.createElement('canvas');c.width=128;c.heigh
   for(let y=0;y<128;y+=2){g.fillStyle=y%4?'rgba(0,0,0,.08)':'rgba(255,255,255,.1)';g.fillRect(0,y,128,1);}
   g.fillStyle='#050505';for(let y=0;y<8;y++)for(let x=0;x<8;x++){g.beginPath();g.arc(x*16+8+(y%2)*8,y*16+8,3.6,0,Math.PI*2);g.fill();}
   const t=new THREE.CanvasTexture(c);t.wrapS=t.wrapT=THREE.RepeatWrapping;t.repeat.set(9,9);t.anisotropy=8;return t;}
-const WEAVE={rib:{t:knitTex,b:3},mesh:{t:makeMesh(),b:2.2},perf:{t:makePerf(),b:4}};
+function makeCloth(){const c=document.createElement('canvas');c.width=c.height=256;const g=c.getContext('2d');const d=g.createImageData(256,256);
+  let sd=7;const rnd=()=>{sd=(sd*16807)%2147483647;return sd/2147483647;};
+  for(let i=0;i<256*256;i++){const x=i%256,y=(i/256)|0;const v=150+70*rnd()+18*Math.sin(x*1.57)*Math.sin(y*1.57);d.data[i*4]=d.data[i*4+1]=d.data[i*4+2]=v;d.data[i*4+3]=255;}
+  g.putImageData(d,0,0);const t=new THREE.CanvasTexture(c);t.wrapS=t.wrapT=THREE.RepeatWrapping;t.repeat.set(6,6);t.anisotropy=8;return t;}
+const WEAVE={cloth:{t:makeCloth(),b:1.1},rib:{t:knitTex,b:3},mesh:{t:makeMesh(),b:2.2},perf:{t:makePerf(),b:4}};
 
 /* livery texture */
 const livCanvas=document.createElement('canvas');livCanvas.width=1024;livCanvas.height=330;
 const livTex=new THREE.CanvasTexture(livCanvas);livTex.colorSpace=THREE.SRGBColorSpace;livTex.anisotropy=8;
+const livGCanvas=document.createElement('canvas');livGCanvas.width=1024;livGCanvas.height=330;
+const livGTex=new THREE.CanvasTexture(livGCanvas);livGTex.colorSpace=THREE.SRGBColorSpace;livGTex.anisotropy=8;
 function drawLivery(){
-  const g=livCanvas.getContext('2d');g.clearRect(0,0,1024,330);
-  const c=new THREE.Color(F.shell);const lum=c.r*.3+c.g*.59+c.b*.11;
-  g.fillStyle=lum>0.5?'rgba(20,22,26,.78)':'rgba(240,242,245,.85)';
-  g.textAlign='center';g.textBaseline='middle';
-  g.font='500 190px Geist, sans-serif';
+  const g=livCanvas.getContext('2d'),gg=livGCanvas.getContext('2d');g.clearRect(0,0,1024,330);gg.clearRect(0,0,1024,330);
+  const c=new THREE.Color(F.shell);const lum=c.r*.3+c.g*.59+c.b*.11;const lit=F.zones&&F.zones.logo;
+  const big=F.style==='suit';
   const txt=(F.livery||'').split('').join(String.fromCharCode(8202));
-  g.fillText(txt,512,140);
-  g.font='500 40px "Geist Mono", monospace';g.globalAlpha=.55;g.fillText('H-01',512,290);g.globalAlpha=1;
-  livTex.needsUpdate=true;
+  for(const [x,glow] of [[g,false],[gg,true]]){
+    x.textAlign='center';x.textBaseline='middle';
+    x.fillStyle=glow?'#ffffff':lit?('#'+new THREE.Color(F.glow).lerp(new THREE.Color(lum>0.5?'#2a6f96':'#ffffff'),lum>0.5?0.62:0.2).getHexString()):(lum>0.5?'rgba(20,22,26,.78)':'rgba(240,242,245,.85)');
+    if(glow&&!lit)continue;
+    if(glow){x.shadowColor='#ffffff';x.shadowBlur=26;}
+    x.font=`500 ${big?230:190}px Geist, sans-serif`;x.fillText(txt,512,big?150:140);
+    x.shadowBlur=0;
+    if(!big){x.font='500 40px "Geist Mono", monospace';x.globalAlpha=.55;x.fillText('H-01',512,290);x.globalAlpha=1;}
+  }
+  livTex.needsUpdate=true;livGTex.needsUpdate=true;
 }
 
 /* =====================================================================
@@ -714,7 +728,7 @@ function drawLivery(){
    ===================================================================== */
 const robot=new THREE.Group();scene.add(robot);
 const comps={};const allMeshes=[];const J={};const fingers=[];
-const COVER=new Set(['eyering','shell','soft','accent','visor','livery','glow','handc','footc','skull','plate','rim','ear','lens']);
+const COVER=new Set(['suitk','eyering','iris','bezel','shell','soft','accent','visor','livery','glow','handc','footc','skull','plate','rim','ear','lens']);
 const GLOWS=[];
 function mat(role){const m=new THREE.MeshPhysicalMaterial({color:0xffffff});m.userData.role=role;
   if(role==='livery'){m.map=livTex;m.transparent=true;m.depthWrite=false;m.polygonOffset=true;m.polygonOffsetFactor=-2;m.side=THREE.DoubleSide;}
@@ -834,7 +848,11 @@ for(const S of [1,-1]){
   const q=new THREE.Quaternion().setFromUnitVectors(new THREE.Vector3(0,0,1),n);
   const e1=add(head,new THREE.CylinderGeometry(0.0108,0.0108,0.003,40).rotateX(Math.PI/2),'lens','face',[p.x,p.y,p.z],0,null,[0,0.02,0.12]);e1.quaternion.copy(q);
   const e2=add(head,new THREE.TorusGeometry(0.0118,0.0017,10,48),'eyering','face',[p.x+n.x*0.0012,p.y+n.y*0.0012,p.z+n.z*0.0012],0,null,[0,0.02,0.12]);e2.quaternion.copy(q);
-  [e1,e2].forEach(o=>{o.userData.n=n.clone();o.userData.b0=o.userData.base.clone();});FACE.eyes.push(e1,e2);
+  // camera-style eye: domed black glass, inner iris ring, metal bezel (bezel shows on knit suits)
+  const e3=add(head,new THREE.SphereGeometry(0.0099,48,24,0,Math.PI*2,0,Math.PI/2).rotateX(Math.PI/2),'lens','face',[p.x,p.y,p.z],0,[1,1,0.62],[0,0.02,0.12]);e3.quaternion.copy(q);
+  const e4=add(head,new THREE.TorusGeometry(0.0052,0.0008,10,40),'iris','face',[p.x+n.x*0.0045,p.y+n.y*0.0045,p.z+n.z*0.0045],0,null,[0,0.02,0.12]);e4.quaternion.copy(q);
+  const e5=add(head,new THREE.TorusGeometry(0.0118,0.0026,14,56),'bezel','face',[p.x-n.x*0.0004,p.y-n.y*0.0004,p.z-n.z*0.0004],0,[1,1,0.7],[0,0.02,0.12]);e5.quaternion.copy(q);
+  [e1,e2,e3,e4,e5].forEach(o=>{o.userData.n=n.clone();o.userData.b0=o.userData.base.clone();});FACE.eyes.push(e1,e2,e3,e4,e5);
 }
 // LED dot-matrix eyes
 {const dg=new THREE.CircleGeometry(0.00125,10);
@@ -939,27 +957,29 @@ comps.ai_stack={meshes:comps.compute.meshes,anchor:null};
    MATERIAL LOOK
    ===================================================================== */
 function resetM(m){m.bumpMap=null;m.sheen=0;m.clearcoat=0;m.clearcoatRoughness=0;m.metalness=0;m.roughness=0.5;m.emissive.set(0);m.emissiveIntensity=1;m.transmission=0;}
-function knit(m,c){const w=WEAVE[F.weave]||WEAVE.rib;m.color.set(c);m.roughness=0.96;m.bumpMap=w.t;m.bumpScale=w.b;const l=m.color.r*.3+m.color.g*.59+m.color.b*.11;m.sheen=l<0.2?0.35:0.6;m.sheenColor.copy(m.color).lerp(new THREE.Color(0xffffff),l<0.2?0.25:1);m.sheenRoughness=0.7;}
+function knit(m,c){const w=WEAVE[F.weave]||WEAVE.rib;m.color.set(c);m.roughness=0.96;m.bumpMap=w.t;m.bumpScale=w.b;const l=m.color.r*.3+m.color.g*.59+m.color.b*.11;m.sheen=l<0.2?0.35:0.6;m.sheenColor.copy(m.color).lerp(new THREE.Color(0xffffff),l<0.2?0.25:1);m.sheenRoughness=0.7;if(F.style==='suit'){m.sheen=0.32;m.sheenColor.copy(m.color).lerp(new THREE.Color(0xffffff),0.3);m.bumpScale=w.b*0.7;}}
 function gloss(m,c){m.color.set(c);m.roughness=0.26;m.clearcoat=0.9;m.clearcoatRoughness=0.12;}
 function satin(m,c){m.color.set(c);m.roughness=0.55;m.clearcoat=0.25;m.clearcoatRoughness=0.4;}
 function selSet(){if(!state.sel)return new Set();const d=DM[state.sel];return new Set([d.focus||d.id]);}
 function styleRole(m,r){
   resetM(m);const st=F.style;
   switch(r){
-    case 'shell': st==='knit'?knit(m,F.shell):gloss(m,F.shell);break;
-    case 'skull': F.face==='knit'?knit(m,F.shell):st==='knit'?satin(m,F.shell):gloss(m,F.shell);break;
-    case 'soft': st==='hard'?(m.color.set(F.soft),m.roughness=0.55,m.clearcoat=0.3):knit(m,F.soft);break;
-    case 'accent': m.color.set(F.accent);m.roughness=st==='knit'?0.8:0.42;m.clearcoat=st==='knit'?0:0.4;break;
+    case 'shell': st==='knit'||st==='suit'?knit(m,F.shell):gloss(m,F.shell);break;
+    case 'skull': F.face==='knit'||st==='suit'?knit(m,F.shell):st==='knit'?satin(m,F.shell):gloss(m,F.shell);break;
+    case 'soft': st==='suit'?knit(m,F.shell):st==='hard'?(m.color.set(F.soft),m.roughness=0.55,m.clearcoat=0.3):knit(m,F.soft);break;
+    case 'accent': if(st==='suit'){knit(m,F.shell);break;}m.color.set(F.accent);m.roughness=st==='knit'?0.8:0.42;m.clearcoat=st==='knit'?0:0.4;break;
     case 'handc': m.color.set(F.hand);m.roughness=st==='knit'?0.6:0.4;m.clearcoat=st==='knit'?0.1:0.4;break;
-    case 'footc': m.color.set(F.foot);m.roughness=0.55;m.clearcoat=0.25;break;
-    case 'ear': st==='knit'||F.face==='knit'?knit(m,F.ear):satin(m,F.ear);break;
+    case 'footc': if(st==='suit'){knit(m,F.foot);break;}m.color.set(F.foot);m.roughness=0.55;m.clearcoat=0.25;break;
+    case 'ear': st==='knit'||st==='suit'||F.face==='knit'?knit(m,F.ear):satin(m,F.ear);break;
     case 'visor': m.color.set(F.visor);m.roughness=0.04;m.metalness=0.35;m.clearcoat=1;break;
     case 'plate': satin(m,F.visor);break;
-    case 'rim': m.color.set(F.rim);m.metalness=0.6;m.roughness=0.3;break;
+    case 'rim': if(st==='suit'&&F.face!=='glass'){knit(m,F.shell);break;}m.color.set(F.rim);m.metalness=0.6;m.roughness=0.3;break;
     case 'lens': m.color.set('#030304');m.roughness=0.08;m.metalness=0.2;m.clearcoat=1;break;
+    case 'iris': m.color.set('#2a2e34');m.roughness=0.3;m.metalness=0.7;break;
+    case 'bezel': m.color.set('#17181b');m.roughness=0.38;m.metalness=0.65;m.clearcoat=0.4;break;
     case 'eyering': m.color.set('#ffffff');m.emissive.set('#ffffff');m.emissiveIntensity=state.power?0.45:0;m.roughness=0.35;break;
     case 'glow': m.color.set(F.glow);m.emissive.set(F.glow);m.emissiveIntensity=1.8;m.roughness=0.4;break;
-    case 'livery': m.color.set(0xffffff);m.roughness=0.5;break;
+    case 'livery': m.color.set(0xffffff);m.roughness=0.5;m.emissiveMap=livGTex;break;
     case 'metal': m.color.set(F.metal);m.metalness=1;m.roughness=0.3;break;
     case 'motor': m.color.set(F.motor);m.metalness=0.75;m.roughness=0.38;break;
     case 'copper': m.color.set('#c9824d');m.metalness=1;m.roughness=0.32;break;
@@ -970,11 +990,12 @@ function styleRole(m,r){
     case 'sensor': m.color.set('#050506');m.roughness=0.05;m.clearcoat=1;m.metalness=0.4;break;
     case 'harness': case 'wire': m.color.set(F.wire);m.roughness=0.6;break;
     case 'coolant': m.color.set('#55b6e6');m.roughness=0.2;m.clearcoat=0.8;break;
-    case 'tactile': m.color.set('#7cc6ff');m.emissive.set('#3d9bff');m.emissiveIntensity=state.xray||L.id?0.8:0.15;m.roughness=0.5;break;
+    case 'tactile': if(F.style==='suit'&&!state.xray&&!L.id){m.color.set(F.hand);m.roughness=0.6;break;}m.color.set('#7cc6ff');m.emissive.set('#3d9bff');m.emissiveIntensity=state.xray||L.id?0.8:0.15;m.roughness=0.5;break;
     case 'imu': m.color.set('#ff8a3d');m.emissive.set('#ff6a1f');m.emissiveIntensity=0.6;break;
-    case 'sole': m.color.set('#141517');m.roughness=0.92;break;
+    case 'sole': if(F.style==='suit'){m.color.set(F.foot).multiplyScalar(0.82);m.roughness=0.9;break;}m.color.set('#141517');m.roughness=0.92;break;
     case 'glass': m.color.set('#a9c4d8');m.roughness=0.05;m.clearcoat=1;break;
     case 'label': m.color.set(0xffffff);m.roughness=0.5;break;
+    case 'suitk': knit(m,F.shell);break;
   }
 }
 const HL=new THREE.Color('#9fd3ee');
@@ -1004,12 +1025,17 @@ function applyLook(){
     if(isSel&&r!=='glow'&&r!=='label'&&r!=='livery'){m.emissive.copy(HL);m.emissiveIntensity=0.1;}
     m.needsUpdate=true;
   }
+  for(const o of GLOWS){const z=o.userData.zone;if(z==='seams'||z==='spine')o.visible=F.style!=='suit';}
+  for(const o of FACE.eyes){o.userData.s0=o.userData.s0||o.scale.clone();o.scale.copy(o.userData.s0).multiplyScalar(F.style==='suit'?0.78:1);}
+  for(const o of FACE.eyes){const r=o.material.userData.role;if(o.visible&&r==='eyering'&&F.style==='suit')o.visible=false;if(r==='bezel'&&o.visible&&F.style!=='suit')o.visible=false;}
+  for(const o of allMeshes){if(o.material.userData.role==='suitk')o.visible=F.style==='suit';else if(o.userData.suitHide)o.visible=F.style!=='suit';}
   discMat.color.set(state.bg==='void'?'#1d1f23':'#f4f5f6');
   ringMat.color.set(F.glow);
 }
 /* glow animation: power, mode, zones */
 const OFFC=new THREE.Color(),GC=new THREE.Color(),RC=new THREE.Color();
-const ZDELAY={face:0.15,ears:0.35,rim:0.5,seams:0.7,spine:0.9};
+let LIVS=null;
+const ZDELAY={face:0.15,ears:0.35,rim:0.5,seams:0.7,spine:0.9,logo:0.6};
 function updateGlow(t){
   OFFC.set(F.accent);GC.set(F.glow);RC.set(F.rim);
   const bt=state.power?(t-state.bootT):0;
@@ -1020,6 +1046,8 @@ function updateGlow(t){
     if(z==='rim'){m.color.copy(RC);m.emissive.copy(RC);m.emissiveIntensity=k*1.6;}
     else{m.color.copy(OFFC).lerp(base,Math.min(1,k));m.emissive.copy(base);m.emissiveIntensity=k*1.8;}
   }
+  {let k=0;if(state.power&&F.zones.logo){k=THREE.MathUtils.clamp((bt-ZDELAY.logo)/0.5,0,1);k=k*(bt<ZDELAY.logo+0.5?1:mf)*F.glowI;}
+   LIVS=LIVS||allMeshes.filter(o=>o.material.userData.role==='livery');const sc=new THREE.Color(F.shell),lu=sc.r*.3+sc.g*.59+sc.b*.11;for(const o of LIVS){const m=o.material;m.emissive.copy(GC);m.emissiveIntensity=k*(lu>0.45?0.5:1.6);}}
   const lf=state.power?mf*F.glowI:0;
   for(const o of L.meshes){const m=o.material;if(m.userData.role==='glow'){m.emissive.set(F.glow);m.emissiveIntensity=lf*1.8;m.color.copy(OFFC).lerp(GC,Math.min(1,lf));}}
   ringMat.color.copy(state.power?GC:OFFC);
@@ -1255,16 +1283,16 @@ const SW=['#ffffff','#f1f0ec','#e6e1d7','#cbbda3','#c9ccd1','#8f949b','#4a4d53',
 const CROWS=[['shell','Shell / body'],['soft','Fabric & joints'],['hand','Hands'],['foot','Feet'],['accent','Trim & unlit seams'],['visor','Face mask'],['rim','Face outline'],['ear','Ear panels'],['glow','Light colour']];
 const IROWS=[['motor','Motor housings'],['metal','Metal & frame'],['wire','Wiring & tendons'],['cell','Battery cells'],['pcb','Circuit boards']];
 const FACES=[['glass','Glass mask','Full glass, two lens eyes'],['bar','Visor + light bar','Half visor, intent light'],['plate','Face plate','Satin plate, outline, eyes'],['knit','Fabric face','Knit head, lens eyes']];
-const ZONES=[['face','Face'],['ears','Ear rings'],['rim','Face outline'],['seams','Seams & joints'],['spine','Spine']];
+const ZONES=[['face','Face'],['ears','Ear rings'],['rim','Face outline'],['seams','Seams & joints'],['spine','Spine'],['logo','Chest logo']];
 const LBL=Object.fromEntries([...CROWS,...IROWS]);
 function finishHTML(){
   const seg=(opts,cur,attr)=>`<div class="segw">${opts.map(([k,n])=>`<button ${attr}="${k}" class="${cur===k?'on':''}">${n}</button>`).join('')}</div>`;
   const row=([k,n])=>`<div class="color ${F.active===k?'act':''}" data-act="${k}"><label>${n}</label><code>${F[k]}</code><input type="color" data-c="${k}" value="${F[k]}"></div>`;
   return `<div class="subnav">${[['looks','Looks'],['body','Body'],['face','Face'],['lights','Lights'],['colours','Colours'],['scene','Scene']].map(([k,n])=>`<button data-jump="${k}">${n}</button>`).join('')}</div>
   <div class="grpT" id="g-looks"><span>01</span>Looks</div><div class="sec"><p class="note" style="margin:0 0 10px">One tap sets body, face, colours and lights together. Fine-tune below.</p><div class="presets">${PRESETS.map(p=>`<button class="pre ${F.preset===p.id?'on':''}" data-pre="${p.id}"><div class="sw"><i style="background:${p.shell}"></i><i style="background:${p.soft}"></i><i style="background:${p.visor}"></i><i style="background:${p.glow}"></i></div><span>${p.n}</span></button>`).join('')}</div></div>
-  <div class="grpT" id="g-body"><span>02</span>Body</div><div class="sec"><h4>Body style</h4>${seg([['knit','Fabric'],['hybrid','Hybrid'],['hard','Hard shell']],F.style,'data-st')}
-  <p class="note" style="margin-top:8px">${F.style==='knit'?'Fully soft, washable knit suit over the frame, like the cloth references. Home and hospitality.':F.style==='hybrid'?'Gloss shell plates on torso and limbs, fabric at every joint. Retail and mixed use.':'All hard plates, rubberised joints. Factories and logistics.'}</p>
-  <h4 style="margin-top:14px">Fabric weave</h4>${seg([['rib','Rib knit'],['mesh','Mesh weave'],['perf','Perforated']],F.weave,'data-wv')}</div>
+  <div class="grpT" id="g-body"><span>02</span>Body</div><div class="sec"><h4>Body style</h4>${seg([['suit','Full Knit'],['knit','Fabric'],['hybrid','Hybrid'],['hard','Hard shell']],F.style,'data-st')}
+  <p class="note" style="margin-top:8px">${F.style==='suit'?'One continuous knit suit from head to toe. No plates, seams or hardware show, only the face, ear rings and a glowing chest logo.':F.style==='knit'?'Fully soft, washable knit suit over the frame, like the cloth references. Home and hospitality.':F.style==='hybrid'?'Gloss shell plates on torso and limbs, fabric at every joint. Retail and mixed use.':'All hard plates, rubberised joints. Factories and logistics.'}</p>
+  <h4 style="margin-top:14px">Fabric weave</h4>${seg([['cloth','Plain Cloth'],['rib','Rib Knit'],['mesh','Mesh Weave'],['perf','Perforated']],F.weave,'data-wv')}</div>
   <div class="grpT" id="g-face"><span>03</span>Face</div><div class="sec"><h4>Face covering</h4><div class="faces">${FACES.map(f=>`<button class="pre ${F.face===f[0]?'on':''}" data-face="${f[0]}"><b>${f[1]}</b><span class="note">${f[2]}</span></button>`).join('')}</div>
   <h4 style="margin-top:14px">Eyes</h4>${seg([['ring','Ring Eyes'],['led','LED Dot Eyes'],['none','No Eyes']],F.eyes||'ring','data-eyes')}
   <p class="note" style="margin-top:8px">${F.face==='bar'?'The visor + light bar face uses its light bar instead of eyes.':'LED dot eyes glow in the light colour and follow the power and behaviour settings.'}</p></div>
@@ -1337,14 +1365,14 @@ body.addEventListener('click',e=>{
   if(e.target.closest('[data-closelab]')){closeLab();return;}
   const sb=e.target.closest('[data-sub]');if(sb){selectSub(+sb.dataset.sub);return;}
   const g=e.target.closest('[data-go]');if(g){state.tab='part';renderTabs();select(g.dataset.go,true,true);return;}
-  const p=e.target.closest('[data-pre]');if(p){const pr=PRESETS.find(x=>x.id===p.dataset.pre);Object.assign(F,pr,{preset:pr.id});state.bg=pr.bg;applyBg();drawLivery();applyLook();rerender();return;}
-  const st=e.target.closest('[data-st]');if(st){F.style=st.dataset.st;F.preset='';applyLook();rerender();return;}
+  const p=e.target.closest('[data-pre]');if(p){const pr=PRESETS.find(x=>x.id===p.dataset.pre);Object.assign(F,pr,{preset:pr.id});F.zones.logo=pr.style==='suit';state.bg=pr.bg;applyBg();drawLivery();applyLook();rerender();return;}
+  const st=e.target.closest('[data-st]');if(st){F.style=st.dataset.st;F.preset='';if(F.style==='suit')F.zones.logo=true;drawLivery();applyLook();rerender();return;}
   const wv=e.target.closest('[data-wv]');if(wv){F.weave=wv.dataset.wv;F.preset='';applyLook();rerender();return;}
   const ey=e.target.closest('[data-eyes]');if(ey){F.eyes=ey.dataset.eyes;F.preset='';applyLook();rerender();return;}
   const fc=e.target.closest('[data-face]');if(fc){F.face=fc.dataset.face;F.preset='';applyLook();rerender();return;}
   const pw=e.target.closest('[data-pw]');if(pw){state.power=pw.dataset.pw==='on';state.bootT=clock.elapsedTime;applyLook();rerender();return;}
   const md=e.target.closest('[data-md]');if(md){F.mode=md.dataset.md;rerender();return;}
-  const zn=e.target.closest('[data-zone]');if(zn){const z=zn.dataset.zone;F.zones[z]=!F.zones[z];if(F.zones[z])state.bootT=clock.elapsedTime-(ZDELAY[z]||0);zn.classList.toggle('on',F.zones[z]);return;}
+  const zn=e.target.closest('[data-zone]');if(zn){const z=zn.dataset.zone;F.zones[z]=!F.zones[z];if(z==='logo')drawLivery();if(F.zones[z])state.bootT=clock.elapsedTime-(ZDELAY[z]||0);zn.classList.toggle('on',F.zones[z]);return;}
   const b=e.target.closest('[data-bg]');if(b){state.bg=b.dataset.bg;applyBg();applyLook();rerender();return;}
   const ui=e.target.closest('[data-ui]');if(ui){document.body.classList.toggle('dark',ui.dataset.ui==='dark');rerender();return;}
   const sw=e.target.closest('[data-sw]');if(sw){setColor(F.active,sw.dataset.sw);return;}
@@ -1905,11 +1933,24 @@ function frame(){
 const tmpO=new THREE.Vector3();
 J.pelvis.userData.base=J.pelvis.position.clone();
 
+/* full-knit suit overlay: continuous sleeves, legs, waist and turtleneck that hide every segment */
+function suitTube(r1,r2,len){const V=THREE.Vector2,pts=[];for(let i=0;i<=10;i++){const t=i/10*Math.PI/2;pts.push(new V(Math.max(1e-4,r1*Math.sin(t)),r1*Math.cos(t)));}
+  for(let i=0;i<=10;i++){const t=i/10*Math.PI/2;pts.push(new V(Math.max(1e-4,r2*Math.cos(t)),-len-r2*Math.sin(t)));}return new THREE.LatheGeometry(pts.reverse(),56);}
+{const cmp=o=>(o.children.find(c=>c.isMesh)||{userData:{}}).userData.comp||'shell';
+ for(const n of ['shL','elL','wrL','shR','elR','wrR','hipL','knL','anL','hipR','knR','anR','neck','waist'])for(const c of J[n].children)if(c.isMesh&&['shell','soft','accent'].includes(c.material.userData.role))c.userData.suitHide=true;
+ for(const sd of ['L','R']){
+  add(J['sh'+sd],suitTube(0.061,0.048,0.29),'suitk',cmp(J['sh'+sd]));
+  add(J['el'+sd],suitTube(0.048,0.038,0.252),'suitk',cmp(J['el'+sd]));
+  add(J['hip'+sd],suitTube(0.083,0.063,0.40),'suitk',cmp(J['hip'+sd]));
+  add(J['kn'+sd],suitTube(0.063,0.05,0.372),'suitk',cmp(J['kn'+sd]));}
+ add(J.waist,new THREE.CylinderGeometry(0.15,0.152,0.22,56,1,true),'suitk',cmp(J.waist),[0,0.02,0],0,[1,1,0.74]);
+ add(J.neck,new THREE.CylinderGeometry(0.056,0.062,0.11,48,1,true),'suitk',cmp(J.neck),[0,0.028,0]);
+}
 document.body.classList.add('dark');state.bg='void';applyBg();drawLivery();applyLook();renderLib();renderTabs();renderBody();updDock();setTitle();if(wide()){$('lib').classList.add('open');$('insp').classList.add('open');$('libBtn').classList.add('on');$('inspBtn').classList.add('on');}layoutPanels();{const [p0,t0]=VIEWS['¾']();camera.position.copy(p0);controls.target.copy(t0);}
 (document.fonts&&document.fonts.ready||Promise.resolve()).then(drawLivery);
 $('loading').remove();
 frame();
-window.__studio={select,state,setXray};
+window.__studio={select,state,setXray,F};
 </script>
 </body>
 </html>
