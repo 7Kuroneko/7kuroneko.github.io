@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <script src="./kn-loader.js" data-bg="#16171a" data-accent="#9fd3ee" data-ink="#F2EFE8" data-mute="#8a8f97" data-cat="#F2EFE8" data-font="'Oxanium','Inter',sans-serif" data-mono="'Oxanium',ui-monospace,monospace" data-title="hito. Humanoid Robotics Customization" data-kind="Interactive 3D · Robotic Customization" data-steps="Weaving Shell Fabric|Fitting Glass Mask|Calibrating Eyes|Tuning Glow Seams|Powering On" data-variant="custom" data-min="2600"></script>
 <title>hito. Humanoid Robotics Studio</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -315,6 +315,66 @@ body:not(.dark) .navpill .tab.on{color:#0b2a3a!important}
 .ptitle,.grpT{font-weight:600;letter-spacing:0}
 .vc b,.kpi b,.hero b{font-weight:600;letter-spacing:0}
 .tbtn,.cbtn,.tog,.tab,.dbtn b{font-weight:500;letter-spacing:.02em}
+
+/* ============ MOBILE (≤760px): bottom-sheet layout ============ */
+.mobx{display:none}
+@media (max-width:760px){
+  html,body{height:100dvh;overscroll-behavior:none;touch-action:manipulation}
+  .app{height:100dvh}
+  .top{top:calc(8px + env(safe-area-inset-top));left:10px;right:10px;height:44px;gap:6px}
+  .top .brand{height:40px}
+  .top .tbtn{height:40px;padding:0 14px;font-size:13px}
+  .title{top:calc(62px + env(safe-area-inset-top));left:16px!important;right:16px}
+  .title .sub{font-size:9.5px}
+  .title h1{font-size:20px;line-height:1.15}
+  .tdwrap{top:calc(118px + env(safe-area-inset-top));left:16px!important;right:16px;flex-wrap:wrap}
+  .tdwrap .tbtn{height:36px;font-size:12.5px;padding:0 12px}
+  .labexit{top:calc(118px + env(safe-area-inset-top))!important;left:16px!important}
+  /* sheets */
+  .panel{top:auto!important;left:0!important;right:0!important;bottom:0!important;width:auto!important;height:min(64dvh,560px)!important;max-height:calc(100dvh - 120px);border-radius:24px 24px 0 0!important;
+    transform:translateY(105%)!important;z-index:60;padding-bottom:env(safe-area-inset-bottom);box-shadow:0 -18px 50px rgba(0,0,0,.35)!important}
+  .panel.open{transform:none!important;opacity:1}
+  .panel::before{content:'';position:absolute;top:7px;left:50%;width:40px;height:4px;margin-left:-20px;border-radius:4px;background:rgba(127,127,127,.45);z-index:5}
+  .panel .phead{padding:20px 16px 10px}
+  .xbtn{width:34px;height:34px;font-size:0!important;border-radius:50%}
+  .xbtn::after{content:'\2715';font-size:13px;line-height:1}
+  .tabs{padding:8px 12px;gap:4px;flex-wrap:nowrap;-webkit-overflow-scrolling:touch}
+  .tabs::-webkit-scrollbar,.subnav::-webkit-scrollbar{display:none}
+  .tabs .tab{flex:none;height:34px;padding:0 14px}
+  .subnav{padding:10px 16px;gap:6px;flex-wrap:nowrap}
+  .subnav button{flex:none;height:34px}
+  .scroll{overscroll-behavior:contain;-webkit-overflow-scrolling:touch}
+  /* while a sheet is open the stage keeps only the robot */
+  .app.sheet .dock,.app.sheet .pop,.app.sheet .tdwrap,.app.sheet .labexit,.app.sheet #labDock,.app.sheet .title .sub{display:none!important}
+  .app.sheet .title{top:calc(60px + env(safe-area-inset-top))}
+  .app.sheet .title h1{font-size:16px}
+  /* dock: five equal buttons, always fits */
+  #dock{left:10px!important;right:10px;bottom:calc(10px + env(safe-area-inset-bottom));transform:none!important;max-width:none;display:grid!important;grid-template-columns:1.55fr 1fr 1fr 1fr .85fr;gap:3px;padding:5px;overflow:visible}
+  #dock .sep2,#dock .rng{display:none}
+  #dock .cbtn,#dock .tog{height:46px;justify-content:center;text-align:center;font-size:12.5px;padding:0 6px;min-width:0}
+  #dock .dbtn{height:46px;min-width:0;padding:0 8px;align-items:center}
+  #dock .dbtn b{font-size:12.5px;max-width:100%;overflow:hidden;text-overflow:ellipsis}
+  #dStyle{font-size:0!important;padding:0 2px!important;overflow:visible}
+  #dStyle::after{content:'Customize';font-size:12px;letter-spacing:0}
+  /* popovers become sheets above the dock */
+  .pop{left:10px!important;right:10px;bottom:calc(70px + env(safe-area-inset-bottom));transform:none!important;max-width:none;padding:12px;max-height:52dvh;overflow:auto}
+  .pop .grid{grid-template-columns:repeat(2,1fr);gap:6px}
+  .pop .grid .cbtn,.pop .grid .tog{height:44px;white-space:normal;line-height:1.15;font-size:13px}
+  .mobx{display:flex}
+  .pop .rng.mobx{padding:12px 4px 2px;gap:12px;font-size:13px}
+  .pop .rng.mobx input{flex:1;width:auto}
+  /* teardown dock: two tidy rows */
+  #labDock{left:10px!important;right:10px;bottom:calc(10px + env(safe-area-inset-bottom));transform:none!important;max-width:none;grid-template-columns:repeat(4,1fr);gap:4px;padding:6px;overflow:visible}
+  .stage.lab #labDock{display:grid}
+  #labDock .sep2{display:none}
+  #labDock .cbtn,#labDock .tog{height:40px;justify-content:center;font-size:11.5px;padding:0 2px;min-width:0;overflow:hidden;text-overflow:ellipsis}
+  #labDock .rng{grid-column:1/-1;order:-1;padding:4px 8px}
+  #labDock .rng input{flex:1;width:auto}
+  #lFit{display:none}
+  .tip{display:none!important}
+  .stage.lab #dock,.stage.lab #pop{display:none!important}
+  #pins .pin span{font-size:10px}
+}
 </style>
 </head>
 <body>
@@ -367,7 +427,8 @@ body:not(.dark) .navpill .tab.on{color:#0b2a3a!important}
           <button class="tog" id="tXray"><i></i>X-Ray</button>
           <button class="tog" id="tBlue"><i></i>Blueprint</button>
           <button class="tog" id="tPins"><i></i>Callouts</button>
-          <button class="tog" id="tSpin"><i></i>Turntable</button></div></div>
+          <button class="tog" id="tSpin"><i></i>Turntable</button></div>
+          <div class="rng mobx"><span>Explode</span><input type="range" id="explode2" min="0" max="1" step="0.01" value="0"></div></div>
         <div class="pp" data-pp="cam"><h5>Camera</h5><div class="grid" id="cams"></div></div>
       </div>
       <div class="ov dock glass" id="labDock">
@@ -666,7 +727,7 @@ controls.maxPolarAngle=Math.PI*0.53;
 
 scene.add(new THREE.HemisphereLight(0xffffff,0x8a8f99,0.55));
 const key=new THREE.DirectionalLight(0xffffff,2.1);key.position.set(2.2,4.2,2.6);key.castShadow=true;
-key.shadow.mapSize.set(2048,2048);key.shadow.camera.left=-1.3;key.shadow.camera.right=1.3;key.shadow.camera.top=2.2;key.shadow.camera.bottom=-0.4;key.shadow.bias=-0.0004;key.shadow.normalBias=0.02;
+key.shadow.mapSize.set(2048,2048);key.shadow.camera.left=-1.15;key.shadow.camera.right=1.15;key.shadow.camera.top=2.1;key.shadow.camera.bottom=-0.35;key.shadow.camera.near=1.5;key.shadow.camera.far=9;key.shadow.camera.updateProjectionMatrix();key.shadow.bias=-0.0008;key.shadow.normalBias=0.035;
 scene.add(key);
 const rim=new THREE.DirectionalLight(0xcfe2ff,1.7);rim.position.set(-3,2.6,-3.2);scene.add(rim);
 const fill=new THREE.DirectionalLight(0xfff3e6,0.45);fill.position.set(-2.5,1,2.5);scene.add(fill);
@@ -728,7 +789,7 @@ function drawLivery(){
    ===================================================================== */
 const robot=new THREE.Group();scene.add(robot);
 const comps={};const allMeshes=[];const J={};const fingers=[];
-const COVER=new Set(['suitk','eyering','iris','bezel','shell','soft','accent','visor','livery','glow','handc','footc','skull','plate','rim','ear','lens']);
+const COVER=new Set(['suitk','suitsole','eyering','iris','bezel','shell','soft','accent','visor','livery','glow','handc','footc','skull','plate','rim','ear','lens']);
 const GLOWS=[];
 function mat(role){const m=new THREE.MeshPhysicalMaterial({color:0xffffff});m.userData.role=role;
   if(role==='livery'){m.map=livTex;m.transparent=true;m.depthWrite=false;m.polygonOffset=true;m.polygonOffsetFactor=-2;m.side=THREE.DoubleSide;}
@@ -996,6 +1057,7 @@ function styleRole(m,r){
     case 'glass': m.color.set('#a9c4d8');m.roughness=0.05;m.clearcoat=1;break;
     case 'label': m.color.set(0xffffff);m.roughness=0.5;break;
     case 'suitk': knit(m,F.shell);break;
+    case 'suitsole': m.color.set(F.foot).multiplyScalar(0.8);m.roughness=0.85;m.metalness=0;m.map=null;m.bumpMap=null;m.sheen=0;break;
   }
 }
 const HL=new THREE.Color('#9fd3ee');
@@ -1028,7 +1090,7 @@ function applyLook(){
   for(const o of GLOWS){const z=o.userData.zone;if(z==='seams'||z==='spine')o.visible=F.style!=='suit';}
   for(const o of FACE.eyes){o.userData.s0=o.userData.s0||o.scale.clone();o.scale.copy(o.userData.s0).multiplyScalar(F.style==='suit'?0.78:1);}
   for(const o of FACE.eyes){const r=o.material.userData.role;if(o.visible&&r==='eyering'&&F.style==='suit')o.visible=false;if(r==='bezel'&&o.visible&&F.style!=='suit')o.visible=false;}
-  for(const o of allMeshes){if(o.material.userData.role==='suitk')o.visible=F.style==='suit';else if(o.userData.suitHide)o.visible=F.style!=='suit';}
+  for(const o of allMeshes){const rl=o.material.userData.role;if(rl==='suitk'||rl==='suitsole')o.visible=F.style==='suit';else if(o.userData.suitHide)o.visible=F.style!=='suit';}
   discMat.color.set(state.bg==='void'?'#1d1f23':'#f4f5f6');
   ringMat.color.set(F.glow);
 }
@@ -1191,8 +1253,9 @@ $('tBlue').onclick=()=>{state.blue=!state.blue;setTog('tBlue',state.blue);scene.
 const blueMat=new THREE.MeshBasicMaterial({color:0x8cc6ff,wireframe:true,transparent:true,opacity:0.32});
 $('tPins').onclick=()=>{state.pins=!state.pins;setTog('tPins',state.pins);setTog('lPins',state.pins);pinsEl.style.display=state.pins?'':'none';};
 $('tSpin').onclick=()=>{state.spin=!state.spin;setTog('tSpin',state.spin);setTog('lSpin',state.spin);};
-$('tReset').onclick=()=>{closeLab(false);state.cam='¾';setTimeout(updDock,0);state.spin=false;setTog('tSpin',false);robot.rotation.y=0;state.pose='idle';renderPoses();$('explode').value=0;state.explode=0;setXray(false);select(null);const [p,t]=VIEWS['¾']();flyTo(p,t);};
-$('explode').oninput=e=>{state.explode=+e.target.value;};
+$('tReset').onclick=()=>{closeLab(false);state.cam='¾';setTimeout(updDock,0);state.spin=false;setTog('tSpin',false);robot.rotation.y=0;state.pose='idle';renderPoses();$('explode').value=0;$('explode2').value=0;state.explode=0;setXray(false);select(null);const [p,t]=VIEWS['¾']();flyTo(p,t);};
+$('explode').oninput=e=>{state.explode=+e.target.value;$('explode2').value=e.target.value;};
+$('explode2').oninput=e=>{state.explode=+e.target.value;$('explode').value=e.target.value;};
 function applyBg(){stageEl.classList.toggle('void',!state.blue&&state.bg==='void');stageEl.classList.toggle('blue',state.blue);}
 
 /* pins */
@@ -1414,7 +1477,8 @@ const wide=()=>innerWidth>1180;
 function setPanel(id,on){const el=$(id);if(!wide()&&on){$(id==='lib'?'insp':'lib').classList.remove('open');}
   el.classList.toggle('open',on);$(id==='lib'?'libBtn':'inspBtn').classList.toggle('on',on);layoutPanels();}
 function layoutPanels(){const w=wide();const lw=w&&$('lib').classList.contains('open')?304:0,rw=w&&$('insp').classList.contains('open')?398:0;
-  const a=$('app');a.style.setProperty('--lw',lw+'px');a.style.setProperty('--rw',rw+'px');state.lw=lw;state.rw=rw;resize();}
+  const a=$('app');a.style.setProperty('--lw',lw+'px');a.style.setProperty('--rw',rw+'px');state.lw=lw;state.rw=rw;
+  a.classList.toggle('sheet',innerWidth<=760&&($('lib').classList.contains('open')||$('insp').classList.contains('open')));resize();}
 function closePanels(){setPanel('lib',false);setPanel('insp',false);}
 $('libBtn').onclick=()=>setPanel('lib',!$('lib').classList.contains('open'));
 $('inspBtn').onclick=()=>setPanel('insp',!$('insp').classList.contains('open'));
@@ -1901,7 +1965,9 @@ $('backAll').onclick=()=>{select(null);const [p,t]=VIEWS['¾']();flyTo(p,t);};
    LOOP
    ===================================================================== */
 function resize(){const w=stageEl.clientWidth,h=stageEl.clientHeight;renderer.setSize(w,h,false);camera.aspect=w/h;
-  const cx=((state.lw||0)+w-(state.rw||0))/2;camera.setViewOffset(w,h,w/2-cx,0,w,h);camera.updateProjectionMatrix();}
+  const cx=((state.lw||0)+w-(state.rw||0))/2;let oy=0;state.mzoom=1;
+  if(innerWidth<=760&&$('app').classList.contains('sheet')){const sh=Math.min(innerHeight*0.64,560),top=84,free=Math.max(120,h-sh-top);oy=(h/2)-(top+free/2);state.mzoom=Math.max(0.5,Math.min(1,free/(h*0.6)));}
+  camera.setViewOffset(w,h,w/2-cx,oy,w,h);camera.zoom=state.mzoom;camera.updateProjectionMatrix();}
 new ResizeObserver(resize).observe(stageEl);resize();
 {const [p0]=VIEWS['¾']();camera.position.copy(p0);}
 
@@ -1942,7 +2008,19 @@ function suitTube(r1,r2,len){const V=THREE.Vector2,pts=[];for(let i=0;i<=10;i++)
   add(J['sh'+sd],suitTube(0.061,0.048,0.29),'suitk',cmp(J['sh'+sd]));
   add(J['el'+sd],suitTube(0.048,0.038,0.252),'suitk',cmp(J['el'+sd]));
   add(J['hip'+sd],suitTube(0.083,0.063,0.40),'suitk',cmp(J['hip'+sd]));
-  add(J['kn'+sd],suitTube(0.063,0.05,0.372),'suitk',cmp(J['kn'+sd]));}
+  add(J['kn'+sd],suitTube(0.063,0.05,0.392),'suitk',cmp(J['kn'+sd]));}
+ // knit sock-shoes: rounded toe, wider forefoot, higher collar at the heel, thin sole
+ const shoe=(()=>{const g=new THREE.CapsuleGeometry(0.043,0.17,16,40).rotateX(Math.PI/2),P=g.attributes.position;
+   for(let i=0;i<P.count;i++){let x=P.getX(i),y=P.getY(i),z=P.getZ(i);const t=THREE.MathUtils.clamp((z+0.131)/0.262,0,1);
+     x*=0.86+0.24*Math.sin(Math.min(1,t*1.15)*Math.PI*0.62);
+     if(y>0)y*=0.34+0.62*Math.pow(1-t,1.6);else y*=0.4;
+     P.setXYZ(i,x,y,z);}g.computeVertexNormals();return g;})();
+ const sole=(()=>{const sh=new THREE.Shape(),N=48;for(let i=0;i<=N;i++){const a=i/N*Math.PI*2,c=Math.cos(a),sn=Math.sin(a);const t=(sn+1)/2;
+     const w=(0.038+0.011*Math.sin(Math.min(1,t*1.15)*Math.PI*0.62));const px=c*w,pz=-0.131+t*0.262;i?sh.lineTo(px,pz):sh.moveTo(px,pz);}
+   const g=new THREE.ExtrudeGeometry(sh,{depth:0.011,bevelEnabled:true,bevelThickness:0.002,bevelSize:0.002,bevelSegments:3,curveSegments:48});g.rotateX(Math.PI/2);return g;})();
+ for(const sd of ['L','R']){const an=J['an'+sd];
+   an.traverse(c=>{if(c.isMesh)c.userData.suitHide=true;});
+   add(an,shoe,'suitk',cmp(an),[0,-0.0585,0.03]);add(an,sole,'suitsole',cmp(an),[0,-0.0725,0.03]);}
  add(J.waist,new THREE.CylinderGeometry(0.15,0.152,0.22,56,1,true),'suitk',cmp(J.waist),[0,0.02,0],0,[1,1,0.74]);
  add(J.neck,new THREE.CylinderGeometry(0.056,0.062,0.11,48,1,true),'suitk',cmp(J.neck),[0,0.028,0]);
 }
@@ -1950,7 +2028,7 @@ document.body.classList.add('dark');state.bg='void';applyBg();drawLivery();apply
 (document.fonts&&document.fonts.ready||Promise.resolve()).then(drawLivery);
 $('loading').remove();
 frame();
-window.__studio={select,state,setXray,F};
+window.__studio={select,state,setXray,F};if(location.search.includes('dbg'))window.__dbg={camera,controls};
 </script>
 </body>
 </html>
