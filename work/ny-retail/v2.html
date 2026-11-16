@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500&family=Chakra+Petch:wght@600&display=swap" rel="stylesheet">
+  <script src="./nysrf-data.js"></script>
+  <script src="./nysrf-intel.js"></script>
+  <title>NY Retail Footprint · The Kuroneko Company</title>
+  <style>
+    html,body{margin:0;height:100%;background:#0A0A0B;color:#F3F4EC;font-family:'IBM Plex Sans',system-ui,sans-serif;-webkit-font-smoothing:antialiased;overscroll-behavior:none;-webkit-tap-highlight-color:transparent}
+    *{box-sizing:border-box}
+    a{color:var(--acc);text-decoration:none} a:hover{color:var(--ink);text-decoration:underline}
+    button,input,select{font-family:inherit}
+    select option{background:var(--s2);color:var(--ink)}
+    :focus-visible{outline:2px solid var(--acc);outline-offset:2px}
+    ::-webkit-scrollbar{width:8px;height:8px}::-webkit-scrollbar-thumb{background:var(--l3);border-radius:4px}
+    [data-theme=dark]{--bg:#0A0A0B;--s1:#121214;--s2:#1A1A1D;--s3:#232327;--ink:#F5F6EE;--ink2:#BEC0B3;--ink3:#878A7E;--acc:#E8ECCC;--l1:rgba(232,236,204,.06);--l2:rgba(232,236,204,.10);--l3:rgba(232,236,204,.18);--l4:rgba(232,236,204,.34);--hdr:rgba(10,10,11,.78);--glass:rgba(20,20,23,.66);--sh:inset 0 1px 0 rgba(255,255,255,.04),0 12px 32px rgba(0,0,0,.32);--shLg:inset 0 1px 0 rgba(255,255,255,.06),0 30px 80px rgba(0,0,0,.55);--glow:radial-gradient(55% 60% at 22% 0%,rgba(232,236,204,.16),rgba(232,236,204,0) 70%),radial-gradient(40% 50% at 85% 10%,rgba(157,180,168,.10),rgba(157,180,168,0) 70%);--mapbg:radial-gradient(ellipse 70% 60% at 50% 50%,#16171A,#0A0A0B);--open:#E8ECCC;--lic:#9DB4A8;--pipe:#D9A55B;--inact:#5A5C54;color-scheme:dark}
+    [data-theme=light]{--bg:#F5F5F0;--s1:#FFFFFF;--s2:#EFEFE9;--s3:#E6E6DF;--ink:#0B0B0C;--ink2:#3C3E37;--ink3:#6B6D64;--acc:#0B0B0C;--l1:rgba(11,11,12,.05);--l2:rgba(11,11,12,.09);--l3:rgba(11,11,12,.16);--l4:rgba(11,11,12,.30);--hdr:rgba(245,245,240,.8);--glass:rgba(255,255,255,.7);--sh:0 1px 2px rgba(0,0,0,.04),0 10px 28px rgba(0,0,0,.06);--shLg:0 1px 2px rgba(0,0,0,.05),0 28px 70px rgba(0,0,0,.12);--glow:radial-gradient(55% 60% at 22% 0%,rgba(214,222,160,.75),rgba(214,222,160,0) 70%),radial-gradient(40% 50% at 85% 10%,rgba(157,180,168,.35),rgba(157,180,168,0) 70%);--mapbg:radial-gradient(ellipse 70% 60% at 50% 50%,#FFFFFF,#EDEDE6);--open:#4E5A1E;--lic:#4F8270;--pipe:#B07524;--inact:#B5B6AD;color-scheme:light}
+    @keyframes kIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+    @keyframes kSheet{from{transform:translateY(24px);opacity:0}to{transform:none;opacity:1}}
+    @keyframes kDrawer{from{transform:translateX(28px);opacity:0}to{transform:none;opacity:1}}
+    @keyframes kFade{from{opacity:0}to{opacity:1}}
+    @media (prefers-reduced-motion:reduce){*{animation-duration:.01ms!important;transition-duration:.01ms!important}}
+  </style>
+</helmet>
+
+<div data-theme="{{ theme }}" style="position:fixed;inset:0;display:flex;flex-direction:column;background:var(--bg);color:var(--ink);transition:background .35s ease,color .35s ease;font-size:14px;font-variant-numeric:tabular-nums">
+
+  <!-- ============ HEADER ============ -->
+  <header style="flex:none;display:flex;align-items:center;gap:16px;height:60px;padding:0 {{ padX }};border-bottom:1px solid var(--l2);background:var(--hdr);backdrop-filter:blur(10px);position:relative;z-index:10">
+    <a href="../../" title="The Kuroneko Company · Portfolio" style="display:flex;align-items:center;gap:10px;color:var(--ink);text-decoration:none;flex:none">
+      <svg viewBox="0 0 100 100" width="22" height="22" aria-hidden="true" style="display:block;flex:none"><path d="M11.2 5.5h5v4.6h-5zM84 5.5h5v4.6h-5zM11.6 13h15.4v4.6h-15.4zM73.2 13h15.4v4.6h-15.4zM12.2 20.5h25.8v4.6h-25.8zM62.2 20.5h25.8v4.6h-25.8zM12.6 28h75v4.6h-75zM11.2 35.5h77.8v4.6h-77.8zM9.2 43h81.8v4.6h-81.8zM8.2 50.5h13.4v4.6h-13.4zM40.2 50.5h19.8v4.6h-19.8zM78.6 50.5h13.4v4.6h-13.4zM8.2 58h24v4.6h-24zM39.4 58h21.4v4.6h-21.4zM68 58h24v4.6h-24zM9 65.5h82.2v4.6h-82.2zM12.2 73h75.8v4.6h-75.8zM18.4 80.5h63.4v4.6h-63.4zM31.2 88h37.8v4.6h-37.8z" fill="var(--acc)"></path></svg>
+      <span style="display:flex;flex-direction:column;gap:3px">
+        <span style="font:600 12px/1 'Chakra Petch',sans-serif;letter-spacing:.16em;color:var(--acc)">KURONEKO</span>
+        <span style="font:500 13px/1 'IBM Plex Sans',sans-serif;color:var(--ink)">NY Retail Footprint</span>
+      </span>
+    </a>
+    <sc-if value="{{ notMob }}" hint-placeholder-val="{{ true }}">
+      <nav aria-label="Primary" style="display:flex;align-items:center;gap:2px;margin-left:12px">
+        <sc-for list="{{ nav }}" as="n" hint-placeholder-count="6">
+          <button onClick="{{ n.go }}" aria-current="{{ n.cur }}" style="display:flex;align-items:center;gap:8px;height:36px;padding:0 12px;border:0;border-radius:999px;background:{{ n.bg }};color:{{ n.fg }};font-size:13px;font-weight:500;cursor:pointer;transition:background .2s ease,color .2s ease" style-hover="color:var(--ink)"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="{{ n.d }}"></path></svg>{{ n.label }}</button>
+        </sc-for>
+      </nav>
+    </sc-if>
+    <span style="flex:1"></span>
+    <button onClick="{{ toggleTheme }}" aria-label="{{ themeLbl }}" title="{{ themeLbl }}" style="display:grid;place-items:center;width:38px;height:38px;border:1px solid var(--l3);border-radius:999px;background:transparent;color:var(--ink);cursor:pointer;transition:background .2s ease" style-hover="background:var(--s2)"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="{{ themeIcon }}"></path></svg></button>
+    <span title="{{ srcTitle }}" style="display:flex;align-items:center;gap:8px;font:400 11px/1.2 'IBM Plex Mono',monospace;color:var(--ink3);white-space:nowrap"><span style="width:7px;height:7px;border-radius:50%;background:{{ srcDot }};flex:none"></span><sc-if value="{{ wideHdr }}" hint-placeholder-val="{{ true }}">{{ srcLbl }}</sc-if></span>
+    <sc-if value="{{ isMob }}" hint-placeholder-val="{{ false }}">
+      <button onClick="{{ goMore }}" aria-label="More" style="display:grid;place-items:center;width:40px;height:40px;border:1px solid var(--l3);border-radius:12px;background:transparent;color:var(--ink);cursor:pointer"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h10"></path></svg></button>
+    </sc-if>
+  </header>
+
+  <main style="flex:1;min-height:0;position:relative;overflow:hidden">
+
+    <!-- ============ HOME ============ -->
+    <sc-if value="{{ pgHome }}" hint-placeholder-val="{{ true }}">
+      <div style="position:absolute;inset:0;overflow:auto;-webkit-overflow-scrolling:touch">
+        <div style="position:relative;max-width:1120px;margin:0 auto;padding:{{ pagePad }};display:flex;flex-direction:column;gap:{{ secGap }};animation:kIn .45s cubic-bezier(.2,.7,.2,1) both">
+          <section style="display:flex;flex-direction:column;gap:18px;padding-top:{{ heroTop }}">
+            <span style="font:400 11px/1 'IBM Plex Mono',monospace;letter-spacing:.16em;color:var(--ink3)">NEW YORK STATE · ADULT-USE RETAIL</span>
+            <h1 style="margin:0;font:300 {{ heroSize }}/1 'IBM Plex Sans',sans-serif;letter-spacing:-.035em;color:var(--ink)"><span style="color:var(--acc)">{{ openHead }}</span> stores open.</h1>
+            <p style="margin:0;max-width:56ch;font-size:16px;line-height:1.55;color:var(--ink2);text-wrap:pretty">Every licensed cannabis storefront in New York, with its license status, sales stage and public rating. Search a name, city or ZIP to start.</p>
+            <label style="display:flex;align-items:center;gap:12px;height:60px;padding:0 18px;border:1px solid var(--l3);border-radius:16px;background:var(--s1);max-width:720px;transition:border-color .2s ease" style-focus="border-color:var(--acc)">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--acc)" stroke-width="1.8" stroke-linecap="round"><path d="M11 18a7 7 0 1 0 0-14a7 7 0 1 0 0 14M20 20l-4-4"></path></svg>
+              <input value="{{ q }}" onChange="{{ onQ }}" placeholder="Store, license number, city or ZIP" aria-label="Search stores" style="flex:1;min-width:0;height:100%;border:0;background:transparent;color:var(--ink);font-size:17px;outline:none">
+              <sc-if value="{{ hasQ }}" hint-placeholder-val="{{ false }}"><button onClick="{{ clearQ }}" aria-label="Clear search" style="border:0;background:transparent;color:var(--ink3);font-size:20px;cursor:pointer;padding:4px 6px">×</button></sc-if>
+            </label>
+            <sc-if value="{{ hasQ }}" hint-placeholder-val="{{ false }}">
+              <div style="max-width:720px;display:flex;flex-direction:column;border:1px solid var(--l2);border-radius:16px;background:var(--s1);overflow:hidden;animation:kFade .2s ease both">
+                <sc-for list="{{ quick }}" as="s" hint-placeholder-count="5">
+                  <button onClick="{{ s.open }}" style="display:flex;align-items:center;gap:12px;min-height:56px;padding:10px 16px;border:0;border-bottom:1px solid var(--l1);background:transparent;color:var(--ink);text-align:left;cursor:pointer" style-hover="background:var(--s2)"><span style="width:8px;height:8px;border-radius:50%;flex:none;background:{{ s.col }}"></span><span style="flex:1;min-width:0;display:flex;flex-direction:column;gap:3px"><span style="font-size:15px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ s.name }}</span><span style="font-size:12.5px;color:var(--ink3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ s.sub }}</span></span><span style="font:400 11px/1 'IBM Plex Mono',monospace;color:var(--ink2);flex:none">{{ s.status }}</span></button>
+                </sc-for>
+                <button onClick="{{ seeAllQ }}" style="height:48px;border:0;background:var(--s2);color:var(--acc);font-size:13px;font-weight:500;cursor:pointer">{{ seeAllLbl }} →</button>
+              </div>
+            </sc-if>
+            
+          </section>
+
+          <section style="display:grid;grid-template-columns:repeat(auto-fit,minmax({{ tileMin }},1fr));gap:10px">
+            <sc-for list="{{ tiles }}" as="t" hint-placeholder-count="4">
+              <button onClick="{{ t.go }}" style="display:flex;flex-direction:column;align-items:flex-start;gap:10px;padding:18px;border:1px solid var(--l2);border-radius:16px;background:var(--s1);color:var(--ink);text-align:left;cursor:pointer;transition:border-color .2s ease,transform .2s ease" style-hover="border-color:var(--l4);transform:translateY(-2px)">
+                <span style="display:flex;align-items:center;gap:8px;font-size:12.5px;color:var(--ink2)"><span style="width:8px;height:8px;border-radius:50%;background:{{ t.col }}"></span>{{ t.label }}</span>
+                <span style="font:300 34px/1 'IBM Plex Sans',sans-serif;letter-spacing:-.02em">{{ t.n }}</span>
+                <span style="font-size:12px;color:var(--ink3);line-height:1.4">{{ t.note }}</span>
+              </button>
+            </sc-for>
+          </section>
+
+          <section style="display:grid;grid-template-columns:{{ homeCols }};gap:16px;align-items:start">
+            <div style="display:flex;flex-direction:column;border:1px solid var(--l2);border-radius:16px;background:var(--s1);overflow:hidden">
+              <div style="display:flex;align-items:baseline;justify-content:space-between;gap:12px;padding:16px 18px 10px"><h2 style="margin:0;font-size:15px;font-weight:600">Open stores by region</h2><span style="font:400 11px/1 'IBM Plex Mono',monospace;color:var(--ink3)">TAP TO FILTER</span></div>
+              <sc-for list="{{ regionBars }}" as="r" hint-placeholder-count="8">
+                <button onClick="{{ r.go }}" style="display:grid;grid-template-columns:minmax(0,130px) minmax(0,1fr) 44px;align-items:center;gap:12px;min-height:40px;padding:4px 18px;border:0;background:transparent;color:var(--ink);text-align:left;cursor:pointer" style-hover="background:var(--s2)"><span style="font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ r.name }}</span><span style="height:6px;border-radius:3px;background:var(--l1);overflow:hidden"><span style="display:block;height:100%;width:{{ r.w }};border-radius:3px;background:var(--acc);transition:width .6s cubic-bezier(.2,.7,.2,1)"></span></span><span style="font:400 12.5px/1 'IBM Plex Mono',monospace;color:var(--ink2);text-align:right">{{ r.n }}</span></button>
+              </sc-for>
+              <span style="height:10px"></span>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:16px">
+              <div style="display:flex;flex-direction:column;border:1px solid var(--l2);border-radius:16px;background:var(--s1);overflow:hidden">
+                <div style="display:flex;align-items:baseline;justify-content:space-between;gap:12px;padding:16px 18px 8px"><h2 style="margin:0;font-size:15px;font-weight:600">Newest openings</h2><button onClick="{{ goNewest }}" style="border:0;background:transparent;color:var(--acc);font-size:12.5px;cursor:pointer">All →</button></div>
+                <sc-for list="{{ newest }}" as="s" hint-placeholder-count="6">
+                  <button onClick="{{ s.open }}" style="display:flex;align-items:center;gap:12px;min-height:52px;padding:8px 18px;border:0;border-top:1px solid var(--l1);background:transparent;color:var(--ink);text-align:left;cursor:pointer" style-hover="background:var(--s2)"><span style="flex:1;min-width:0;display:flex;flex-direction:column;gap:3px"><span style="font-size:14px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ s.name }}</span><span style="font-size:12px;color:var(--ink3)">{{ s.sub }}</span></span><span style="font:400 11.5px/1 'IBM Plex Mono',monospace;color:var(--ink2);flex:none">{{ s.date }}</span></button>
+                </sc-for>
+              </div>
+              <div style="display:flex;flex-direction:column;border:1px solid var(--l2);border-radius:16px;background:var(--s1);overflow:hidden">
+                <div style="display:flex;align-items:baseline;justify-content:space-between;gap:12px;padding:16px 18px 8px"><h2 style="margin:0;font-size:15px;font-weight:600">Top rated</h2><button onClick="{{ goRankings }}" style="border:0;background:transparent;color:var(--acc);font-size:12.5px;cursor:pointer">Rankings →</button></div>
+                <sc-for list="{{ topRated }}" as="s" hint-placeholder-count="5">
+                  <button onClick="{{ s.open }}" style="display:flex;align-items:center;gap:12px;min-height:52px;padding:8px 18px;border:0;border-top:1px solid var(--l1);background:transparent;color:var(--ink);text-align:left;cursor:pointer" style-hover="background:var(--s2)"><span style="font:400 12px/1 'IBM Plex Mono',monospace;color:var(--ink3);width:20px;flex:none">{{ s.rank }}</span><span style="flex:1;min-width:0;display:flex;flex-direction:column;gap:3px"><span style="font-size:14px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ s.name }}</span><span style="font-size:12px;color:var(--ink3)">{{ s.city }}</span></span><span style="font-size:13px;color:var(--acc);flex:none">★ {{ s.rating }}</span></button>
+                </sc-for>
+              </div>
+            </div>
+          </section>
+
+          <section style="display:flex;flex-direction:column;gap:12px;padding:18px;border:1px solid var(--l2);border-radius:16px;background:var(--s1)">
+            <div style="display:flex;align-items:baseline;justify-content:space-between;gap:12px"><h2 style="margin:0;font-size:15px;font-weight:600">Sales pipeline</h2><span style="display:flex;align-items:center;gap:12px"><span style="font:400 10.5px/1 'IBM Plex Mono',monospace;letter-spacing:.1em;padding:4px 7px;border:1px solid rgba(217,165,91,.5);border-radius:6px;color:#D9A55B">DEMO DATA</span><button onClick="{{ goPipeline }}" style="border:0;background:transparent;color:var(--acc);font-size:12.5px;cursor:pointer">Board →</button></span></div>
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(96px,1fr));gap:6px">
+              <sc-for list="{{ stageStrip }}" as="s" hint-placeholder-count="8">
+                <button onClick="{{ s.go }}" style="display:flex;flex-direction:column;gap:6px;padding:12px;border:0;border-radius:12px;background:var(--s2);color:var(--ink);text-align:left;cursor:pointer;transition:background .2s ease" style-hover="background:var(--s3)"><span style="font:300 22px/1 'IBM Plex Sans',sans-serif">{{ s.n }}</span><span style="font-size:11.5px;color:var(--ink2)">{{ s.label }}</span></button>
+              </sc-for>
+            </div>
+          </section>
+          <p style="margin:0;font-size:12px;line-height:1.55;color:var(--ink3);max-width:80ch">{{ footNote }}</p>
+        </div>
+      </div>
+    </sc-if>
+
+    <!-- ============ STORES ============ -->
+    <sc-if value="{{ pgStores }}" hint-placeholder-val="{{ false }}">
+      <div style="position:absolute;inset:0;overflow:auto;-webkit-overflow-scrolling:touch">
+        <div style="max-width:1120px;margin:0 auto;padding:{{ pagePad }};display:flex;flex-direction:column;gap:16px;animation:kIn .4s cubic-bezier(.2,.7,.2,1) both">
+          <div style="display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:12px">
+            <div style="display:flex;flex-direction:column;gap:6px"><h1 style="margin:0;font:400 {{ h1Size }}/1.1 'IBM Plex Sans',sans-serif;letter-spacing:-.02em">Stores</h1><span style="font-size:13px;color:var(--ink3)">{{ countLbl }}</span></div>
+            <div style="display:flex;gap:8px">
+              <button onClick="{{ goMap }}" style="display:flex;align-items:center;gap:8px;height:40px;padding:0 14px;border:1px solid var(--l3);border-radius:12px;background:transparent;color:var(--ink);font-size:13px;cursor:pointer" style-hover="border-color:var(--acc)">View on map</button>
+              <button onClick="{{ exportCsv }}" style="display:flex;align-items:center;gap:8px;height:40px;padding:0 14px;border:1px solid var(--acc);border-radius:12px;background:var(--acc);color:var(--bg);font-size:13px;font-weight:500;cursor:pointer">Export CSV</button>
+            </div>
+          </div>
+          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax({{ ctrlMin }},1fr));gap:8px;padding:10px;border:1px solid var(--l2);border-radius:16px;background:var(--s1)">
+            <label style="grid-column:{{ searchSpan }};display:flex;align-items:center;gap:10px;height:44px;padding:0 12px;border:1px solid var(--l3);border-radius:12px;background:var(--bg)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--ink3)" stroke-width="1.8" stroke-linecap="round"><path d="M11 18a7 7 0 1 0 0-14a7 7 0 1 0 0 14M20 20l-4-4"></path></svg><input value="{{ q }}" onChange="{{ onQ }}" placeholder="Search name, license, city or ZIP" aria-label="Search stores" style="flex:1;min-width:0;border:0;background:transparent;color:var(--ink);font-size:15px;outline:none"></label>
+            <select value="{{ statusVal }}" onChange="{{ onStatus }}" aria-label="Status" style="height:44px;padding:0 10px;border:1px solid var(--l3);border-radius:12px;background:var(--bg);color:var(--ink);font-size:14px"><sc-for list="{{ statusOpts }}" as="o" hint-placeholder-count="5"><option value="{{ o.v }}">{{ o.l }}</option></sc-for></select>
+            <select value="{{ region }}" onChange="{{ onRegion }}" aria-label="Region" style="height:44px;padding:0 10px;border:1px solid var(--l3);border-radius:12px;background:var(--bg);color:var(--ink);font-size:14px"><sc-for list="{{ regionOpts }}" as="o" hint-placeholder-count="8"><option value="{{ o.v }}">{{ o.l }}</option></sc-for></select>
+            <sc-if value="{{ isMob }}" hint-placeholder-val="{{ false }}"><button onClick="{{ toggleMore }}" aria-expanded="{{ moreStr }}" style="grid-column:1 / -1;display:flex;align-items:center;justify-content:space-between;height:44px;padding:0 14px;border:1px solid var(--l3);border-radius:12px;background:var(--s2);color:var(--ink);font-size:14px;cursor:pointer"><span>{{ moreLbl }}</span><span aria-hidden="true">{{ moreIcon }}</span></button></sc-if>
+            <sc-if value="{{ showMore }}" hint-placeholder-val="{{ true }}">
+              <select value="{{ type }}" onChange="{{ onType }}" aria-label="License type" style="height:44px;padding:0 10px;border:1px solid var(--l3);border-radius:12px;background:var(--bg);color:var(--ink);font-size:14px"><sc-for list="{{ typeOpts }}" as="o" hint-placeholder-count="4"><option value="{{ o.v }}">{{ o.l }}</option></sc-for></select>
+              <select value="{{ sort }}" onChange="{{ onSort }}" aria-label="Sort" style="height:44px;padding:0 10px;border:1px solid var(--l3);border-radius:12px;background:var(--bg);color:var(--ink);font-size:14px"><sc-for list="{{ sortOpts }}" as="o" hint-placeholder-count="4"><option value="{{ o.v }}">{{ o.l }}</option></sc-for></select>
+              <div style="grid-column:1 / -1;display:flex;flex-wrap:wrap;gap:6px">
+                <sc-for list="{{ flagChips }}" as="c" hint-placeholder-count="4">
+                  <button onClick="{{ c.toggle }}" aria-pressed="{{ c.pressed }}" style="display:flex;align-items:center;gap:8px;height:36px;padding:0 12px;border:1px solid {{ c.bd }};border-radius:999px;background:{{ c.bg }};color:{{ c.fg }};font-size:13px;cursor:pointer;transition:all .2s ease">{{ c.label }}<span style="font:400 11.5px/1 'IBM Plex Mono',monospace;opacity:.7">{{ c.n }}</span></button>
+                </sc-for>
+                <sc-if value="{{ anyFilter }}" hint-placeholder-val="{{ false }}"><button onClick="{{ resetF }}" style="height:36px;padding:0 12px;border:0;background:transparent;color:var(--acc);font-size:13px;cursor:pointer">Reset filters</button></sc-if>
+              </div>
+            </sc-if>
+          </div>
+          <div style="display:flex;flex-direction:column;border:1px solid var(--l2);border-radius:16px;background:var(--s1);overflow:hidden">
+            <sc-for list="{{ rows }}" as="s" hint-placeholder-count="10">
+              <button onClick="{{ s.open }}" style="display:grid;grid-template-columns:{{ rowCols }};align-items:center;gap:14px;min-height:64px;padding:10px 18px;border:0;border-bottom:1px solid var(--l1);background:{{ s.bg }};color:var(--ink);text-align:left;cursor:pointer;transition:background .15s ease" style-hover="background:var(--s2)">
+                <span style="display:flex;align-items:center;gap:12px;min-width:0"><span style="width:9px;height:9px;border-radius:50%;flex:none;background:{{ s.col }}"></span><span style="display:flex;flex-direction:column;gap:4px;min-width:0"><span style="font-size:15px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ s.name }}</span><span style="font-size:12.5px;color:var(--ink3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ s.sub }}</span></span></span>
+                <sc-if value="{{ notMob }}" hint-placeholder-val="{{ true }}"><span style="font-size:12.5px;color:var(--ink2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ s.type }}</span></sc-if>
+                <sc-if value="{{ notMob }}" hint-placeholder-val="{{ true }}"><span style="font-size:12.5px;color:var(--ink2)">{{ s.stage }}</span></sc-if>
+                <span style="font-size:13px;color:var(--acc);text-align:right;white-space:nowrap">{{ s.ratingLbl }}</span>
+              </button>
+            </sc-for>
+            <sc-if value="{{ noRows }}" hint-placeholder-val="{{ false }}"><div style="padding:40px 18px;text-align:center;color:var(--ink2);font-size:14px">No stores match. <button onClick="{{ resetF }}" style="border:0;background:transparent;color:var(--acc);font-size:14px;cursor:pointer;text-decoration:underline">Reset filters</button></div></sc-if>
+            <sc-if value="{{ hasMoreRows }}" hint-placeholder-val="{{ false }}"><button onClick="{{ showMoreRows }}" style="height:52px;border:0;background:var(--s2);color:var(--acc);font-size:13.5px;font-weight:500;cursor:pointer">Show more · {{ remainingLbl }}</button></sc-if>
+          </div>
+        </div>
+      </div>
+    </sc-if>
+
+    <!-- ============ MAP ============ -->
+    <sc-if value="{{ pgMap }}" hint-placeholder-val="{{ false }}">
+      <div style="position:absolute;inset:0;background:var(--mapbg);animation:kFade .4s ease both">
+        <canvas aria-label="Map of New York retail locations" style="position:absolute;inset:0;width:100%;height:100%;display:block;touch-action:none;cursor:grab"></canvas>
+        <div style="position:absolute;left:{{ floatX }};right:{{ floatX }};top:{{ floatX }};display:flex;flex-wrap:wrap;gap:6px;pointer-events:none">
+          <sc-for list="{{ mapChips }}" as="c" hint-placeholder-count="4">
+            <button onClick="{{ c.toggle }}" aria-pressed="{{ c.pressed }}" style="pointer-events:auto;display:flex;align-items:center;gap:8px;height:38px;padding:0 14px;border:1px solid {{ c.bd }};border-radius:999px;background:var(--glass);backdrop-filter:blur(8px);color:{{ c.fg }};font-size:13px;cursor:pointer;transition:all .2s ease"><span style="width:8px;height:8px;border-radius:50%;background:{{ c.col }};opacity:{{ c.op }}"></span>{{ c.label }}<span style="font:400 11.5px/1 'IBM Plex Mono',monospace;opacity:.7">{{ c.n }}</span></button>
+          </sc-for>
+          <select value="{{ region }}" onChange="{{ onRegion }}" aria-label="Region" style="pointer-events:auto;height:38px;padding:0 10px;border:1px solid var(--l3);border-radius:999px;background:var(--glass);color:var(--ink);font-size:13px"><sc-for list="{{ regionOpts }}" as="o" hint-placeholder-count="8"><option value="{{ o.v }}">{{ o.l }}</option></sc-for></select>
+        </div>
+        <div style="position:absolute;right:{{ floatX }};bottom:{{ zoomBottom }};display:flex;flex-direction:column;gap:6px">
+          <button onClick="{{ zoomIn }}" aria-label="Zoom in" style="width:44px;height:44px;border:1px solid var(--l3);border-radius:12px;background:var(--glass);color:var(--ink);font-size:20px;cursor:pointer">+</button>
+          <button onClick="{{ zoomOut }}" aria-label="Zoom out" style="width:44px;height:44px;border:1px solid var(--l3);border-radius:12px;background:var(--glass);color:var(--ink);font-size:20px;cursor:pointer">−</button>
+          <button onClick="{{ zoomReset }}" aria-label="Reset map" style="width:44px;height:44px;border:1px solid var(--l3);border-radius:12px;background:var(--glass);color:var(--ink);font-size:14px;cursor:pointer">⟲</button>
+        </div>
+        <div style="position:absolute;left:{{ floatX }};bottom:{{ floatX }};font:400 11px/1.4 'IBM Plex Mono',monospace;color:var(--ink3);pointer-events:none;max-width:60%">{{ mapNote }}</div>
+      </div>
+    </sc-if>
+
+    <!-- ============ PIPELINE ============ -->
+    <sc-if value="{{ pgPipeline }}" hint-placeholder-val="{{ false }}">
+      <div style="position:absolute;inset:0;display:flex;flex-direction:column;animation:kIn .4s cubic-bezier(.2,.7,.2,1) both">
+        <div style="flex:none;max-width:1120px;width:100%;margin:0 auto;padding:{{ pagePadTop }};display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:12px">
+          <div style="display:flex;flex-direction:column;gap:6px"><h1 style="margin:0;font:400 {{ h1Size }}/1.1 'IBM Plex Sans',sans-serif;letter-spacing:-.02em">Sales pipeline</h1><span style="font-size:13px;color:var(--ink3)">Open and licensed stores by sales stage. Stages are demo data; change one from a store's profile.</span></div>
+          <select value="{{ region }}" onChange="{{ onRegion }}" aria-label="Region" style="height:40px;padding:0 10px;border:1px solid var(--l3);border-radius:12px;background:var(--s1);color:var(--ink);font-size:14px"><sc-for list="{{ regionOpts }}" as="o" hint-placeholder-count="8"><option value="{{ o.v }}">{{ o.l }}</option></sc-for></select>
+        </div>
+        <div style="flex:1;min-height:0;overflow-x:auto;overflow-y:hidden;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch">
+          <div style="display:flex;gap:10px;height:100%;padding:4px {{ padX }} 18px;width:max-content">
+            <sc-for list="{{ columns }}" as="c" hint-placeholder-count="8">
+              <div style="width:{{ colW }};height:100%;display:flex;flex-direction:column;border:1px solid var(--l2);border-radius:16px;background:var(--s1);scroll-snap-align:start;overflow:hidden">
+                <div style="flex:none;display:flex;align-items:center;justify-content:space-between;padding:14px 16px;border-bottom:1px solid var(--l1)"><span style="display:flex;align-items:center;gap:8px;font-size:14px;font-weight:600"><span style="width:8px;height:8px;border-radius:50%;background:{{ c.col }}"></span>{{ c.label }}</span><span style="font:400 12px/1 'IBM Plex Mono',monospace;color:var(--ink2)">{{ c.n }}</span></div>
+                <div style="flex:1;min-height:0;overflow:auto;padding:8px;display:flex;flex-direction:column;gap:6px">
+                  <sc-for list="{{ c.cards }}" as="s" hint-placeholder-count="4">
+                    <button onClick="{{ s.open }}" style="display:flex;flex-direction:column;gap:4px;padding:12px;border:1px solid var(--l1);border-radius:12px;background:var(--s2);color:var(--ink);text-align:left;cursor:pointer;transition:border-color .2s ease" style-hover="border-color:var(--l4)"><span style="font-size:13.5px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ s.name }}</span><span style="font-size:12px;color:var(--ink3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ s.sub }}</span></button>
+                  </sc-for>
+                  <sc-if value="{{ c.hasMore }}" hint-placeholder-val="{{ false }}"><span style="padding:8px 4px;font-size:12px;color:var(--ink3)">+ {{ c.more }} more</span></sc-if>
+                </div>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+      </div>
+    </sc-if>
+
+    <!-- ============ RANKINGS ============ -->
+    <sc-if value="{{ pgRankings }}" hint-placeholder-val="{{ false }}">
+      <div style="position:absolute;inset:0;overflow:auto;-webkit-overflow-scrolling:touch">
+        <div style="max-width:880px;margin:0 auto;padding:{{ pagePad }};display:flex;flex-direction:column;gap:16px;animation:kIn .4s cubic-bezier(.2,.7,.2,1) both">
+          <div style="display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:12px">
+            <div style="display:flex;flex-direction:column;gap:6px"><h1 style="margin:0;font:400 {{ h1Size }}/1.1 'IBM Plex Sans',sans-serif;letter-spacing:-.02em">Rankings</h1><span style="font-size:13px;color:var(--ink3);max-width:60ch">{{ rankNote }}</span></div>
+            <select value="{{ region }}" onChange="{{ onRegion }}" aria-label="Region" style="height:40px;padding:0 10px;border:1px solid var(--l3);border-radius:12px;background:var(--s1);color:var(--ink);font-size:14px"><sc-for list="{{ regionOpts }}" as="o" hint-placeholder-count="8"><option value="{{ o.v }}">{{ o.l }}</option></sc-for></select>
+          </div>
+          <div style="display:flex;flex-direction:column;border:1px solid var(--l2);border-radius:16px;background:var(--s1);overflow:hidden">
+            <sc-for list="{{ ranked }}" as="s" hint-placeholder-count="10">
+              <button onClick="{{ s.open }}" style="display:grid;grid-template-columns:36px minmax(0,1fr) auto;align-items:center;gap:14px;min-height:64px;padding:10px 18px;border:0;border-bottom:1px solid var(--l1);background:transparent;color:var(--ink);text-align:left;cursor:pointer" style-hover="background:var(--s2)">
+                <span style="font:300 22px/1 'IBM Plex Sans',sans-serif;color:{{ s.rankCol }}">{{ s.rank }}</span>
+                <span style="display:flex;flex-direction:column;gap:4px;min-width:0"><span style="font-size:15px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ s.name }}</span><span style="font-size:12.5px;color:var(--ink3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ s.sub }}</span></span>
+                <span style="display:flex;flex-direction:column;align-items:flex-end;gap:4px"><span style="font-size:15px;color:var(--acc)">★ {{ s.rating }}</span><span style="font:400 11px/1 'IBM Plex Mono',monospace;color:var(--ink3)">{{ s.reviews }} reviews</span></span>
+              </button>
+            </sc-for>
+            <sc-if value="{{ noRanked }}" hint-placeholder-val="{{ false }}"><div style="padding:40px 18px;text-align:center;color:var(--ink2)">No rated stores in this region yet.</div></sc-if>
+          </div>
+        </div>
+      </div>
+    </sc-if>
+
+    <!-- ============ MORE ============ -->
+    <sc-if value="{{ pgMore }}" hint-placeholder-val="{{ false }}">
+      <div style="position:absolute;inset:0;overflow:auto;-webkit-overflow-scrolling:touch">
+        <div style="max-width:880px;margin:0 auto;padding:{{ pagePad }};display:flex;flex-direction:column;gap:16px;animation:kIn .4s cubic-bezier(.2,.7,.2,1) both">
+          <h1 style="margin:0;font:400 {{ h1Size }}/1.1 'IBM Plex Sans',sans-serif;letter-spacing:-.02em">Data, export &amp; tools</h1>
+          <div style="display:flex;flex-direction:column;border:1px solid var(--l2);border-radius:16px;background:var(--s1);overflow:hidden">
+            <div style="padding:16px 18px 6px;font:400 11px/1 'IBM Plex Mono',monospace;letter-spacing:.14em;color:var(--ink3)">SOURCES</div>
+            <sc-for list="{{ sources }}" as="s" hint-placeholder-count="3">
+              <div style="display:flex;flex-direction:column;gap:5px;padding:14px 18px;border-top:1px solid var(--l1)"><span style="display:flex;align-items:center;justify-content:space-between;gap:12px"><span style="font-size:14.5px;font-weight:500">{{ s.name }}</span><span style="font:400 10.5px/1 'IBM Plex Mono',monospace;letter-spacing:.08em;padding:4px 7px;border:1px solid {{ s.bd }};border-radius:6px;color:{{ s.fg }};white-space:nowrap">{{ s.tag }}</span></span><span style="font-size:13px;color:var(--ink2);line-height:1.5">{{ s.detail }}</span></div>
+            </sc-for>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:12px;padding:18px;border:1px solid var(--l2);border-radius:16px;background:var(--s1)">
+            <div style="font:400 11px/1 'IBM Plex Mono',monospace;letter-spacing:.14em;color:var(--ink3)">EXPORT</div>
+            <span style="font-size:13.5px;color:var(--ink2)">{{ exportNote }}</span>
+            <div style="display:flex;flex-wrap:wrap;gap:8px"><button onClick="{{ exportCsv }}" style="height:44px;padding:0 16px;border:1px solid var(--acc);border-radius:12px;background:var(--acc);color:var(--bg);font-size:14px;font-weight:500;cursor:pointer">Download CSV</button><button onClick="{{ exportJson }}" style="height:44px;padding:0 16px;border:1px solid var(--l3);border-radius:12px;background:transparent;color:var(--ink);font-size:14px;cursor:pointer">Download JSON</button></div>
+          </div>
+          <div style="display:flex;flex-direction:column;border:1px solid var(--l2);border-radius:16px;background:var(--s1);overflow:hidden">
+            <div style="padding:16px 18px 6px;font:400 11px/1 'IBM Plex Mono',monospace;letter-spacing:.14em;color:var(--ink3)">STATUS DEFINITIONS</div>
+            <sc-for list="{{ defs }}" as="d" hint-placeholder-count="4">
+              <div style="display:grid;grid-template-columns:150px minmax(0,1fr);gap:12px;padding:12px 18px;border-top:1px solid var(--l1)"><span style="display:flex;align-items:center;gap:8px;font-size:13.5px"><span style="width:8px;height:8px;border-radius:50%;background:{{ d.col }}"></span>{{ d.label }}</span><span style="font-size:13px;color:var(--ink2);line-height:1.5">{{ d.desc }}</span></div>
+            </sc-for>
+          </div>
+          <a href="./NY Retail Footprint.dc.html" style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:18px;border:1px solid var(--l2);border-radius:16px;background:var(--s1);color:var(--ink);text-decoration:none"><span style="display:flex;flex-direction:column;gap:5px"><span style="font-size:14.5px;font-weight:500">Advanced tools</span><span style="font-size:13px;color:var(--ink2)">Territories and reps, visit routes, proposed sites, municipal opt-outs and data-quality checks in the full workspace.</span></span><span style="color:var(--acc);font-size:18px">→</span></a>
+        </div>
+      </div>
+    </sc-if>
+
+    <!-- ============ PROFILE ============ -->
+    <sc-if value="{{ hasSel }}" hint-placeholder-val="{{ false }}">
+      <div onClick="{{ closeSel }}" style="position:absolute;inset:0;z-index:20;background:rgba(0,0,0,.5);animation:kFade .2s ease both"></div>
+      <aside role="dialog" aria-modal="true" aria-label="Store profile" style="position:absolute;z-index:21;left:{{ shL }};right:{{ shR }};top:{{ shT }};bottom:{{ shB }};width:{{ shW }};max-height:{{ shMH }};border-radius:{{ shRad }};display:flex;flex-direction:column;background:var(--s1);border:1px solid var(--l2);box-shadow:var(--shLg);animation:{{ sheetAnim }};overflow:hidden">
+        <div style="flex:none;display:flex;align-items:flex-start;gap:12px;padding:18px 18px 14px;border-bottom:1px solid var(--l1)">
+          <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:8px">
+            <span style="display:flex;align-items:center;gap:8px;font:400 11px/1 'IBM Plex Mono',monospace;letter-spacing:.08em;color:var(--ink2)"><span style="width:8px;height:8px;border-radius:50%;background:{{ p.col }}"></span>{{ p.status }}</span>
+            <h2 style="margin:0;font:400 22px/1.2 'IBM Plex Sans',sans-serif;letter-spacing:-.01em;text-wrap:balance">{{ p.name }}</h2>
+            <span style="font-size:13px;color:var(--ink3)">{{ p.entity }}</span>
+          </div>
+          <button onClick="{{ closeSel }}" aria-label="Close" style="flex:none;width:40px;height:40px;border:1px solid var(--l3);border-radius:12px;background:transparent;color:var(--ink);font-size:20px;cursor:pointer">×</button>
+        </div>
+        <div style="flex:1;min-height:0;overflow:auto;padding:16px 18px calc(22px + env(safe-area-inset-bottom));display:flex;flex-direction:column;gap:18px">
+          <div style="display:flex;flex-direction:column;gap:6px"><span style="font-size:15px">{{ p.addr }}</span><span style="font-size:13px;color:var(--ink3)">{{ p.region }}</span></div>
+          <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px">
+            <a href="{{ p.dirUrl }}" target="_blank" rel="noopener" style="display:flex;align-items:center;justify-content:center;height:46px;border-radius:12px;background:var(--acc);color:var(--bg);font-size:14px;font-weight:500;text-decoration:none">Directions</a>
+            <sc-if value="{{ p.hasWeb }}" hint-placeholder-val="{{ false }}"><a href="{{ p.web }}" target="_blank" rel="noopener" style="display:flex;align-items:center;justify-content:center;height:46px;border:1px solid var(--l3);border-radius:12px;color:var(--ink);font-size:14px;text-decoration:none">Website</a></sc-if>
+            <sc-if value="{{ p.noWeb }}" hint-placeholder-val="{{ true }}"><button onClick="{{ showOnMap }}" style="height:46px;border:1px solid var(--l3);border-radius:12px;background:transparent;color:var(--ink);font-size:14px;cursor:pointer">Show on map</button></sc-if>
+          </div>
+          <sc-if value="{{ p.hasRating }}" hint-placeholder-val="{{ false }}"><div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px;border-radius:12px;background:var(--s2)"><span style="display:flex;flex-direction:column;gap:4px"><span style="font-size:20px;color:var(--acc)">★ {{ p.rating }}</span><span style="font-size:12px;color:var(--ink3)">{{ p.reviews }} Google reviews · {{ intelAt }}</span></span><span style="font:400 11px/1 'IBM Plex Mono',monospace;color:var(--ink3)">PUBLIC RATING</span></div></sc-if>
+          <label style="display:flex;flex-direction:column;gap:8px"><span style="display:flex;align-items:center;justify-content:space-between"><span style="font-size:12.5px;color:var(--ink2)">Sales stage</span><span style="font:400 10px/1 'IBM Plex Mono',monospace;letter-spacing:.1em;color:#D9A55B">DEMO</span></span><select value="{{ p.stage }}" onChange="{{ onStageSel }}" style="height:46px;padding:0 12px;border:1px solid var(--l3);border-radius:12px;background:var(--bg);color:var(--ink);font-size:15px"><sc-for list="{{ stageOpts }}" as="o" hint-placeholder-count="8"><option value="{{ o }}">{{ o }}</option></sc-for></select></label>
+          <dl style="margin:0;display:grid;grid-template-columns:120px minmax(0,1fr);gap:10px 14px;font-size:13.5px">
+            <sc-for list="{{ p.facts }}" as="f" hint-placeholder-count="8"><dt style="color:var(--ink3)">{{ f.k }}</dt><dd style="margin:0;color:var(--ink);overflow-wrap:anywhere">{{ f.v }}</dd></sc-for>
+          </dl>
+          <sc-if value="{{ p.hasHours }}" hint-placeholder-val="{{ false }}"><div style="display:flex;flex-direction:column;gap:6px"><span style="font-size:12.5px;color:var(--ink2)">Hours</span><sc-for list="{{ p.hours }}" as="hr" hint-placeholder-count="7"><span style="font:400 12.5px/1.5 'IBM Plex Mono',monospace;color:var(--ink)">{{ hr }}</span></sc-for></div></sc-if>
+          <span style="font-size:11.5px;line-height:1.5;color:var(--ink3)">License fields from the OCM Current Licenses dataset. Map position is a ZIP centroid, not a surveyed address.</span>
+        </div>
+      </aside>
+    </sc-if>
+  </main>
+
+  <!-- ============ MOBILE TAB BAR ============ -->
+  <sc-if value="{{ isMob }}" hint-placeholder-val="{{ false }}">
+    <nav aria-label="Primary" style="flex:none;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));padding:6px 6px calc(6px + env(safe-area-inset-bottom));border-top:1px solid var(--l2);background:var(--hdr);backdrop-filter:blur(10px);position:relative;z-index:10">
+      <sc-for list="{{ tabs }}" as="n" hint-placeholder-count="5">
+        <button onClick="{{ n.go }}" aria-current="{{ n.cur }}" style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;height:54px;border:0;border-radius:12px;background:{{ n.bg }};color:{{ n.fg }};font-size:11px;font-weight:500;cursor:pointer;transition:color .2s ease,background .2s ease"><svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="{{ n.d }}"></path></svg>{{ n.label }}</button>
+      </sc-for>
+    </nav>
+  </sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+const OCM_OPEN = 705; // OCM-reported open dispensaries, Cannabis Control Board release, Aug 7, 2026
+const STAGES = ["Not researched", "Researched", "Contacted", "Visited", "Sampled", "Negotiating", "Customer", "Lost"];
+const STAGE_COL = { "Not researched": "#55574F", Researched: "var(--ink3)", Contacted: "#9DB4A8", Visited: "#B9C7A3", Sampled: "#D4DCB6", Negotiating: "#D9A55B", Customer: "var(--open)", Lost: "#8A4B3C" };
+const COH = { open: "Open", licensed: "Licensed, not open", pipeline: "Pipeline", inactive: "Inactive" };
+const COH_COL = { open: "var(--open)", licensed: "var(--lic)", pipeline: "var(--pipe)", inactive: "var(--inact)" };
+const CANVAS = { dark: { land: "#141416", edge: "rgba(232,236,204,.45)", county: "rgba(232,236,204,.10)", label: "rgba(232,236,204,.55)", sel: "#FFFFFF", open: "#E8ECCC", licensed: "#9DB4A8", pipeline: "#D9A55B", inactive: "#5A5C54" }, light: { land: "#FFFFFF", edge: "rgba(11,11,12,.40)", county: "rgba(11,11,12,.09)", label: "rgba(11,11,12,.55)", sel: "#0B0B0C", open: "#4E5A1E", licensed: "#4F8270", pipeline: "#B07524", inactive: "#B5B6AD" } };
+const COH_DEF = { open: "Retail license active and officially operating.", licensed: "Retail license active, not yet operating.", pipeline: "Application in process, amendment or proximity review.", inactive: "License inactive or historical." };
+const RTYPES = ["Adult-Use Retail Dispensary License", "Adult-Use Conditional Retail Dispensary License", "Adult-Use Registered Organization Dispensary License"];
+const TSHORT = { "Adult-Use Retail Dispensary License": "Retail Dispensary", "Adult-Use Conditional Retail Dispensary License": "CAURD", "Adult-Use Microbusiness License": "Microbusiness", "Adult-Use Registered Organization Dispensary License": "RO Dispensary" };
+const REGION_ORDER = ["Manhattan", "Brooklyn", "Queens", "Bronx", "Staten Island", "Long Island", "Mid-Hudson", "Capital District", "Mohawk Valley", "North Country", "Central NY", "Southern Tier", "Finger Lakes", "Western NY"];
+const IC = { home: "M3 11l9-7 9 7v9h-6v-6H9v6H3z", stores: "M4 6h16M4 12h16M4 18h10", map: "M9 4L3 6v14l6-2 6 2 6-2V4l-6 2-6-2zM9 4v14M15 6v14", pipeline: "M4 5h16l-6 7v6l-4 2v-8z", rankings: "M12 3l2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1L3.2 9.5l6.1-.9z", more: "M5 12h.01M12 12h.01M19 12h.01" };
+const LS = "nyrf2-state";
+const hsh = s => { let h = 2166136261; for (let i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 16777619); } return ((h >>> 0) % 100000) / 100000; };
+const pd = s => s ? new Date(s.slice(0, 10) + "T12:00:00") : null;
+const fmtN = n => Number(n).toLocaleString("en-US");
+const fmtD = d => d ? d.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }) : "—";
+const TC = s => (s || "").toLowerCase().replace(/\b([a-z])/g, m => m.toUpperCase());
+
+function buildData(records) {
+  const D0 = window.NYSRF_DATA || { regions: {}, zips: {}, zipCounty: {} };
+  const C2R = {}; Object.keys(D0.regions || {}).forEach(r => D0.regions[r].forEach(c => { C2R[c] = r; }));
+  const all = records.filter(r => RTYPES.includes(r.license_type) || r.retail_activities_sales_with === "1" || r.retail_activities_sales_no === "1" || /Retail Sales/.test(r.business_purpose || "")).map((r, i) => {
+    const id = (r.license_number || r.application_number || "rec" + i) + "|" + (r.location_id || i);
+    const zip5 = (r.zip_code || "").slice(0, 5);
+    let county = r.county === "St Lawrence" ? "St. Lawrence" : (r.county || ""); if (!county && D0.zipCounty[zip5]) county = D0.zipCounty[zip5];
+    const region = C2R[county] || r.region || "";
+    const z = D0.zips[zip5]; const lat = z ? z[0] + (hsh(id + "a") - .5) * .012 : null, lon = z ? z[1] + (hsh(id + "b") - .5) * .016 : null;
+    const st = r.license_status, op = r.operational_status;
+    const cohort = st === "Inactive" ? "inactive" : st === "Active" ? (op === "Active" ? "open" : "licensed") : "pipeline";
+    const name = r.dba || r.entity_name || "Unnamed";
+    const h = hsh(id + "s"); let stage = "Not researched";
+    if (cohort === "open") stage = h < .3 ? "Not researched" : h < .48 ? "Researched" : h < .62 ? "Contacted" : h < .72 ? "Visited" : h < .8 ? "Sampled" : h < .86 ? "Negotiating" : h < .96 ? "Customer" : "Lost";
+    else if (cohort === "licensed") stage = h < .55 ? "Not researched" : h < .8 ? "Researched" : h < .93 ? "Contacted" : "Visited";
+    const addr = [r.address_line_1, r.address_line_2].filter(Boolean).join(", ");
+    return { id, r, name, entity: r.entity_name || "", addr, city: TC(r.city || ""), zip5, county, region, lat, lon, cohort, type: TSHORT[r.license_type] || r.license_type || "", opened: pd(r.retail_date_opened_to_public), issued: pd(r.issued_date), exp: pd(r.expiration_date),
+      delivery: r.retail_activities_sales_with === "1", drive: r.retail_activities_drive_thru === "1", noncann: r.retail_activities_non_cannabis === "1", see: r.see_category || "", stage0: stage,
+      idx: [name, r.entity_name, r.license_number, r.city, zip5, county, region, r.address_line_1].filter(Boolean).join(" ").toLowerCase() };
+  });
+  const pool = all.filter(x => x.cohort === "open" || x.cohort === "licensed"), used = new Set();
+  (window.NYSRF_INTEL || []).forEach(([k, city, addr, rating, n]) => { const m = pool.find(x => !used.has(x.id) && x.idx.includes(k) && (!city || x.idx.includes(city)) && (!addr || (x.addr || "").toLowerCase().includes(addr))); if (m) { used.add(m.id); m.rating = rating; m.reviews = n; } });
+  const byId = {}; all.forEach(x => { byId[x.id] = x; });
+  return { all, byId };
+}
+
+class Component extends DCLogic {
+  constructor(p) {
+    super(p);
+    let saved = {}; try { saved = JSON.parse(localStorage.getItem(LS) || "{}"); } catch (e) {}
+    this.state = { theme: saved.theme2 || "dark", page: saved.page || "home", q: "", status: "active", region: "", type: "", sort: "rating", flags: {}, limit: 60, sel: null, more: false, stages: saved.stages || {}, mapF: { open: true, licensed: true, pipeline: false, inactive: false }, vw: window.innerWidth, live: false, at: null, err: "" };
+    const D0 = window.NYSRF_DATA; this.D = D0 ? buildData(D0.records || []) : { all: [], byId: {} };
+    this.view = { k: 1, x: 0, y: 0 };
+
+  }
+  componentDidMount() {
+    this._rs = () => this.setState({ vw: window.innerWidth }); window.addEventListener("resize", this._rs);
+    this.syncCanvas(); setTimeout(() => this.setState({ vw: window.innerWidth }), 0);
+    this._key = e => { if (e.key === "Escape" && this.state.sel) this.setState({ sel: null }); }; window.addEventListener("keydown", this._key);
+    if (!window.NYSRF_DATA) { const t = setInterval(() => { if (window.NYSRF_DATA) { clearInterval(t); this.D = buildData(window.NYSRF_DATA.records || []); this.forceUpdate(); } }, 100); }
+    const ctl = typeof AbortController !== "undefined" ? new AbortController() : null, to = setTimeout(() => ctl && ctl.abort(), 9000);
+    fetch("https://data.ny.gov/resource/jskf-tt3q.json?$limit=50000", ctl ? { signal: ctl.signal } : {}).then(r => { if (!r.ok) throw new Error("HTTP " + r.status); return r.json(); })
+      .then(j => { clearTimeout(to); if (Array.isArray(j) && j.length > 100) { this.D = buildData(j); this._fk = null; this.setState({ live: true, at: new Date() }); } })
+      .catch(e => { clearTimeout(to); this.setState({ err: String(e.message || e) }); });
+  }
+  componentWillUnmount() { window.removeEventListener("resize", this._rs); window.removeEventListener("keydown", this._key); this.ro && this.ro.disconnect(); }
+  componentDidUpdate(pp, ps) {
+    if (!ps || ps.page !== this.state.page || ps.stages !== this.state.stages) try { localStorage.setItem(LS, JSON.stringify({ page: this.state.page, stages: this.state.stages, theme2: this.state.theme })); } catch (e) {}
+    this.syncCanvas();
+  }
+  syncCanvas() {
+    const el = this.state.page === "map" ? document.querySelector('canvas[aria-label^="Map of New York"]') : null;
+    if (el && el !== this.cv) { this.ro && this.ro.disconnect(); this.cv = el; this.bindMap(el); }
+    else if (!el && this.cv) { this.ro && this.ro.disconnect(); this.cv = null; }
+    else if (el) this.draw();
+    if (this.state.page === "map" && !el) setTimeout(() => this.syncCanvas(), 60);
+  }
+  stageOf(x) { return this.state.stages[x.id] || x.stage0; }
+  go(page, extra) { this.setState(Object.assign({ page, sel: null, limit: 60 }, extra || {})); }
+  open(x) { this.setState({ sel: x.id }); }
+  filtered() {
+    const S = this.state, key = [S.q, S.status, S.region, S.type, S.sort, JSON.stringify(S.flags), this.D.all.length, S.stages].join("|");
+    if (this._fk === key) return this._fl;
+    const toks = S.q.trim().toLowerCase().split(/\s+/).filter(t => t.length > 0), now = Date.now();
+    const okStatus = x => S.status === "all" ? true : S.status === "active" ? (x.cohort === "open" || x.cohort === "licensed") : x.cohort === S.status;
+    let out = this.D.all.filter(x => okStatus(x) && (!S.region || x.region === S.region) && (!S.type || x.type === S.type) && toks.every(t => x.idx.includes(t))
+      && (!S.flags.delivery || x.delivery) && (!S.flags.drive || x.drive) && (!S.flags.rated || x.rating) && (!S.flags.recent || (x.opened && now - x.opened < 30 * 864e5)));
+    const rk = { open: 0, licensed: 1, pipeline: 2, inactive: 3 };
+    const bay = x => x.rating ? (x.rating * x.reviews + 4.5 * 40) / (x.reviews + 40) : 0;
+    if (S.sort === "rating") out.sort((a, b) => rk[a.cohort] - rk[b.cohort] || bay(b) - bay(a) || a.name.localeCompare(b.name));
+    else if (S.sort === "newest") out.sort((a, b) => (b.opened || 0) - (a.opened || 0));
+    else if (S.sort === "city") out.sort((a, b) => a.city.localeCompare(b.city) || a.name.localeCompare(b.name));
+    else out.sort((a, b) => a.name.localeCompare(b.name));
+    this._fk = key; this._fl = out; return out;
+  }
+  // ---------- map ----------
+  bindMap(cv) {
+    this.ro = new ResizeObserver(() => this.draw()); this.ro.observe(cv);
+    let drag = null;
+    cv.addEventListener("pointerdown", e => { drag = { x: e.clientX, y: e.clientY, vx: this.view.x, vy: this.view.y, moved: 0 }; cv.setPointerCapture(e.pointerId); cv.style.cursor = "grabbing"; });
+    cv.addEventListener("pointermove", e => { if (!drag) return; const dx = e.clientX - drag.x, dy = e.clientY - drag.y; drag.moved = Math.max(drag.moved, Math.hypot(dx, dy)); this.view.x = drag.vx + dx; this.view.y = drag.vy + dy; this.draw(); });
+    cv.addEventListener("pointerup", e => { cv.style.cursor = "grab"; if (drag && drag.moved < 6) { const r = cv.getBoundingClientRect(), mx = e.clientX - r.left, my = e.clientY - r.top; let best = null, bd = 14; (this.hits || []).forEach(h => { const d = Math.hypot(h.x - mx, h.y - my); if (d < bd) { bd = d; best = h; } }); if (best) this.setState({ sel: best.id }); } drag = null; });
+    cv.addEventListener("wheel", e => { e.preventDefault(); const r = cv.getBoundingClientRect(); this.zoomAt(e.deltaY < 0 ? 1.25 : 0.8, e.clientX - r.left, e.clientY - r.top); }, { passive: false });
+    this.draw();
+  }
+  zoomAt(f, mx, my) { const v = this.view, cv = this.cv; if (!cv) return; const W = cv.clientWidth, H = cv.clientHeight; if (mx == null) { mx = W / 2; my = H / 2; } const nk = Math.max(1, Math.min(40, v.k * f)), rf = nk / v.k; v.x = mx - W / 2 - (mx - W / 2 - v.x) * rf; v.y = my - H / 2 - (my - H / 2 - v.y) * rf; v.k = nk; this.draw(); }
+  draw() {
+    if (this._raf) return; const run = () => { if (!this._raf) return; this._raf = null; this.paint(); }; this._raf = requestAnimationFrame(run); setTimeout(run, 50);
+  }
+  paint() {
+    const cv = this.cv; if (!cv) return; const D0 = window.NYSRF_DATA || {}; const dpr = Math.min(2, window.devicePixelRatio || 1), W = cv.clientWidth, H = cv.clientHeight; if (!W || !H) return;
+    if (cv.width !== Math.round(W * dpr)) { cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr); }
+    const C = CANVAS[this.state.theme] || CANVAS.dark; const x = cv.getContext("2d"); x.setTransform(dpr, 0, 0, dpr, 0, 0); x.clearRect(0, 0, W, H);
+    const lon0 = -75.8, lat0 = 42.75, cs = Math.cos(lat0 * Math.PI / 180), mob = W < 700;
+    const s = Math.min((W - (mob ? 24 : 80)) / (8.1 * cs), (H - (mob ? 150 : 140)) / 4.7) * this.view.k;
+    const P = (lo, la) => [W / 2 + this.view.x + (lo - lon0) * cs * s, H / 2 + 20 + this.view.y - (la - lat0) * s];
+    const ring = rg => { rg.forEach((p, i) => { const [a, b] = P(p[0], p[1]); i ? x.lineTo(a, b) : x.moveTo(a, b); }); x.closePath(); };
+    x.lineJoin = "round";
+    (D0.nyOutline || []).forEach(rg => { x.beginPath(); ring(rg); x.fillStyle = C.land; x.fill(); x.strokeStyle = C.edge; x.lineWidth = 1.2; x.stroke(); });
+    x.strokeStyle = C.county; x.lineWidth = .7; (D0.counties || []).forEach(c => { x.beginPath(); c.rings.forEach(ring); x.stroke(); });
+    const S = this.state, mf = S.mapF; this.hits = [];
+    const pts = this.D.all.filter(p => p.lat != null && mf[p.cohort] && (!S.region || p.region === S.region));
+    const order = { inactive: 0, pipeline: 1, licensed: 2, open: 3 }; pts.sort((a, b) => order[a.cohort] - order[b.cohort]);
+    const r = Math.max(2.2, Math.min(5.5, 1.6 + this.view.k * .5));
+    pts.forEach(p => { const [a, b] = P(p.lon, p.lat); if (a < -10 || a > W + 10 || b < -10 || b > H + 10) return; x.beginPath(); x.arc(a, b, r, 0, 7); x.fillStyle = C[p.cohort]; x.globalAlpha = p.cohort === "open" ? .9 : .75; x.fill(); x.globalAlpha = 1; this.hits.push({ x: a, y: b, id: p.id }); });
+    const sel = S.sel && this.D.byId[S.sel]; if (sel && sel.lat != null) { const [a, b] = P(sel.lon, sel.lat); x.beginPath(); x.arc(a, b, r + 6, 0, 7); x.strokeStyle = C.sel; x.lineWidth = 2; x.stroke(); }
+    if (this.view.k > 2.4) { x.font = "500 11px 'IBM Plex Sans', sans-serif"; x.fillStyle = C.label; x.textAlign = "center"; (D0.counties || []).forEach(c => { let sx = 0, sy = 0, n = 0; c.rings[0].forEach(p => { sx += p[0]; sy += p[1]; n++; }); const [a, b] = P(sx / n, sy / n); if (a > 0 && a < W && b > 0 && b < H) x.fillText(c.name, a, b); }); }
+  }
+  renderVals() {
+    const S = this.state, D = this.D, all = D.all, vw = window.innerWidth, isMob = vw < 768, F = this.filtered();
+    if (S.page === "map" || this.cv) setTimeout(() => this.syncCanvas(), 0);
+    if (this._lastPage !== S.page + S.theme) { this._lastPage = S.page + S.theme; try { localStorage.setItem(LS, JSON.stringify({ page: S.page, stages: S.stages, theme2: S.theme })); } catch (e) {} }
+    const cnt = k => all.filter(x => x.cohort === k).length;
+    const open = all.filter(x => x.cohort === "open");
+    const mk = x => ({ name: x.name, sub: [x.addr, x.city].filter(Boolean).join(", "), col: COH_COL[x.cohort], status: COH[x.cohort], open: () => this.open(x) });
+    const navDef = [["home", "Home"], ["stores", "Stores"], ["map", "Map"], ["pipeline", "Pipeline"], ["rankings", "Rankings"], ["more", "Data"]];
+    const navOf = list => list.map(([id, label]) => { const on = S.page === id; return { label, d: IC[id], cur: on ? "page" : "false", bg: on ? "var(--l2)" : "transparent", fg: on ? "var(--acc)" : "var(--ink3)", go: () => this.go(id) }; });
+    const toks = S.q.trim().length >= 2;
+    const quickAll = toks ? all.filter(x => S.q.trim().toLowerCase().split(/\s+/).every(t => x.idx.includes(t))) : [];
+    const regionOpts = [{ v: "", l: "All regions" }].concat(REGION_ORDER.map(r => ({ v: r, l: r })));
+    const maxR = Math.max(1, ...REGION_ORDER.map(r => open.filter(x => x.region === r).length));
+    const newest = open.filter(x => x.opened).sort((a, b) => b.opened - a.opened).slice(0, 6);
+    const ratedAll = all.filter(x => x.rating && (x.cohort === "open" || x.cohort === "licensed"));
+    const bay = x => (x.rating * x.reviews + 4.5 * 40) / (x.reviews + 40);
+    const ranked = ratedAll.filter(x => !S.region || x.region === S.region).sort((a, b) => bay(b) - bay(a));
+    const active = all.filter(x => x.cohort === "open" || x.cohort === "licensed");
+    const types = [...new Set(all.map(x => x.type))].filter(Boolean).sort();
+    const now = Date.now();
+    const flagDef = [["delivery", "Delivery", x => x.delivery], ["drive", "Drive-through", x => x.drive], ["rated", "Has rating", x => !!x.rating], ["recent", "Opened in last 30 days", x => x.opened && now - x.opened < 30 * 864e5]];
+    const nFlags = Object.values(S.flags).filter(Boolean).length + (S.type ? 1 : 0);
+    const rows = F.slice(0, S.limit);
+    const sel = S.sel && D.byId[S.sel];
+    const at = S.live ? S.at : (window.NYSRF_DATA ? new Date(window.NYSRF_DATA.retrieved) : null);
+    let p = {};
+    if (sel) {
+      const r = sel.r, hrs = (r.hours_of_operation || "").split(/;\s*/).filter(Boolean);
+      const web = r.business_website ? (/^https?:/.test(r.business_website) ? r.business_website : "https://" + r.business_website) : "";
+      p = { name: sel.name, entity: sel.entity && sel.entity !== sel.name ? sel.entity : sel.type, status: COH[sel.cohort].toUpperCase() + " · " + sel.type.toUpperCase(), col: COH_COL[sel.cohort], addr: [sel.addr, sel.city, "NY " + sel.zip5].filter(Boolean).join(", "), region: [sel.county ? sel.county + " County" : "", sel.region].filter(Boolean).join(" · "),
+        dirUrl: "https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent([sel.name, sel.addr, sel.city, "NY", sel.zip5].join(" ")), web, hasWeb: !!web, noWeb: !web,
+        hasRating: !!sel.rating, rating: sel.rating ? sel.rating.toFixed(1) : "", reviews: sel.reviews ? fmtN(sel.reviews) : "", stage: this.stageOf(sel), hours: hrs, hasHours: hrs.length > 0,
+        facts: [["License", r.license_number || "—"], ["Status", (r.license_status || "—") + " · " + (r.operational_status || "—")], ["Opened", fmtD(sel.opened)], ["Issued", fmtD(sel.issued)], ["Expires", fmtD(sel.exp)], ["Delivery", sel.delivery ? "Yes" : "No"], ["Drive-through", sel.drive ? "Yes" : "No"], ["SEE category", sel.see || "—"]].map(([k, v]) => ({ k, v })) };
+    }
+    const download = (blob, name) => { const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = name; document.body.appendChild(a); a.click(); a.remove(); };
+    const cols = ["license_number", "dba", "entity_name", "license_type", "license_status", "operational_status", "address_line_1", "city", "zip_code", "county", "retail_date_opened_to_public", "business_website"];
+    const exportCsv = () => { const esc = v => '"' + String(v == null ? "" : v).replace(/"/g, '""') + '"'; const lines = [cols.concat(["region", "status", "sales_stage_demo", "google_rating", "google_reviews"]).join(",")].concat(F.map(x => cols.map(c => esc(x.r[c])).concat([esc(x.region), esc(COH[x.cohort]), esc(this.stageOf(x)), esc(x.rating || ""), esc(x.reviews || "")]).join(","))); download(new Blob([lines.join("\n")], { type: "text/csv" }), "ny-retail-footprint.csv"); };
+    const exportJson = () => download(new Blob([JSON.stringify(F.map(x => Object.assign({}, x.r, { _region: x.region, _status: COH[x.cohort], _sales_stage_demo: this.stageOf(x), _google_rating: x.rating || null, _google_reviews: x.reviews || null })), null, 1)], { type: "application/json" }), "ny-retail-footprint.json");
+    const pill = (on, col) => ({ bd: on ? (col || "var(--acc)") : "var(--l3)", bg: on ? "var(--l2)" : "transparent", fg: on ? "var(--ink)" : "var(--ink2)", pressed: on ? "true" : "false" });
+    return {
+      theme: S.theme, toggleTheme: () => this.setState(s => ({ theme: s.theme === "dark" ? "light" : "dark" })), themeLbl: S.theme === "dark" ? "Light mode" : "Dark mode",
+      themeIcon: S.theme === "dark" ? "M12 16a4 4 0 1 0 0-8a4 4 0 1 0 0 8M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4" : "M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z",
+      heroCols: isMob || vw < 1000 ? "minmax(0,1fr)" : "minmax(0,1.25fr) minmax(320px,.9fr)", heroGap: isMob ? "22px" : "40px", asOfShort: fmtD(at).toUpperCase(),
+      isMob, notMob: !isMob, wideHdr: vw >= 1180, padX: isMob ? "14px" : "28px", pagePad: isMob ? "18px 14px 32px" : "36px 28px 56px", pagePadTop: isMob ? "18px 14px 12px" : "36px 28px 16px", secGap: isMob ? "22px" : "28px", heroTop: isMob ? "6px" : "28px", heroSize: isMob ? "44px" : "76px", h1Size: isMob ? "28px" : "36px",
+      tileMin: isMob ? "150px" : "200px", homeCols: isMob ? "minmax(0,1fr)" : "minmax(0,1.1fr) minmax(0,1fr)", ctrlMin: isMob ? "140px" : "170px", searchSpan: isMob ? "1 / -1" : "span 2", rowCols: isMob ? "minmax(0,1fr) auto" : "minmax(0,1fr) 150px 120px 70px", colW: isMob ? "82vw" : "280px", floatX: isMob ? "12px" : "20px", zoomBottom: isMob ? "56px" : "28px",
+      nav: navOf(navDef), tabs: navOf(navDef.slice(0, 5)), goMore: () => this.go("more"),
+      pgHome: S.page === "home", pgStores: S.page === "stores", pgMap: S.page === "map", pgPipeline: S.page === "pipeline", pgRankings: S.page === "rankings", pgMore: S.page === "more",
+      srcDot: S.live ? "#9DE3A5" : S.err ? "#D9A55B" : "var(--ink3)", srcLbl: S.live ? "LIVE · OCM · " + fmtD(at).toUpperCase() : "SNAPSHOT · " + fmtD(at).toUpperCase(), srcTitle: S.live ? "Live from data.ny.gov" : "Cached OCM snapshot" + (S.err ? " (live request failed: " + S.err + ")" : ""),
+      q: S.q, hasQ: toks, onQ: e => this.setState({ q: e.target.value, limit: 60 }), clearQ: () => this.setState({ q: "" }),
+      quick: quickAll.slice(0, 6).map(mk), seeAllLbl: "See all " + fmtN(quickAll.length) + " results", seeAllQ: () => this.go("stores", { status: "all", q: S.q }),
+      openHead: fmtN(OCM_OPEN),
+      tiles: [["open", "Open", OCM_OPEN, "OCM, Aug 7, 2026"], ["licensed", "Licensed, not open", cnt("licensed"), "Active license, not operating"], ["pipeline", "Pipeline", cnt("pipeline"), "In process or under review"], ["inactive", "Inactive", cnt("inactive"), "Inactive or historical"]].map(([k, label, n, note]) => ({ label, n: fmtN(n), note, col: COH_COL[k], w: (n / OCM_OPEN * 100).toFixed(1) + "%", go: () => this.go("stores", { status: k }) })),
+      regionBars: REGION_ORDER.map(r => { const n = open.filter(x => x.region === r).length; return { name: r, n: fmtN(n), w: (n / maxR * 100).toFixed(1) + "%", go: () => this.go("stores", { region: r, status: "open" }) }; }),
+      newest: newest.map(x => ({ name: x.name, sub: x.city + (x.region ? " · " + x.region : ""), date: fmtD(x.opened), open: () => this.open(x) })), goNewest: () => this.go("stores", { status: "open", sort: "newest" }),
+      topRated: ratedAll.slice().sort((a, b) => bay(b) - bay(a)).slice(0, 5).map((x, i) => ({ rank: i + 1, name: x.name, city: x.city, rating: x.rating.toFixed(1), open: () => this.open(x) })), goRankings: () => this.go("rankings"),
+      stageStrip: STAGES.map(st => ({ label: st, n: fmtN(active.filter(x => this.stageOf(x) === st).length), go: () => this.go("pipeline") })), goPipeline: () => this.go("pipeline"),
+      footNote: "The open count is OCM's figure from the Cannabis Control Board release of Aug 7, 2026. Every other number is computed from the OCM Current Licenses dataset (" + fmtN(all.length) + " retail-capable records, " + fmtN(open.length) + " marked operating). Sales stages are demo data.",
+      countLbl: fmtN(F.length) + " stores" + (S.region ? " in " + S.region : "") + " · as of " + fmtD(at),
+      statusVal: S.status, onStatus: e => this.setState({ status: e.target.value, limit: 60 }), statusOpts: [["active", "Open + licensed"], ["open", "Open"], ["licensed", "Licensed, not open"], ["pipeline", "Pipeline"], ["inactive", "Inactive"], ["all", "All statuses"]].map(([v, l]) => ({ v, l })),
+      region: S.region, onRegion: e => this.setState({ region: e.target.value, limit: 60 }), regionOpts,
+      type: S.type, onType: e => this.setState({ type: e.target.value }), typeOpts: [{ v: "", l: "All license types" }].concat(types.map(t => ({ v: t, l: t }))),
+      sort: S.sort, onSort: e => this.setState({ sort: e.target.value }), sortOpts: [["rating", "Sort: Best rated"], ["newest", "Sort: Newest opening"], ["name", "Sort: Name A–Z"], ["city", "Sort: City"]].map(([v, l]) => ({ v, l })),
+      flagChips: flagDef.map(([k, label, fn]) => Object.assign({ label, n: fmtN(F.length && S.flags[k] ? F.length : all.filter(x => fn(x) && (S.status === "all" || (S.status === "active" ? (x.cohort === "open" || x.cohort === "licensed") : x.cohort === S.status))).length), toggle: () => this.setState(s => ({ flags: Object.assign({}, s.flags, { [k]: !s.flags[k] }) })) }, pill(!!S.flags[k]))),
+      anyFilter: nFlags > 0 || !!S.region || !!S.q || S.status !== "active", resetF: () => this.setState({ flags: {}, region: "", type: "", q: "", status: "active", sort: "rating" }),
+      showMore: !isMob || S.more, moreStr: S.more ? "true" : "false", moreIcon: S.more ? "−" : "+", moreLbl: "Type, sort & filters" + (nFlags ? " · " + nFlags + " on" : ""), toggleMore: () => this.setState(s => ({ more: !s.more })),
+      rows: rows.map(x => Object.assign(mk(x), { type: x.type, stage: this.stageOf(x), ratingLbl: x.rating ? "★ " + x.rating.toFixed(1) : "", bg: S.sel === x.id ? "var(--s2)" : "transparent" })),
+      noRows: F.length === 0, hasMoreRows: F.length > S.limit, remainingLbl: fmtN(F.length - S.limit) + " left", showMoreRows: () => this.setState(s => ({ limit: s.limit + 100 })),
+      exportCsv, exportJson, exportNote: "Exports the stores matching your current Stores filters: " + fmtN(F.length) + " rows, official license fields plus region, status, rating and demo sales stage.",
+      goMap: () => this.go("map"),
+      mapChips: ["open", "licensed", "pipeline", "inactive"].map(k => { const on = !!S.mapF[k]; return Object.assign({ label: COH[k], n: fmtN(k === "open" ? cnt("open") : cnt(k)), col: COH_COL[k], op: on ? 1 : .35, toggle: () => this.setState(s => ({ mapF: Object.assign({}, s.mapF, { [k]: !s.mapF[k] }) })) }, pill(on, COH_COL[k])); }),
+      zoomIn: () => this.zoomAt(1.5), zoomOut: () => this.zoomAt(1 / 1.5), zoomReset: () => { this.view = { k: 1, x: 0, y: 0 }; this.draw(); },
+      mapNote: isMob ? "Drag to pan · tap a dot" : "Drag to pan · scroll to zoom · click a dot for the store profile · positions are ZIP centroids",
+      columns: STAGES.map(st => { const list = active.filter(x => this.stageOf(x) === st && (!S.region || x.region === S.region)); return { label: st, n: fmtN(list.length), col: STAGE_COL[st], cards: list.slice(0, 40).map(x => ({ name: x.name, sub: x.city + " · " + COH[x.cohort], open: () => this.open(x) })), hasMore: list.length > 40, more: fmtN(list.length - 40) }; }),
+      ranked: ranked.slice(0, 100).map((x, i) => ({ rank: i + 1, rankCol: i < 3 ? "var(--acc)" : "var(--ink3)", name: x.name, sub: [x.city, x.region].filter(Boolean).join(" · "), rating: x.rating.toFixed(1), reviews: fmtN(x.reviews), open: () => this.open(x) })), noRanked: ranked.length === 0,
+      rankNote: "Google ratings as listed on bestdispensaries.munchmakers.com, checked " + (window.NYSRF_INTEL_AT || "Oct 5, 2026") + ". Ranked by rating weighted by review count. " + fmtN(ratedAll.length) + " stores matched.",
+      sources: [{ name: "OCM Current Licenses", tag: "OFFICIAL", detail: "data.ny.gov dataset jskf-tt3q. " + (S.live ? "Live response " + fmtD(at) : "Cached snapshot " + fmtD(at)) + " · " + fmtN(all.length) + " retail-capable records.", bd: "rgba(157,227,165,.5)", fg: "#9DE3A5" },
+        { name: "OCM open-store count", tag: "OFFICIAL", detail: "705 legal dispensaries open, Cannabis Control Board release, Aug 7, 2026. Used for the headline only.", bd: "rgba(157,227,165,.5)", fg: "#9DE3A5" },
+        { name: "Public ratings", tag: "THIRD PARTY", detail: "Google rating and review count as listed on bestdispensaries.munchmakers.com, checked " + (window.NYSRF_INTEL_AT || "Oct 5, 2026") + ".", bd: "var(--l4)", fg: "var(--ink2)" },
+        { name: "Sales stages", tag: "DEMO", detail: "Generated for demonstration. Changes you make are saved in this browser only.", bd: "rgba(217,165,91,.5)", fg: "#D9A55B" }],
+      defs: ["open", "licensed", "pipeline", "inactive"].map(k => ({ label: COH[k], col: COH_COL[k], desc: COH_DEF[k] })),
+      hasSel: !!sel, p, closeSel: () => this.setState({ sel: null }), intelAt: window.NYSRF_INTEL_AT || "Oct 5, 2026", stageOpts: STAGES,
+      onStageSel: e => { const v = e.target.value, id = S.sel; this.setState(s => { const stages = Object.assign({}, s.stages, { [id]: v }); try { localStorage.setItem(LS, JSON.stringify({ page: s.page, stages, theme2: s.theme })); } catch (er) {} return { stages }; }); },
+      showOnMap: () => { const id = S.sel, x0 = D.byId[id]; this.setState(s => ({ page: "map", sel: null, mapF: Object.assign({}, s.mapF, { [x0.cohort]: true }) }), () => setTimeout(() => this.setState({ sel: id }), 350)); },
+      shL: isMob ? "0" : "auto", shR: isMob ? "0" : "12px", shT: isMob ? "auto" : "12px", shB: isMob ? "0" : "12px", shW: isMob ? "auto" : "420px", shMH: isMob ? "88%" : "none", shRad: isMob ? "20px 20px 0 0" : "20px",
+      sheetAnim: isMob ? "kSheet .32s cubic-bezier(.2,.7,.2,1) both" : "kDrawer .32s cubic-bezier(.2,.7,.2,1) both",
+    };
+  }
+}
+</script>
+</body>
+</html>

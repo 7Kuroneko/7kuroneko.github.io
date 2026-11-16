@@ -24,7 +24,7 @@ const ring = (r, tube, mat, x = 0) => { const t = new THREE.Mesh(new THREE.Torus
 
 export function mount(el, cb = {}) {
   const renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: 'high-performance' });
-  renderer.setPixelRatio(Math.min(2, window.devicePixelRatio || 1));
+  renderer.setPixelRatio(Math.min(matchMedia('(pointer:coarse)').matches ? 1.5 : 2, window.devicePixelRatio || 1));
   renderer.toneMapping = THREE.ACESFilmicToneMapping; renderer.toneMappingExposure = .92;
   renderer.shadowMap.enabled = true; renderer.shadowMap.type = THREE.PCFSoftShadowMap;
   renderer.domElement.style.cssText = 'display:block;width:100%;height:100%;outline:none;cursor:grab;touch-action:none';
@@ -41,7 +41,7 @@ export function mount(el, cb = {}) {
 
   const camera = new THREE.PerspectiveCamera(30, 1, .1, 1000);
   const controls = new OrbitControls(camera, renderer.domElement);
-  controls.enableDamping = true; controls.dampingFactor = .08; controls.enableZoom = false; controls.enablePan = false;
+  controls.enableDamping = true; controls.dampingFactor = .08; controls.enableZoom = false; controls.enablePan = true; controls.screenSpacePanning = true; controls.panSpeed = .8;
   controls.minDistance = 8; controls.maxDistance = 140; controls.autoRotateSpeed = .45;
   let lastInteract = performance.now();
   controls.addEventListener('start', () => { lastInteract = performance.now(); controls.autoRotate = false; camAnim = null; });
@@ -399,7 +399,7 @@ export function mount(el, cb = {}) {
   cvs.addEventListener('pointermove', e => { if (down && Math.hypot(e.clientX - down.x, e.clientY - down.y) > 4) return; const p = pick(e); if (p !== ptrHover) { ptrHover = p; cb.onHover && cb.onHover(p); cvs.style.cursor = p ? 'pointer' : 'grab'; } });
   cvs.addEventListener('pointerdown', e => { down = { x: e.clientX, y: e.clientY }; });
   cvs.addEventListener('pointerup', e => { if (down && Math.hypot(e.clientX - down.x, e.clientY - down.y) < 5) { const p = pick(e); cb.onSelect && cb.onSelect(p); } down = null; });
-  cvs.addEventListener('dblclick', e => { const p = pick(e); if (p) cb.onDrill && cb.onDrill(p); });
+  cvs.addEventListener('dblclick', e => { const p = pick(e); cb.onDrill && cb.onDrill(p || null); });
   cvs.addEventListener('pointerleave', () => { if (ptrHover) { ptrHover = null; cb.onHover && cb.onHover(null); } });
   cvs.addEventListener('wheel', e => {
     if (!(e.ctrlKey || e.metaKey)) return; e.preventDefault();
@@ -424,6 +424,7 @@ export function mount(el, cb = {}) {
     set(o) {
       const sx = o.safe && (o.safe.l !== safe.l || o.safe.t !== safe.t || o.safe.r !== safe.r || o.safe.b !== safe.b); if (o.safe) Object.assign(safe, o.safe);
       const cfg = o.config && o.config !== opts.config, fin = o.finish && o.finish !== opts.finish;
+      if (o.labels != null) labelR.domElement.style.display = o.labels ? '' : 'none';
       Object.assign(opts, o); if (o.explode != null) Et = o.explode; if (o.color) KY.set(o.color);
       if (cfg) applyConfig(); if (o.parts) Object.entries(o.parts).forEach(([k, v]) => setVariant(k, v)); if (fin || o.parts) applyFinish();
       if (o.level && (!cur || cur.name !== o.level)) goLevel(o.level);

@@ -65,7 +65,7 @@ void main(){
   vec3 v = vec3(dot(rel, uR), dot(rel, uU), dot(rel, uF));
   if (v.z < .05) { gl_Position = vec4(2., 2., 2., 1.); gl_PointSize = 0.; return; }
   gl_Position = vec4(uFocal * v.x / v.z, uFocal * v.y / v.z * uAsp, 0., 1.);
-  gl_PointSize = (sz + 0.9) * uPx;
+  gl_PointSize = (sz + (kind == 1. ? 1.4 : 0.9)) * uPx;
   vC = col * br * (sz > 1.5 ? 1.1 : 1.) * (kind == 1. ? 1.15 : 1.);
 }`;
   const FS = `#version 300 es
@@ -94,7 +94,7 @@ precision highp float; in vec3 vC; out vec4 o; void main(){ vec2 q = gl_PointCoo
   }
   const PAL = ['#1a0118', '#4a0440', '#940868', '#d80c84', '#ff1896', '#ff32a6', '#ff52b6', '#ff78c6'].map(hex);
   function palette(v) {
-    v = Math.max(0, Math.min(0.9999, v)) * (PAL.length - 1);
+    v = Math.max(0, Math.min(0.9999, 0.28 + 0.72 * v)) * (PAL.length - 1);
     const i = Math.floor(v), f = v - i, e = f * f * (3 - 2 * f);
     return [0, 1, 2].map(k => PAL[i][k] + (PAL[i + 1][k] - PAL[i][k]) * e);
   }
@@ -137,7 +137,7 @@ precision highp float; in vec3 vC; out vec4 o; void main(){ vec2 q = gl_PointCoo
       push([s * Math.cos(a) * 80, u * 80, s * Math.sin(a) * 80], c.map(v => v * b), [0, r() < 0.035 ? 2 : 1, r()]);
     }
     // globe
-    const N1 = noise3(71), N2 = noise3(72), NG = 140000, ga = Math.PI * (3 - Math.sqrt(5));
+    const N1 = noise3(71), N2 = noise3(72), NG = 280000, ga = Math.PI * (3 - Math.sqrt(5));
     for (let i = 0; i < NG; i++) {
       const lat = Math.asin(r() * 2 - 1), lon = r() * TAU;
       const c = cloud(lat, lon, N1, N2), j = 0.94 + 0.12 * r();
@@ -145,7 +145,7 @@ precision highp float; in vec3 vC; out vec4 o; void main(){ vec2 q = gl_PointCoo
     }
     // haze shell
     const hzIn = hex('#ff4fa8'), hzOut = hex('#8a5cff');
-    for (let i = 0; i < 70000; i++) {
+    for (let i = 0; i < 0; i++) { // haze shell removed (speckles outside the limb)
       const u = r() * 2 - 1, lat = Math.asin(u), lon = r() * TAU, h = -Math.log(1 - r() * 0.985) / 4.2, rad = 1.004 + h * 0.07;
       const k = Math.min(1, h / 0.9), c = [0, 1, 2].map(j => hzIn[j] + (hzOut[j] - hzIn[j]) * k), b = 0.34 * Math.exp(-h * 1.1);
       push([lat, lon, rad], c.map(v => v * b), [2, 1, r()]);
@@ -225,7 +225,7 @@ precision highp float; in vec3 vC; out vec4 o; void main(){ vec2 q = gl_PointCoo
     gl.enable(gl.BLEND); gl.blendFunc(gl.ONE, gl.ONE);
     gl.useProgram(prog);
     gl.uniform3fv(U.uCam, C.cam); gl.uniform3fv(U.uF, C.f); gl.uniform3fv(U.uR, C.r); gl.uniform3fv(U.uU, C.u); gl.uniform3fv(U.uSun, sun);
-    gl.uniform1f(U.uFocal, FOCAL); gl.uniform1f(U.uAsp, glc.width / glc.height); gl.uniform1f(U.uPx, glc.height / 1080); gl.uniform1f(U.uT, t);
+    gl.uniform1f(U.uFocal, FOCAL); gl.uniform1f(U.uAsp, glc.width / glc.height); gl.uniform1f(U.uPx, glc.height / 1080 * (o.pt || 1)); gl.uniform1f(U.uT, t);
     // steady rotation: constant spin, fixed axis with a very slow precession
     const spin = t * TAU / 210;
     const tilt = 0.34, prec = TAU * t / 420;

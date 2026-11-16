@@ -160,6 +160,29 @@
       set(cr[0], P0, P1); set(cr[1], P1, J); set(cr[2], P1, C2); set(cr[3], hk, hb);
       el.querySelector('[data-k="crane"]').setAttribute('opacity', gp > 98 ? '0' : '1');
       var pu = q('pulse'); if (gp > 75) { var u = (t / 1300) % 1, sg = u < .5 ? 0 : 1, lu = sg ? (u - .5) * 2 : u * 2, A2 = txp[sg], B2 = txp[sg + 1]; pu.setAttribute('cx', (A2[0] + (B2[0] - A2[0]) * lu).toFixed(1)); pu.setAttribute('cy', (A2[1] + (B2[1] - A2[1]) * lu).toFixed(1)); pu.setAttribute('opacity', '1'); } else pu.setAttribute('opacity', '0'); };
+  } else if (V === 'cursed') {
+    bgx = '#05060C;background-image:radial-gradient(ellipse 60% 55% at 50% 60%,' + acc2 + '1f,transparent 70%)';
+    html = '<div style="display:flex;flex-direction:column;align-items:center;gap:22px;width:min(720px,92vw)">' +
+      '<div style="display:flex;flex-direction:column;align-items:center;gap:12px">' + cat(44) + brand + T('clamp(32px,5vw,52px)') + K + '</div>' +
+      '<div style="position:relative;width:min(100%,calc((100vh - 300px) * 1.78));aspect-ratio:16/9;-webkit-mask:radial-gradient(ellipse 50% 50% at 50% 50%,#000 55%,transparent 100%);mask:radial-gradient(ellipse 50% 50% at 50% 50%,#000 55%,transparent 100%)"><canvas data-k="cv" width="960" height="540" style="position:absolute;inset:0;width:100%;height:100%;display:block;opacity:0;transition:opacity .8s"></canvas></div>' +
+      '<div style="width:100%;max-width:520px;display:flex;flex-direction:column;gap:10px"><div style="height:1px;background:' + acc + '22;position:relative"><div data-k="fill" style="position:absolute;inset:0 auto 0 0;width:0;background:linear-gradient(90deg,' + acc2 + ',#fff);box-shadow:0 0 8px ' + acc2 + '"></div></div>' + meta + '</div></div>';
+    var gp = 0, cx = null, T0 = 540;
+    setP = function (p) { gp = p; };
+    anim = function (t, q) {
+      var S = window.CursedScene; if (!S || !S.draw) return;
+      var cvs = q('cv'); if (!cx) { cx = cvs.getContext('2d'); cvs.style.opacity = '1'; }
+      cx.setTransform(.5, 0, 0, .5, 0, 0);
+      try { S.draw(cx, T0 + t / 1000, { palette: 'cursed', glow: .35 + .65 * gp / 100, wave: 0, depth: 1, density: 1 }); } catch (e) {}
+    };
+  } else if (V === 'mirror') {
+    bgx = '#05060C;background-image:radial-gradient(ellipse 60% 55% at 50% 60%,' + acc2 + '1c,transparent 70%)';
+    html = '<div style="display:flex;flex-direction:column;align-items:center;gap:22px;width:min(720px,92vw)">' +
+      '<div style="display:flex;flex-direction:column;align-items:center;gap:12px">' + cat(44) + brand + T('clamp(32px,5vw,52px)') + K + '</div>' +
+      '<div style="position:relative;width:min(100%,calc((100vh - 300px) * 1.78));aspect-ratio:16/9;-webkit-mask:radial-gradient(ellipse 50% 50% at 50% 50%,#000 55%,transparent 100%);mask:radial-gradient(ellipse 50% 50% at 50% 50%,#000 55%,transparent 100%)"><canvas data-k="cv" width="960" height="540" style="position:absolute;inset:0;width:100%;height:100%;display:block;opacity:0;transition:opacity .8s"></canvas></div>' +
+      '<div style="width:100%;max-width:520px;display:flex;flex-direction:column;gap:10px"><div style="height:1px;background:' + acc + '22;position:relative"><div data-k="fill" style="position:absolute;inset:0 auto 0 0;width:0;background:linear-gradient(90deg,' + acc2 + ',#fff);box-shadow:0 0 8px ' + acc2 + '"></div></div>' + meta + '</div></div>';
+    var mx = null, src = d.mirror || 'canvas#field';
+    anim = function (t, q) { var s = document.querySelector(src); if (!s || !s.width) return; var cvs = q('cv'); if (!mx) mx = cvs.getContext('2d');
+      try { var fn = window[d.sceneFn || 'renderScene']; if (typeof fn === 'function') fn((+d.sceneT || 120) + t / 1000); mx.drawImage(s, 0, 0, 960, 540); if (cvs.style.opacity !== '1') cvs.style.opacity = '1'; } catch (e) {} };
   } else if (V === 'atlas') {
     bgx = bg + ';background-image:linear-gradient(' + ink + '08 1px,transparent 1px),linear-gradient(90deg,' + ink + '08 1px,transparent 1px);background-size:48px 48px';
     var camp = [[214, 128, 22, 16], [242, 120, 18, 22], [222, 152, 26, 14], [256, 146, 20, 18]], cs = '';

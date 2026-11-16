@@ -1,0 +1,1644 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Portals · Portal · The Kuroneko Company</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --lumen:  #FAFAFA;
+    --silver: #C9C9C8;
+    --signal: #6B6B70;
+    --nebula: #424348;
+    --meteor: #171717;
+    --void:   #0A0A0A;
+    --halo:   #FFF738;
+    --mono: 'JetBrains Mono', ui-monospace, "SF Mono", Menlo, monospace;
+    --sans: 'DM Sans', system-ui, sans-serif;
+  }
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0; padding: 0;
+    background: #000;
+    height: 100vh; width: 100vw;
+    overflow: hidden;
+  }
+  body {
+    display: flex; align-items: center; justify-content: center;
+    cursor: none;
+  }
+  body.show-cursor { cursor: default; }
+
+  #stage {
+    position: relative;
+    background: #000;
+    display: block;
+    overflow: hidden;
+  }
+  canvas#field { display: block; width: 100%; height: 100%; }
+
+  /* ============ Corner chrome ============ */
+  .chrome {
+    position: absolute;
+    z-index: 6;
+    font-family: var(--mono);
+    pointer-events: none;
+    transition: opacity 0.6s ease;
+  }
+  .chrome.eyebrow {
+    top: clamp(16px, 3.2vh, 34px);
+    left: clamp(18px, 3.2vw, 40px);
+    display: flex; align-items: center; gap: 12px;
+    font-size: clamp(8px, 0.74vw, 11px);
+    letter-spacing: 0.34em;
+    text-transform: uppercase;
+    color: var(--signal);
+  }
+  .chrome.eyebrow .mark {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    grid-template-rows: repeat(8, 1fr);
+    width: clamp(11px, 1vw, 15px);
+    aspect-ratio: 6 / 8;
+    gap: 0;
+  }
+  .chrome.eyebrow .mark i { background: var(--silver); }
+  .chrome.eyebrow .dot { width: 4px; height: 4px; background: var(--halo); }
+
+  .chrome.timecode {
+    top: clamp(16px, 3.2vh, 34px);
+    right: clamp(18px, 3.2vw, 40px);
+    display: flex; align-items: center; gap: 10px;
+    font-size: clamp(9px, 0.8vw, 12px);
+    letter-spacing: 0.22em;
+    color: var(--signal);
+    font-variant-numeric: tabular-nums;
+  }
+  .chrome.timecode b { color: var(--silver); font-weight: 400; }
+  .chrome.timecode .sep { color: var(--nebula); }
+
+  body.hud-hidden .chrome.eyebrow,
+  body.hud-hidden .chrome.timecode { opacity: 0; }
+  .chrome.timecode.off { display: none; }
+
+  /* ============ Title / end cards ============ */
+  .card {
+    position: absolute;
+    inset: 0;
+    z-index: 8;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    pointer-events: none;
+    opacity: 0;
+  }
+  .card .eb {
+    font-family: var(--mono);
+    font-size: clamp(9px, 0.95vw, 13px);
+    letter-spacing: 0.4em;
+    text-transform: uppercase;
+    color: var(--signal);
+    margin-bottom: clamp(20px, 3vh, 34px);
+    display: flex; align-items: center; gap: 14px;
+  }
+  .card .eb .dot { width: 5px; height: 5px; background: var(--halo); }
+  .card h1 {
+    font-family: var(--sans);
+    font-weight: 300;
+    font-size: clamp(40px, 8.2vw, 132px);
+    letter-spacing: 0.04em;
+    line-height: 0.92;
+    margin: 0;
+    color: var(--lumen);
+  }
+  .card .sub {
+    font-family: var(--mono);
+    font-size: clamp(9px, 0.92vw, 13px);
+    letter-spacing: 0.32em;
+    text-transform: uppercase;
+    color: var(--signal);
+    margin-top: clamp(22px, 3.4vh, 38px);
+  }
+  .card .sub b { color: var(--silver); font-weight: 400; }
+
+  /* big pixel lettermark on end card */
+  .endmark {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    grid-template-rows: repeat(8, 1fr);
+    width: clamp(40px, 5vw, 70px);
+    aspect-ratio: 6 / 8;
+    margin-bottom: clamp(26px, 4vh, 46px);
+  }
+  .endmark i { background: var(--lumen); }
+
+  #replay {
+    pointer-events: auto;
+    margin-top: clamp(30px, 4.6vh, 52px);
+    appearance: none;
+    background: transparent;
+    border: 1px solid var(--meteor);
+    color: var(--silver);
+    font-family: var(--mono);
+    font-size: clamp(9px, 0.82vw, 12px);
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+    padding: 12px 22px;
+    cursor: pointer;
+    display: inline-flex; align-items: center; gap: 12px;
+    transition: border-color 0.15s, color 0.15s;
+  }
+  #replay::before { content: '↻'; color: var(--halo); font-size: 1.2em; line-height: 1; }
+  #replay:hover { border-color: var(--halo); color: var(--lumen); }
+
+  /* ============ Player controls ============ */
+  #controls {
+    position: absolute;
+    left: 0; right: 0; bottom: 0;
+    z-index: 7;
+    padding: 0 clamp(18px, 3vw, 40px) clamp(14px, 2.4vh, 26px);
+    background: linear-gradient(to top, rgba(0,0,0,0.72) 0%, rgba(0,0,0,0.34) 55%, transparent 100%);
+    transition: opacity 0.45s ease, transform 0.45s ease;
+    display: flex;
+    flex-direction: column;
+    gap: clamp(10px, 1.4vh, 16px);
+    padding-top: clamp(40px, 6vh, 70px);
+  }
+  body.hud-hidden #controls {
+    opacity: 0;
+    transform: translateY(8px);
+    /* stays clickable while faded so a click on the scrubber seeks immediately
+       instead of being swallowed just to re-reveal the HUD */
+  }
+
+  #scrub {
+    position: relative;
+    height: 14px;
+    padding: 10px 0;
+    margin: -10px 0;
+    box-sizing: content-box;
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+  }
+  #scrub .track {
+    position: relative;
+    width: 100%;
+    height: 2px;
+    background: rgba(250,250,250,0.16);
+  }
+  #scrub .fill {
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 0%;
+    background: var(--halo);
+  }
+  #scrub .knob {
+    position: absolute;
+    top: 50%;
+    width: 9px; height: 9px;
+    background: var(--halo);
+    transform: translate(-50%, -50%) scale(0.5);
+    opacity: 0;
+    transition: opacity 0.15s, transform 0.15s;
+  }
+  #scrub:hover .knob { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+  #scrub:hover .track { height: 3px; }
+
+  .ctl-row {
+    display: flex;
+    align-items: center;
+    gap: clamp(14px, 1.6vw, 22px);
+    font-family: var(--mono);
+  }
+  .ctl-btn {
+    appearance: none;
+    background: transparent;
+    border: none;
+    color: var(--silver);
+    cursor: pointer;
+    padding: 4px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: color 0.15s;
+  }
+  .ctl-btn:hover { color: var(--lumen); }
+  .ctl-btn svg { display: block; width: clamp(16px, 1.5vw, 20px); height: clamp(16px, 1.5vw, 20px); }
+  .ctl-time {
+    font-size: clamp(10px, 0.86vw, 13px);
+    letter-spacing: 0.16em;
+    color: var(--silver);
+    font-variant-numeric: tabular-nums;
+  }
+  .ctl-time .tot { color: var(--nebula); }
+  .ctl-spacer { flex: 1; }
+  .ctl-label {
+    font-size: clamp(8px, 0.7vw, 10px);
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--signal);
+    white-space: nowrap;
+  }
+
+  /* ============ Tweaks panel ============ */
+  #tp {
+    position: fixed;
+    top: 24px; right: 24px;
+    width: 256px;
+    background: #0A0A0B;
+    border: 1px solid #1d1e20;
+    padding: 18px 18px 22px;
+    font-family: var(--sans);
+    color: var(--lumen);
+    z-index: 50;
+    display: none;
+    box-shadow: 0 30px 80px rgba(0,0,0,0.5);
+  }
+  #tp.open { display: block; }
+  #tp .hd {
+    display: flex; justify-content: space-between; align-items: center;
+    font-family: var(--mono);
+    font-size: 10px; letter-spacing: 0.3em; color: #818283;
+    padding-bottom: 14px; border-bottom: 1px solid #1d1e20; margin-bottom: 14px;
+  }
+  #tp .hd .x { color: #4F5052; cursor: pointer; padding: 4px 8px; margin: -4px -8px; border: 1px solid transparent; }
+  #tp .hd .x:hover { border-color: #232323; color: #C5C6C8; }
+  #tp label {
+    display: block; font-size: 9px; letter-spacing: 0.3em; color: #818283;
+    margin: 16px 0 8px; text-transform: uppercase;
+  }
+  #tp .seg { display: grid; grid-template-columns: 1fr 1fr; gap: 2px; }
+  #tp .seg button {
+    text-align: left; background: transparent; border: 1px solid #1d1e20;
+    color: #818283; padding: 8px 10px; font-family: inherit; font-size: 10px;
+    letter-spacing: 0.18em; cursor: pointer; text-transform: uppercase; transition: all 0.12s;
+  }
+  #tp .seg button:hover { color: #C5C6C8; border-color: #2a2b2e; }
+  #tp .seg button.on { background: #16171a; border-color: #4F5052; color: var(--lumen); }
+  #tp .row { display: flex; align-items: center; gap: 10px; }
+  #tp input[type=range] {
+    flex: 1; appearance: none; -webkit-appearance: none; background: transparent; height: 14px; cursor: pointer;
+  }
+  #tp input[type=range]::-webkit-slider-runnable-track { height: 1px; background: #2a2b2e; }
+  #tp input[type=range]::-moz-range-track { height: 1px; background: #2a2b2e; }
+  #tp input[type=range]::-webkit-slider-thumb { appearance: none; -webkit-appearance: none; width: 8px; height: 14px; background: var(--lumen); border: 0; margin-top: -7px; border-radius: 0; }
+  #tp input[type=range]::-moz-range-thumb { width: 8px; height: 14px; background: var(--lumen); border: 0; border-radius: 0; }
+  #tp .val { font-family: var(--mono); font-size: 10px; color: #818283; min-width: 46px; text-align: right; letter-spacing: 0.06em; }
+
+  /* ============ Hint ============ */
+  #hint {
+    position: fixed;
+    bottom: 18px; left: 50%; transform: translateX(-50%);
+    color: #4F5052;
+    font-family: var(--sans);
+    font-size: 10px; letter-spacing: 0.34em; text-transform: uppercase;
+    z-index: 9; pointer-events: none;
+    transition: opacity 1.2s ease;
+  }
+  #hint.gone { opacity: 0; }
+  #outro { padding: 0 20%; }
+  @media (max-width: 1200px) { #hint { display: none; } }
+</style>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+<style id="portals-serif">.card h1,#oracle p,#verse p,[id*="oracle"] p{font-family:'Instrument Serif',Georgia,serif!important;font-weight:400!important;font-style:normal!important;letter-spacing:.01em!important}</style>
+</head>
+<body>
+<script src="./kn-loader.js" data-variant="mirror" data-scene-t="300" data-bg="#05060C" data-accent="#E8ECCC" data-accent2="#D5B0FF" data-ink="#F2EFE8" data-mute="#8E8980" data-title="Portal" data-kind="Portals · Video · Focus soundscape" data-steps="Opening the portal|Gathering radiance|Tuning the soundscape|Entering" data-min="3200"></script>
+
+<div id="stage">
+  <canvas id="field"></canvas>
+
+  <!-- corner chrome -->
+  <div class="chrome eyebrow">
+    <span class="mark" id="mark-tl" aria-hidden="true"></span>
+    <span>PORTALS · FOCUSFIELD</span>
+    <span class="dot"></span>
+    <span>PORTAL</span>
+  </div>
+  <div class="chrome timecode" id="tc">
+    <b id="tc-cur">00:00</b><span class="sep">/</span><span id="tc-tot">30:00</span>
+  </div>
+
+  <!-- intro title card -->
+  <div class="card" id="intro">
+    <div class="eb"><span>PORTALS · FOCUSFIELD · VOL. 007</span><span class="dot"></span><span>NO. 007</span></div>
+    <h1>Portal</h1>
+    <div class="sub"><b id="intro-dur">30 MINUTE</b> &nbsp;·&nbsp; <span style="color:var(--halo)">2 PETER 1:11</span> &nbsp;·&nbsp; DEEP FOCUS</div>
+  </div>
+
+  <!-- end card -->
+  <div class="card" id="outro">
+    <span class="endmark" id="endmark" aria-hidden="true"></span>
+    <div class="eb"><span>FOCUSFIELD</span><span class="dot"></span><span>PORTAL</span></div>
+    <h1 style="font-size:clamp(28px,4.4vw,70px);">Mission Complete</h1>
+    <div class="sub">RUNTIME <b id="outro-dur">30:00</b> &nbsp;·&nbsp; THANK YOU FOR FOCUSING</div>
+    <button id="replay">Replay</button>
+  </div>
+
+  <!-- player controls -->
+  <div id="controls">
+    <div id="scrub">
+      <div class="track"><div class="fill" id="scrub-fill"></div></div>
+      <div class="knob" id="scrub-knob"></div>
+    </div>
+    <div class="ctl-row">
+      <button class="ctl-btn" id="restart-btn" aria-label="Restart from beginning">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M6 5h2v14H6z"></path><path d="M20 5l-10 7 10 7z"></path></svg>
+      </button>
+      <button class="ctl-btn" id="play-btn" aria-label="Play / pause">
+        <svg id="ic-pause" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="5" width="4" height="14"/><rect x="14" y="5" width="4" height="14"/></svg>
+        <svg id="ic-play" viewBox="0 0 24 24" fill="currentColor" style="display:none"><path d="M7 5l12 7-12 7z"/></svg>
+      </button>
+      <button class="ctl-btn" id="back-btn" aria-label="Back 60 seconds">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 5L5 11l6 6"/><path d="M5 11h9a5 5 0 0 1 5 5v0"/></svg>
+      </button>
+      <button class="ctl-btn" id="fwd-btn" aria-label="Forward 60 seconds">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 5l6 6-6 6"/><path d="M19 11h-9a5 5 0 0 0-5 5v0"/></svg>
+      </button>
+      <span class="ctl-time"><span id="ctl-cur">00:00</span> <span class="tot">/ <span id="ctl-tot">30:00</span></span></span>
+      <span class="ctl-spacer"></span>
+      <span class="ctl-label">FOCUSFIELD · PORTAL</span>
+      <button class="ctl-btn" id="dl-btn" aria-label="Export video" title="Export video" onclick="document.getElementById('export-btn').click()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 4v11"></path><path d="M7 10l5 5 5-5"></path><path d="M5 20h14"></path></svg></button>
+      <button class="ctl-btn" id="mute-btn" aria-label="Mute soundscape">
+        <svg id="ic-sound" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 9v6h4l5 4V5L8 9H4z"/><path d="M16.5 8.5a5 5 0 0 1 0 7M19 6a8 8 0 0 1 0 12"/></svg>
+        <svg id="ic-muted" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:none"><path d="M4 9v6h4l5 4V5L8 9H4z"/><path d="M22 9l-6 6M16 9l6 6"/></svg>
+      </button>
+      <button class="ctl-btn" id="full-btn" aria-label="Fullscreen">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg>
+      </button>
+    </div>
+  </div>
+</div>
+
+<div id="tp" role="dialog" aria-label="Tweaks">
+  <div class="hd"><span>TWEAKS · PORTAL</span><span class="x" id="tp-close">×</span></div>
+
+  <label>Drift · seconds per revolution</label>
+  <div class="row"><input type="range" id="r-period" min="20" max="180" step="5" /><span class="val" id="r-period-v"></span></div>
+
+  <label>Portal density</label>
+  <div class="row"><input type="range" id="r-density" min="80" max="260" step="5" /><span class="val" id="r-density-v"></span></div>
+
+  <label>Seed</label>
+  <div class="row"><input type="range" id="r-seed" min="1" max="99" step="1" /><span class="val" id="r-seed-v"></span></div>
+
+  <label>Runtime · minutes</label>
+  <div class="row"><input type="range" id="r-dur" min="1" max="60" step="1" /><span class="val" id="r-dur-v"></span></div>
+
+  <label>Persistent timecode</label>
+  <div class="seg" id="seg-tc">
+    <button data-v="1">Show</button>
+    <button data-v="0">Hide</button>
+  </div>
+
+  <label>Soundscape volume</label>
+  <div class="row"><input type="range" id="r-vol" min="0" max="100" step="2" /><span class="val" id="r-vol-v"></span></div>
+</div>
+
+<div id="hint">SPACE&nbsp;PLAY&nbsp;·&nbsp;F&nbsp;FULLSCREEN&nbsp;·&nbsp;M&nbsp;MUTE&nbsp;·&nbsp;T&nbsp;TWEAKS</div>
+
+<!-- ============ Export / render to a video file ============ -->
+<style>
+  #export-btn {
+    position: fixed; right: 24px; bottom: 96px; z-index: 60;
+    appearance: none; background: rgba(10,10,10,0.82); border: 1px solid var(--halo);
+    color: var(--halo); font-family: var(--mono); font-size: 11px; letter-spacing: 0.22em;
+    text-transform: uppercase; padding: 10px 14px; cursor: pointer;
+    backdrop-filter: blur(8px); transition: all .14s ease;
+  }
+  #export-btn:hover { background: var(--halo); color: var(--void); }
+  #export-btn:disabled { opacity: .4; cursor: default; }
+  body.recording #export-btn { display: none; }
+  #export-btn { display: none !important; }
+
+  #rec-hud { position: fixed; inset: 0; z-index: 70; display: none;
+    align-items: flex-start; justify-content: center; pointer-events: none; }
+  #rec-hud.on { display: flex; }
+  #rec-hud .rb { margin-top: 30px; display: flex; align-items: center; gap: 14px;
+    padding: 11px 16px; background: rgba(10,10,10,0.92); border: 1px solid var(--halo);
+    font-family: var(--mono); font-size: 12px; letter-spacing: 0.18em; text-transform: uppercase;
+    color: var(--lumen); pointer-events: auto; }
+  #rec-hud b { color: var(--silver); font-weight: 400; }
+  #rec-dot2 { width: 11px; height: 11px; border-radius: 50%; background: #ff3b30;
+    animation: recblink 1s steps(2) infinite; }
+  @keyframes recblink { 50% { opacity: .15; } }
+  #rec-stop { appearance: none; background: transparent; border: 1px solid var(--halo);
+    color: var(--halo); font-family: var(--mono); font-size: 11px; letter-spacing: 0.18em;
+    text-transform: uppercase; padding: 6px 12px; cursor: pointer; }
+  #rec-stop:hover { background: var(--halo); color: var(--void); }
+  #rec-note { position: fixed; top: 76px; left: 50%; transform: translateX(-50%);
+    font-family: var(--mono); font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase;
+    color: var(--signal); pointer-events: none; }
+
+  /* lock the player chrome while capturing so nothing drifts mid-export */
+  body.recording #controls { opacity: .22 !important; pointer-events: none; }
+  body.recording #scrub, body.recording #hint, body.recording #tp { pointer-events: none; }
+
+  /* export explainer modal */
+  #exp-modal { position: fixed; inset: 0; z-index: 80; display: none;
+    align-items: center; justify-content: center; background: rgba(5,5,5,0.74); }
+  #exp-modal.on { display: flex; }
+  #exp-modal .box { width: min(560px, 90vw); background: #0d0d0d; border: 1px solid var(--meteor);
+    padding: 30px 32px; font-family: var(--sans); color: var(--silver); }
+  #exp-modal .eb { font-family: var(--mono); font-size: 10px; letter-spacing: 0.28em;
+    text-transform: uppercase; color: var(--halo); margin-bottom: 14px; }
+  #exp-modal .h { font-weight: 500; font-size: 25px; color: var(--lumen); margin-bottom: 14px; letter-spacing: -0.01em; }
+  #exp-modal p { font-size: 15px; line-height: 1.6; margin: 0 0 14px; text-wrap: pretty; }
+  #exp-modal b { color: var(--lumen); font-weight: 500; }
+  #exp-modal ul { margin: 0 0 24px; padding-left: 18px; font-size: 14px; line-height: 1.75; }
+  #exp-modal .btns { display: flex; gap: 12px; justify-content: flex-end; }
+  #exp-modal button { appearance: none; font-family: var(--mono); font-size: 11px; letter-spacing: 0.2em;
+    text-transform: uppercase; padding: 12px 18px; cursor: pointer; border: 1px solid var(--meteor);
+    background: transparent; color: var(--silver); transition: all .14s ease; }
+  #exp-cancel:hover { border-color: var(--signal); color: var(--lumen); }
+  #exp-start { border-color: var(--halo); color: var(--halo); }
+  #exp-start:hover { background: var(--halo); color: var(--void); }
+</style>
+
+<button id="export-btn" title="Export this video as a downloadable file">⬇ Export Video</button>
+<div id="rec-hud">
+  <div class="rb">
+    <span id="rec-dot2"></span>
+    <span><span id="rec-verb">Recording</span> · <b id="rec-el">00:00</b> / <span id="rec-to">30:00</span></span>
+    <button id="rec-stop">Stop &amp; Save</button>
+  </div>
+  <div id="rec-note">Keep this tab in front · records in real time</div>
+</div>
+
+<div id="exp-modal">
+  <div class="box">
+    <div class="eb">Portals · FocusField · Export</div>
+    <div class="h">Render this as a video file</div>
+    <p>This renders the whole video and its sound into a finished <b>MP4</b> on your computer — the pre-made video you upload to YouTube.</p>
+    <ul>
+      <li>Renders the full <b><span id="exp-len">30</span>-minute</b> video from start to finish, at top quality.</li>
+      <li id="exp-speed">As fast as your computer allows — usually a few minutes.</li>
+      <li id="exp-save">Pick a folder to save into; it streams straight to disk. <b>Keep this tab in front</b> while it works.</li>
+    </ul>
+    <div class="btns"><button id="exp-cancel">Cancel</button><button id="exp-start">Start export</button></div>
+  </div>
+</div>
+
+<script src="portal-audio.js?v=6"></script>
+<script>
+// ============================================================================
+// FOCUSFIELD · PORTAL — a 30-minute video.
+// A dedicated cut of the Vol. 002 "Portal" glory — radiance pouring
+// out of a single source — wrapped in real player structure: title card →
+// glory → end card, with an auto-hiding scrubber, timecode, a luminous
+// generative soundscape, and persistent playback position.
+// ============================================================================
+
+const LS_KEY = 'focusfield-portal-30min';
+
+// rotationPeriod: seconds per revolution · starDensity: glory density · seed
+// durationMin: runtime · timecode: corner clock · muted/volume: soundscape
+const TWEAKS = /*EDITMODE-BEGIN*/{
+  "rotationPeriod": 120,
+  "starDensity": 260,
+  "seed": 12,
+  "durationMin": 30,
+  "timecode": 1,
+  "muted": 0,
+  "volume": 80
+}/*EDITMODE-END*/;
+
+// ---- restore saved tweaks + playhead ----
+let savedTime = 0, savedPlaying = false;
+try {
+  const s = JSON.parse(localStorage.getItem(LS_KEY) || '{}');
+  if (s.tweaks) Object.assign(TWEAKS, s.tweaks);
+  if (typeof s.time === 'number') savedTime = s.time;
+  if (typeof s.playing === 'boolean') savedPlaying = s.playing;
+} catch (e) {}
+
+// ============ Stage fit (letterbox 16:9) ============
+const stage  = document.getElementById('stage');
+const canvas = document.getElementById('field');
+const W = 1920, H = 1080;
+canvas.width = W; canvas.height = H;
+const ctx = canvas.getContext('2d', { alpha: false });
+
+function fit() {
+  const vw = window.innerWidth, vh = window.innerHeight;
+  const ratio = 16 / 9;
+  let cw, ch;
+  if (vw / vh > ratio) { ch = vh; cw = Math.round(vh * ratio); }
+  else                 { cw = vw; ch = Math.round(vw / ratio); }
+  stage.style.width  = cw + 'px';
+  stage.style.height = ch + 'px';
+}
+fit();
+window.addEventListener('resize', fit);
+
+// ============ 3D math ============
+const FOCAL = 1180;
+const CAM_Z = 5.4;
+const CAM_TILT_X = 0.16;
+
+function rotY(p, a){ const c=Math.cos(a),s=Math.sin(a); return [c*p[0]+s*p[2], p[1], -s*p[0]+c*p[2]]; }
+function rotX(p, a){ const c=Math.cos(a),s=Math.sin(a); return [p[0], c*p[1]-s*p[2], s*p[1]+c*p[2]]; }
+
+function project(p) {
+  const z = p[2] + CAM_Z;
+  if (z <= 0.05) return null;
+  const k = FOCAL / z;
+  return [W/2 + p[0]*k, H/2 + p[1]*k];
+}
+
+// Seeded RNG (deterministic per seed)
+function makeRng(seed) {
+  let s = (seed | 0) || 1;
+  return () => { s = (s * 16807 + 2654435761) % 2147483647; return s / 2147483647; };
+}
+
+// ============ Portal — a dimensional rift facing the camera ============
+// A dedicated cut of the Vol. 002 "Portal" rift, read outside-in: a streaming
+// corona spiralling into the rim, a thick breathing multi-shell ring (violet →
+// white-hot), four counter-rotating iridescent spiral arms, a receding tunnel
+// of dimming rings that gives real depth, and a hot white core deep inside.
+// Drawn additively so the layers bloom where they overlap.
+function genPortal(rng, density) {
+  const blocks = [];
+  const R = 2.10;                  // main portal radius
+  const RING_W = 0.16;              // ring half-thickness
+  const TWO_PI = Math.PI * 2;
+
+  // ---- 1) Inward stream — particles spiraling from just inside the ring
+  // toward the centre, all contained within the portal's interior.
+  {
+    const N = Math.max(0, Math.round(density * 20));
+    const parts = new Array(N);
+    for (let i = 0; i < N; i++) {
+      parts[i] = {
+        theta0: rng() * TWO_PI,
+        rStart: R * (0.85 + rng() * 0.10),   // just inside the inner ring edge
+        rEnd:   R * 0.03,                     // pulled to the centre
+        spiral: 2.8 + rng() * 1.6,
+        speed:  0.18 + rng() * 0.30,
+        phase:  rng(),
+        z:      (rng() * 2 - 1) * 0.18,
+      };
+    }
+    const stars = new Array(N);
+    for (let i = 0; i < N; i++) stars[i] = [0, 0, 0];
+    blocks.push({
+      verts: [], edges: [], stars,
+      surface: true,
+      color: '#7A3DD8',
+      update(time) {
+        for (let i = 0; i < N; i++) {
+          const p = parts[i];
+          const t = (p.phase + time * p.speed) % 1;
+          const rho = p.rEnd + (p.rStart - p.rEnd) * (1 - t);
+          // Tangential swirl accelerates as it nears the centre
+          const swirl = (1 - t) * p.spiral;
+          const th = p.theta0 + swirl + time * 0.15;
+          stars[i][0] = rho * Math.cos(th);
+          stars[i][1] = -(rho * Math.sin(th));
+          stars[i][2] = p.z;
+        }
+      },
+    });
+  }
+
+  // ---- 2) Main ring — multi-shell, breathing, bright energy band ----
+  const ringShells = [
+    { color: '#FFFFFF', dens: 10, wMul: 0.30 },   // white-hot inner edge
+    { color: '#D5B0FF', dens: 14, wMul: 0.55 },
+    { color: '#A86CFF', dens: 18, wMul: 0.85 },
+    { color: '#6324C9', dens: 14, wMul: 1.20 },   // outer violet halo
+  ];
+  for (const rs of ringShells) {
+    const N = Math.max(0, Math.round(density * rs.dens));
+    const parts = new Array(N);
+    for (let i = 0; i < N; i++) {
+      parts[i] = {
+        theta:    rng() * TWO_PI,
+        rOff:     (rng() * 2 - 1) * RING_W * rs.wMul,
+        z:        (rng() * 2 - 1) * RING_W * 0.45 * rs.wMul,
+        drift:    (rng() * 2 - 1) * 0.18,
+        wob:      rng() * TWO_PI,
+        wobFreq:  0.8 + rng() * 1.6,
+        wobAmp:   0.012 + rng() * 0.018,
+      };
+    }
+    const stars = new Array(N);
+    for (let i = 0; i < N; i++) stars[i] = [0, 0, 0];
+    blocks.push({
+      verts: [], edges: [], stars,
+      surface: true,
+      color: rs.color,
+      update(time) {
+        // Whole-ring breathing pulse
+        const breath = 1 + 0.022 * Math.sin(time * 0.85);
+        for (let i = 0; i < N; i++) {
+          const p = parts[i];
+          const th = p.theta + p.drift * time * 0.08;
+          const r = (R + p.rOff) * breath +
+                    p.wobAmp * Math.sin(time * p.wobFreq + p.wob);
+          stars[i][0] = r * Math.cos(th);
+          stars[i][1] = -(r * Math.sin(th));
+          stars[i][2] = p.z;
+        }
+      },
+    });
+  }
+
+  // ---- 3) Inner swirl — four iridescent spiral arms counter-rotating ----
+  const armColors = [
+    { color: '#00E5FF', rot:  1.30 },   // cyan
+    { color: '#FF66E0', rot: -1.15 },   // magenta
+    { color: '#5BFFC9', rot:  0.95 },   // mint
+    { color: '#B070FF', rot: -0.80 },   // violet
+  ];
+  for (let a = 0; a < armColors.length; a++) {
+    const arm = armColors[a];
+    const N = Math.max(0, Math.round(density * 8));
+    const parts = new Array(N);
+    const armBase = (a / armColors.length) * TWO_PI;
+    for (let i = 0; i < N; i++) {
+      const tParam = Math.pow(rng(), 1.1);                    // 0..1 along the arm
+      const r0 = R * 0.96 * tParam;
+      const arc = tParam * (3.2 + rng() * 1.6);                // wraps several times
+      parts[i] = {
+        r0, arc, armBase,
+        offRho: (rng() * 2 - 1) * 0.05 * (1 - tParam * 0.6),
+        offTh:  (rng() * 2 - 1) * 0.05,
+        rotMul: 0.55 + (1 - tParam) * 0.8,                     // inner spins faster
+        z:      (rng() * 2 - 1) * 0.12 - tParam * 0.04,
+      };
+    }
+    const stars = new Array(N);
+    for (let i = 0; i < N; i++) stars[i] = [0, 0, 0];
+    blocks.push({
+      verts: [], edges: [], stars,
+      surface: true,
+      color: arm.color,
+      update(time) {
+        for (let i = 0; i < N; i++) {
+          const p = parts[i];
+          const th = p.armBase + p.arc + p.offTh + time * arm.rot * p.rotMul;
+          const rho = p.r0 + p.offRho;
+          stars[i][0] = rho * Math.cos(th);
+          stars[i][1] = -(rho * Math.sin(th));
+          stars[i][2] = p.z;
+        }
+      },
+    });
+  }
+
+  // ---- 4) Receding tunnel — concentric rings behind the membrane,
+  // each smaller and pushed deeper into Z, giving the portal real depth.
+  const LAYERS = 7;
+  for (let L = 0; L < LAYERS; L++) {
+    const layerR = R * 0.92 * Math.pow(0.78, L);
+    const layerZ = 0.45 + L * 0.55;                  // positive z = farther from camera
+    const N = Math.max(0, Math.round(density * 6 * Math.pow(0.82, L)));
+    if (N === 0) continue;
+    const parts = new Array(N);
+    for (let i = 0; i < N; i++) {
+      parts[i] = {
+        theta:   rng() * TWO_PI,
+        offR:    (rng() * 2 - 1) * 0.045,
+        offZ:    (rng() * 2 - 1) * 0.14,
+        rotSpd:  0.04 + 0.03 * L + rng() * 0.02,
+      };
+    }
+    const stars = new Array(N);
+    for (let i = 0; i < N; i++) stars[i] = [0, 0, 0];
+    // Depth gradient: nearer rings are bright violet, deeper rings shift
+    // to cyan-teal (otherworldly colour change).
+    const hue = 268 + (L / (LAYERS - 1)) * 60;        // 268° → 328° / wrap
+    const lit = 60 - L * 5;
+    blocks.push({
+      verts: [], edges: [], stars,
+      surface: true,
+      color: `hsl(${hue}, 78%, ${Math.max(20, lit)}%)`,
+      update(time) {
+        for (let i = 0; i < N; i++) {
+          const p = parts[i];
+          const th = p.theta + time * p.rotSpd;
+          const r = layerR + p.offR;
+          stars[i][0] = r * Math.cos(th);
+          stars[i][1] = -(r * Math.sin(th));
+          stars[i][2] = layerZ + p.offZ;
+        }
+      },
+    });
+  }
+
+  // ---- 5) Hot core — bright bloom deep inside the rift ----
+  {
+    const N = Math.max(0, Math.round(density * 8));
+    const parts = new Array(N);
+    for (let i = 0; i < N; i++) {
+      const u = Math.pow(rng(), 1.7);
+      const r = u * 0.22;
+      const th = rng() * TWO_PI;
+      parts[i] = {
+        r, th,
+        z: 4.20 + (rng() * 2 - 1) * 0.18,             // way back in the tunnel
+        flick: rng() * TWO_PI,
+        flickFreq: 4 + rng() * 8,
+      };
+    }
+    const stars = new Array(N);
+    for (let i = 0; i < N; i++) stars[i] = [0, 0, 0];
+    blocks.push({
+      verts: [], edges: [], stars,
+      surface: true,
+      color: '#FFFFFF',
+      update(time) {
+        for (let i = 0; i < N; i++) {
+          const p = parts[i];
+          const flick = 1 + 0.25 * Math.sin(time * p.flickFreq + p.flick);
+          const r = p.r * flick;
+          stars[i][0] = r * Math.cos(p.th);
+          stars[i][1] = -(r * Math.sin(p.th));
+          stars[i][2] = p.z;
+        }
+      },
+    });
+  }
+
+  return blocks;
+}
+
+// ---- Cohesive cut (matches the thumbnail's "Tight" look): arms wrap more turns with less scatter,
+// every layer turns the same way so the whole rift reads as one spinning vortex, the core is a steady
+// round disc, the ring is a clean band, and the interior fills evenly out to the rim.
+const genPortalV2 = (() => {
+  const src = genPortal.toString().replace('function genPortal', 'function genPortalV2')
+    .replace('tParam * (3.2 + rng() * 1.6)', 'tParam * (5.0 + rng() * 0.7)')
+    .replace('(rng() * 2 - 1) * 0.05 * (1 - tParam * 0.6)', '(rng() * 2 - 1) * 0.03 * (1 - tParam * 0.6)')
+    .replace('spiral: 2.8 + rng() * 1.6', 'spiral: 4.4 + rng() * 0.8')
+    .replace('Math.pow(rng(), 1.7)', 'Math.sqrt(rng())').replace('u * 0.22', 'u * 0.42')
+    .replace('1 + 0.25 * Math.sin(time * p.flickFreq + p.flick)', '1')
+    .replace('rEnd:   R * 0.03', 'rEnd:   R * 0.11')
+    .replace('const RING_W = 0.16', 'const RING_W = 0.085')
+    .replace('wMul: 1.20', 'wMul: 0.9')
+    .replace('0.012 + rng() * 0.018', '0.003 + rng() * 0.004')
+    .replace('Math.pow(rng(), 1.1);', 'Math.sqrt(rng());').replace('const r0 = R * 0.96 * tParam', 'const r0 = R * 0.97 * tParam')
+    .replace('rStart: R * (0.85 + rng() * 0.10)', 'rStart: R * (0.93 + rng() * 0.05)')
+    .replace('const LAYERS = 7', 'const LAYERS = 11').replace('Math.pow(0.78, L)', 'Math.pow(0.86, L)')
+    .replace('const layerZ = 0.45 + L * 0.55', 'const layerZ = 0.05 + L * 0.36').replace('offR:    (rng() * 2 - 1) * 0.045', 'offR:    (rng() * 2 - 1) * 0.11')
+    // one direction of spin: arms turn rigidly (shape holds, rotation is obvious), stream and tunnel follow
+    .replace('time * arm.rot * p.rotMul', 'time * SPIN')
+    // eight spiral arms instead of four, interleaved so the colours alternate around the disc
+    .replace("{ color: '#B070FF', rot: -0.80 },   // violet", "{ color: '#B070FF', rot: -0.80 }, { color: '#9AF0FF', rot: 1 }, { color: '#FF9BEF', rot: 1 }, { color: '#A6FFE0', rot: 1 }, { color: '#D5B0FF', rot: 1 },")
+    .replace('const armBase = (a / armColors.length) * TWO_PI;', 'const armBase = (((a % 4) * 2 + (a >> 2)) / armColors.length) * TWO_PI;')
+    // pulled in: the stream is denser and brighter, rides the arms' twist and accelerates toward the heart
+    .replace('Math.round(density * 20)', 'Math.round(density * 34)')
+    .replace('(p.rStart - p.rEnd) * (1 - t);', '(p.rStart - p.rEnd) * (1 - t * t);')
+    .replace('const swirl = (1 - t) * p.spiral;', 'const swirl = (1 - t * t) * p.spiral;')
+    .replace("color: '#7A3DD8',", "color: '#B07CFF',")
+    // outer inflow: faint smoke drawn in from outside the ring, spiralling with the vortex
+    .replace('  // ---- 2) Main ring', `  {
+    const N = Math.max(0, Math.round(density * 10)); const parts = new Array(N);
+    for (let i = 0; i < N; i++) parts[i] = { th0: rng() * TWO_PI, sp: 0.10 + rng() * 0.14, ph: rng(), z: (rng() * 2 - 1) * 0.1, tw: 1.4 + rng() * 0.8 };
+    const stars = new Array(N); for (let i = 0; i < N; i++) stars[i] = [0, 0, 0];
+    blocks.push({ verts: [], edges: [], stars, surface: true, color: '#5A34B0', update(time) {
+      for (let i = 0; i < N; i++) { const p = parts[i], t = (p.ph + time * p.sp) % 1, rho = R * (1.55 - 0.55 * t * t), th = p.th0 + t * p.tw + time * SPIN * 0.35;
+        stars[i][0] = rho * Math.cos(th); stars[i][1] = -(rho * Math.sin(th)); stars[i][2] = p.z; } } });
+  }
+  // ---- 2) Main ring`)
+    .replace('p.theta0 + swirl + time * 0.15', 'p.theta0 + swirl + time * SPIN')
+    .replace('time * p.rotSpd', 'time * (SPIN * 0.6 + p.rotSpd)')
+    .replace('p.theta + p.drift * time * 0.08', 'p.theta + time * SPIN * 0.35 + p.drift * time * 0.02');
+  return new Function('SPIN', 'return ' + src)(0.5);
+})();
+// ============ Build ============
+let activeBlocks = [];
+function rebuild() {
+  const rng = makeRng(TWEAKS.seed * 7919 + 1);
+  activeBlocks = genPortalV2(rng, Math.max(TWEAKS.starDensity, 600));
+}
+rebuild();
+
+// ============ Scene renderer ============
+// Draws the full glory at scene-time `t` (seconds). Additive blending always
+// on (this subject is emissive). The whole scene is dimmed toward black by the
+// caller's intensity overlay for the intro build-up and outro fade.
+const DEPTH_SPLIT = 4.8;
+const DEFAULT_STAR = '#FAFAFA';
+
+// GPU renderer: every particle is a soft, sub-pixel-positioned point sprite
+// drawn with additive blending in WebGL, then composited onto the 2D stage in
+// one drawImage. Smooth motion at full frame rate, no pixel-snapping shimmer.
+const GLR = (() => {
+  const c = document.createElement('canvas');
+  const gl = c.getContext('webgl', { alpha: false, antialias: false, premultipliedAlpha: false, preserveDrawingBuffer: true });
+  if (!gl) return null;
+  const vs = 'attribute vec2 p;attribute vec3 col;attribute float sz;uniform vec2 res;varying vec3 vc;varying float va;' +
+    'void main(){vec2 q=p/res*2.0-1.0;gl_Position=vec4(q.x,-q.y,0.0,1.0);float s=max(sz,1.0);gl_PointSize=s*2.2;va=min(1.0,sz*sz);vc=col;}';
+  const fs = 'precision mediump float;varying vec3 vc;varying float va;' +
+    'void main(){vec2 d=gl_PointCoord-0.5;float r2=dot(d,d)*4.0;float w=exp(-r2*3.2)*1.55*va;gl_FragColor=vec4(vc*w,1.0);}';
+  const sh = (t, s) => { const o = gl.createShader(t); gl.shaderSource(o, s); gl.compileShader(o); return o; };
+  const pr = gl.createProgram();
+  gl.attachShader(pr, sh(gl.VERTEX_SHADER, vs)); gl.attachShader(pr, sh(gl.FRAGMENT_SHADER, fs));
+  gl.linkProgram(pr);
+  if (!gl.getProgramParameter(pr, gl.LINK_STATUS)) return null;
+  gl.useProgram(pr);
+  const buf = gl.createBuffer(); gl.bindBuffer(gl.ARRAY_BUFFER, buf);
+  const L = n => gl.getAttribLocation(pr, n);
+  const lp = L('p'), lc = L('col'), ls = L('sz');
+  gl.enableVertexAttribArray(lp); gl.enableVertexAttribArray(lc); gl.enableVertexAttribArray(ls);
+  gl.vertexAttribPointer(lp, 2, gl.FLOAT, false, 24, 0);
+  gl.vertexAttribPointer(lc, 3, gl.FLOAT, false, 24, 8);
+  gl.vertexAttribPointer(ls, 1, gl.FLOAT, false, 24, 20);
+  gl.enable(gl.BLEND); gl.blendFunc(gl.ONE, gl.ONE);
+  return { c, gl, uRes: gl.getUniformLocation(pr, 'res'), data: new Float32Array(0) };
+})();
+const _colCtx = document.createElement('canvas').getContext('2d');
+const _colCache = {};
+function rgbOf(c) {
+  if (_colCache[c]) return _colCache[c];
+  _colCtx.fillStyle = '#000'; _colCtx.fillStyle = c;
+  const s = _colCtx.fillStyle; let r = 255, g = 255, b = 255;
+  if (s[0] === '#') { r = parseInt(s.slice(1, 3), 16); g = parseInt(s.slice(3, 5), 16); b = parseInt(s.slice(5, 7), 16); }
+  else { const m = s.match(/[\d.]+/g); if (m) { r = +m[0]; g = +m[1]; b = +m[2]; } }
+  return (_colCache[c] = [r / 255, g / 255, b / 255]);
+}
+function renderScene(t) {
+  const cw = canvas.width, S = cw / W;
+  const ch = canvas.height;
+  for (let bi = 0; bi < activeBlocks.length; bi++) {
+    const b = activeBlocks[bi];
+    if (b.update) b.update(t);
+  }
+  const drift = (t * 2 * Math.PI) / TWEAKS.rotationPeriod;
+  const cosD = Math.cos(drift), sinD = Math.sin(drift);
+  ctx.save(); ctx.setTransform(1, 0, 0, 1, 0, 0);
+  ctx.globalAlpha = 1; ctx.globalCompositeOperation = 'source-over';
+  ctx.fillStyle = '#000'; ctx.fillRect(0, 0, cw, ch);
+  if (!GLR) { ctx.restore(); return; }
+  const { c, gl } = GLR;
+  if (c.width !== cw || c.height !== ch) { c.width = cw; c.height = ch; }
+  let total = 0;
+  for (const b of activeBlocks) if (b.stars && !b.void) total += b.stars.length;
+  if (GLR.data.length < total * 6) GLR.data = new Float32Array(total * 6);
+  const D = GLR.data;
+  const cx0 = cw / 2, cy0 = ch / 2, F = FOCAL * S;
+  let n = 0;
+  for (let bi = 0; bi < activeBlocks.length; bi++) {
+    const b = activeBlocks[bi];
+    const stars = b.stars;
+    if (!stars || !stars.length || b.void) continue;
+    const col = rgbOf(b.color || DEFAULT_STAR);
+    const cr = col[0] * 0.95, cg = col[1] * 0.95, cb = col[2] * 0.95;
+    const psO = b.pointSize;
+    for (let si = 0; si < stars.length; si++) {
+      const p = stars[si];
+      const z = p[2] + CAM_Z;
+      if (z <= 0.1) continue;
+      const k = F / z;
+      D[n++] = cx0 + (cosD * p[0] - sinD * p[1]) * k;
+      D[n++] = cy0 + (sinD * p[0] + cosD * p[1]) * k;
+      D[n++] = cr; D[n++] = cg; D[n++] = cb;
+      D[n++] = (psO || (z < 4.6 ? 1.9 : 1.3)) * S;
+    }
+  }
+  gl.viewport(0, 0, cw, ch);
+  gl.clearColor(0, 0, 0, 1); gl.clear(gl.COLOR_BUFFER_BIT);
+  gl.uniform2f(GLR.uRes, cw, ch);
+  gl.bufferData(gl.ARRAY_BUFFER, D.subarray(0, n), gl.STREAM_DRAW);
+  gl.drawArrays(gl.POINTS, 0, n / 6);
+  ctx.drawImage(c, 0, 0);
+  if (window.__thumbRender) { ctx.restore(); return; }   // the thumbnail kit adds its own surface/heart/bloom
+  // portal surface: faint energy filling the disc so the swirl sits on light, not black
+  ctx.globalCompositeOperation = 'lighter';
+  const RR = 459 * S * 0.97, sf = ctx.createRadialGradient(cx0, cy0, 0, cx0, cy0, RR);
+  sf.addColorStop(0, 'rgba(150,80,255,.30)'); sf.addColorStop(0.35, 'rgba(170,60,230,.20)'); sf.addColorStop(0.75, 'rgba(110,40,210,.16)');
+  sf.addColorStop(0.94, 'rgba(120,60,230,.22)'); sf.addColorStop(1, 'rgba(120,60,230,0)');
+  ctx.fillStyle = sf; ctx.beginPath(); ctx.arc(cx0, cy0, RR, 0, Math.PI * 2); ctx.fill();
+  // smooth white heart
+  const R0 = 51.6 * S, hg = ctx.createRadialGradient(cx0, cy0, 0, cx0, cy0, R0 * 1.9);
+  hg.addColorStop(0, 'rgba(255,255,255,1)'); hg.addColorStop(0.4, 'rgba(255,255,255,.95)'); hg.addColorStop(0.52, 'rgba(240,225,255,.55)');
+  hg.addColorStop(0.7, 'rgba(200,160,255,.18)'); hg.addColorStop(1, 'rgba(160,110,255,0)');
+  ctx.fillStyle = hg; ctx.beginPath(); ctx.arc(cx0, cy0, R0 * 1.9, 0, Math.PI * 2); ctx.fill();
+  // soft bloom: downsampled copy added back, binds neighbouring particles into continuous light
+  const bw = Math.max(8, Math.round(cw / 10)), bh = Math.max(8, Math.round(ch / 10));
+  if (!GLR.bl) GLR.bl = document.createElement('canvas');
+  const bl = GLR.bl; if (bl.width !== bw || bl.height !== bh) { bl.width = bw; bl.height = bh; }
+  const bx = bl.getContext('2d'); bx.imageSmoothingEnabled = true; bx.imageSmoothingQuality = 'high'; bx.clearRect(0, 0, bw, bh); bx.drawImage(c, 0, 0, bw, bh);
+  ctx.imageSmoothingEnabled = true; ctx.imageSmoothingQuality = 'high'; ctx.globalAlpha = 0.55; ctx.drawImage(bl, 0, 0, cw, ch);
+  ctx.globalAlpha = 1; ctx.globalCompositeOperation = 'source-over';
+  ctx.restore();
+}
+
+// ============ Video clock + phases ============
+let DURATION = TWEAKS.durationMin * 60;     // seconds
+let videoTime = Math.min(savedTime, DURATION - 0.001);
+let playing = false;
+let lastFrame = performance.now();
+let ended = false;
+
+const INTRO_IN = 2.5, INTRO_HOLD_END = 10, INTRO_OUT_END = 15;
+const OUT_DIM = 9;    // seconds before end the glory starts dimming
+const OUT_CARD = 22;  // seconds before end the card fades in (≥20 s hold for YouTube end screens)
+
+const intro = document.getElementById('intro');
+const outro = document.getElementById('outro');
+const replayBtn = document.getElementById('replay');
+
+function fmt(sec) {
+  sec = Math.max(0, Math.floor(sec));
+  const m = Math.floor(sec / 60), s = sec % 60;
+  return (m < 10 ? '0' : '') + m + ':' + (s < 10 ? '0' : '') + s;
+}
+
+function frame(now) {
+  if (window.__offlineRendering) { requestAnimationFrame(frame); return; }
+  let dt = (now - lastFrame) / 1000;
+  lastFrame = now;
+  if (dt < 0) dt = 0;
+  if (dt > 0.25) dt = 0.25;     // tab refocus guard
+
+  if (playing && !ended && !loaderUp()) {
+    videoTime += dt;
+    if (videoTime >= DURATION) {
+      videoTime = DURATION;
+      setPlaying(false);
+      ended = true;
+    }
+  }
+
+  // ---- draw the glory at the current scene time ----
+  renderScene(videoTime);
+
+  // ---- intensity: intro build-up + outro fade, dimmed via black overlay ----
+  let intensity = 1;
+  if (videoTime < 13) {
+    const b = Math.min(1, videoTime / 13);
+    const eased = b * b * (3 - 2 * b);          // smoothstep
+    intensity = 0.04 + 0.96 * eased;
+  }
+  const toEnd = DURATION - videoTime;
+  if (toEnd < OUT_DIM) intensity = Math.min(intensity, Math.max(0, toEnd / OUT_DIM));
+  if (intensity < 1) {
+    ctx.fillStyle = 'rgba(0,0,0,' + (1 - intensity).toFixed(3) + ')';
+    ctx.fillRect(0, 0, W, H);
+  }
+
+  // ---- intro card opacity ----
+  let io = 0;
+  if (videoTime < INTRO_IN) io = videoTime / INTRO_IN;
+  else if (videoTime < INTRO_HOLD_END) io = 1;
+  else if (videoTime < INTRO_OUT_END) io = 1 - (videoTime - INTRO_HOLD_END) / (INTRO_OUT_END - INTRO_HOLD_END);
+  intro.style.opacity = io.toFixed(3);
+
+  // ---- end card opacity ----
+  let oo = 0;
+  if (toEnd < OUT_CARD) oo = Math.min(1, (OUT_CARD - toEnd) / 2);
+  outro.style.opacity = oo.toFixed(3);
+  // keep the card click-through so the control bar underneath stays usable;
+  // only the Replay button itself is interactive, and only while the card is shown
+  outro.style.pointerEvents = 'none';
+  replayBtn.style.pointerEvents = oo > 0.5 ? 'auto' : 'none';
+
+  // ---- HUD: progress + timecode ----
+  const pct = (videoTime / DURATION) * 100;
+  scrubFill.style.width = pct + '%';
+  scrubKnob.style.left = pct + '%';
+  const cur = fmt(videoTime);
+  tcCur.textContent = cur;
+  ctlCur.textContent = cur;
+
+  persistThrottle += dt;
+  if (persistThrottle > 2) { persist(); persistThrottle = 0; }
+
+  requestAnimationFrame(frame);
+}
+
+// ============ Persistence ============
+let persistThrottle = 0;
+function persist() {
+  try {
+    localStorage.setItem(LS_KEY, JSON.stringify({ tweaks: TWEAKS, time: videoTime, playing }));
+  } catch (e) {}
+}
+
+// ============ Play / pause ============
+const icPlay = document.getElementById('ic-play');
+const icPause = document.getElementById('ic-pause');
+function setPlaying(p) {
+  playing = p;
+  icPlay.style.display = p ? 'none' : 'block';
+  icPause.style.display = p ? 'block' : 'none';
+  if (p) { hint.classList.add('gone'); scheduleHide(); PortalAudio.start({ buildup: videoTime < 2 && !ended }); }
+  else { showHud(); PortalAudio.stop(); }
+  persist();
+}
+function loaderUp() { const el = document.getElementById('pl-load'); return !!el && !el.classList.contains('out'); }
+function togglePlay() {
+  if (loaderUp()) return;
+  // from the end, play means start over
+  if (!playing && ended) { restart(); return; }
+  setPlaying(!playing);
+}
+function restart() {
+  if (loaderUp()) return;
+  videoTime = 0; ended = false;
+  lastFrame = performance.now();
+  PortalAudio.seek(0);          // soundscape back to the top too
+  setPlaying(true);
+}
+function seek(sec, resyncAudio = true) {
+  videoTime = Math.max(0, Math.min(DURATION - 0.001, sec));
+  if (videoTime < DURATION) ended = false;
+  lastFrame = performance.now();          // no dt jump after a seek
+  showHud();
+  persist();
+  if (resyncAudio) PortalAudio.seek(videoTime);   // paused too — audio stores it for resume
+}
+
+// ============ Controls wiring ============
+const scrub = document.getElementById('scrub');
+const scrubFill = document.getElementById('scrub-fill');
+const scrubKnob = document.getElementById('scrub-knob');
+const tcCur = document.getElementById('tc-cur');
+const ctlCur = document.getElementById('ctl-cur');
+const hint = document.getElementById('hint');
+
+document.getElementById('play-btn').addEventListener('click', togglePlay);
+document.getElementById('back-btn').addEventListener('click', () => seek(videoTime - 60));
+document.getElementById('fwd-btn').addEventListener('click', () => seek(videoTime + 60));
+document.getElementById('replay').addEventListener('click', restart);
+document.getElementById('restart-btn').addEventListener('click', restart);
+document.getElementById('full-btn').addEventListener('click', toggleFull);
+document.getElementById('mute-btn').addEventListener('click', () => setMuted(!TWEAKS.muted));
+
+// ============ Mute ============
+const icSound = document.getElementById('ic-sound');
+const icMuted = document.getElementById('ic-muted');
+function setMuted(m) {
+  TWEAKS.muted = m ? 1 : 0;
+  icSound.style.display = m ? 'none' : 'block';
+  icMuted.style.display = m ? 'block' : 'none';
+  PortalAudio.setMuted(!!m);
+  persist();
+}
+
+function scrubAt(clientX, commit) {
+  const r = scrub.getBoundingClientRect();
+  const f = Math.max(0, Math.min(1, (clientX - r.left) / r.width));
+  seek(f * DURATION, !!commit);
+  const pct = (videoTime / DURATION) * 100;
+  scrubFill.style.width = pct + '%';
+  scrubKnob.style.left = pct + '%';
+  tcCur.textContent = ctlCur.textContent = fmt(videoTime);
+}
+let scrubbing = false;
+scrub.addEventListener('pointerdown', (e) => {
+  e.preventDefault();
+  showHud();
+  scrubbing = true;
+  scrubAt(e.clientX, true);               // click = commit: video AND audio jump together
+  try { scrub.setPointerCapture(e.pointerId); } catch (err) {}   // capture is best-effort, never blocks the seek
+});
+scrub.addEventListener('pointermove', (e) => { if (scrubbing) scrubAt(e.clientX, false); });
+scrub.addEventListener('pointerup', () => { scrubbing = false; PortalAudio.seek(videoTime); });
+scrub.addEventListener('pointercancel', () => { scrubbing = false; });
+
+// pause when this video's tab is hidden — no two videos playing over each other
+document.addEventListener('visibilitychange', () => { if (document.hidden && playing) setPlaying(false); });
+
+function toggleFull() {
+  if (!document.fullscreenElement) (document.documentElement.requestFullscreen && document.documentElement.requestFullscreen());
+  else (document.exitFullscreen && document.exitFullscreen());
+}
+
+// ============ HUD auto-hide ============
+let hideTimer = null;
+function showHud() {
+  document.body.classList.remove('hud-hidden');
+  document.body.classList.add('show-cursor');
+  scheduleHide();
+}
+function scheduleHide() {
+  clearTimeout(hideTimer);
+  if (!playing) return;
+  hideTimer = setTimeout(() => {
+    document.body.classList.add('hud-hidden');
+    document.body.classList.remove('show-cursor');
+  }, 2600);
+}
+['mousemove', 'pointerdown', 'touchstart', 'keydown'].forEach(ev =>
+  window.addEventListener(ev, () => { showHud(); if (playing) PortalAudio.resumeIfPending(); }, { passive: true }));
+
+// ============ Keyboard ============
+window.addEventListener('keydown', (e) => {
+  if (e.key === ' ' || e.code === 'Space') { e.preventDefault(); togglePlay(); }
+  else if (e.key === 'f' || e.key === 'F') toggleFull();
+  else if (e.key === 't' || e.key === 'T') {
+    tp.classList.toggle('open');
+    const msg = tp.classList.contains('open') ? '__edit_mode_available' : '__edit_mode_dismissed';
+    try { window.parent.postMessage({ type: msg }, '*'); } catch (err) {}
+  }
+  else if (e.key === 'm' || e.key === 'M') setMuted(!TWEAKS.muted);
+  else if (e.key === 'ArrowRight') seek(videoTime + 10);
+  else if (e.key === 'ArrowLeft') seek(videoTime - 10);
+});
+
+// ============ Pixel lettermark (P, 6×8) ============
+const P_GRID = [
+  1,1,1,1,1,0,
+  1,1,0,0,1,1,
+  1,1,0,0,1,1,
+  1,1,1,1,1,1,
+  1,1,1,1,1,0,
+  1,1,0,0,0,0,
+  1,1,0,0,0,0,
+  1,1,0,0,0,0,
+];
+function buildMark(el) {
+  el.innerHTML = '';
+  P_GRID.forEach(v => {
+    const i = document.createElement('i');
+    if (!v) i.style.background = 'transparent';
+    el.appendChild(i);
+  });
+}
+buildMark(document.getElementById('mark-tl'));
+buildMark(document.getElementById('endmark'));
+
+// ============ Tweaks panel ============
+const tp = document.getElementById('tp');
+
+// ---- Host Tweaks protocol: surface this panel via the toolbar toggle ----
+function openTweaks() { tp.classList.add('open'); }
+function closeTweaks() { tp.classList.remove('open'); }
+// Persist a changed tweak to disk through the host (survives reload).
+function pushTweak(key) {
+  try { window.parent.postMessage({ type: '__edit_mode_set_keys', edits: { [key]: TWEAKS[key] } }, '*'); } catch (e) {}
+}
+window.addEventListener('message', (e) => {
+  const t = e.data && e.data.type;
+  if (t === '__activate_edit_mode') openTweaks();
+  else if (t === '__deactivate_edit_mode') closeTweaks();
+});
+window.parent.postMessage({ type: '__edit_mode_available' }, '*');
+
+document.getElementById('tp-close').addEventListener('click', () => {
+  closeTweaks();
+  try { window.parent.postMessage({ type: '__edit_mode_dismissed' }, '*'); } catch (e) {}
+});
+
+const segTc = document.getElementById('seg-tc');
+[...segTc.children].forEach(b => b.addEventListener('click', () => {
+  TWEAKS.timecode = parseInt(b.dataset.v, 10); syncTc(); persist(); pushTweak('timecode');
+}));
+function syncTc() {
+  [...segTc.children].forEach(b => b.classList.toggle('on', parseInt(b.dataset.v, 10) === TWEAKS.timecode));
+  document.getElementById('tc').classList.toggle('off', !TWEAKS.timecode);
+}
+
+function bindSlider(id, key, fmtFn, onChange) {
+  const inp = document.getElementById(id), out = document.getElementById(id + '-v');
+  inp.value = TWEAKS[key];
+  out.textContent = fmtFn(TWEAKS[key]);
+  inp.addEventListener('input', () => {
+    TWEAKS[key] = parseFloat(inp.value);
+    out.textContent = fmtFn(TWEAKS[key]);
+    if (onChange) onChange();
+    persist();
+  });
+  inp.addEventListener('change', () => pushTweak(key));
+}
+bindSlider('r-period', 'rotationPeriod', v => v + 's');
+bindSlider('r-density', 'starDensity', v => v + '', () => { rebuild(); });
+bindSlider('r-seed', 'seed', v => v + '', () => { rebuild(); });
+bindSlider('r-dur', 'durationMin', v => v + ' MIN', () => {
+  DURATION = TWEAKS.durationMin * 60;
+  if (videoTime > DURATION) videoTime = DURATION - 0.001;
+  const tot = fmt(DURATION);
+  document.getElementById('tc-tot').textContent = tot;
+  document.getElementById('ctl-tot').textContent = tot;
+  document.getElementById('outro-dur').textContent = tot;
+  document.getElementById('intro-dur').textContent = TWEAKS.durationMin + ' MINUTE';
+  ended = false;
+});
+bindSlider('r-vol', 'volume', v => v + '%', () => { PortalAudio.setVolume(TWEAKS.volume / 100); });
+
+// ============ Init ============
+function initLabels() {
+  const tot = fmt(DURATION);
+  document.getElementById('tc-tot').textContent = tot;
+  document.getElementById('ctl-tot').textContent = tot;
+  document.getElementById('outro-dur').textContent = tot;
+  document.getElementById('intro-dur').textContent = TWEAKS.durationMin + ' MINUTE';
+  syncTc();
+  PortalAudio.setVolume(TWEAKS.volume / 100);
+  setMuted(TWEAKS.muted);
+}
+initLabels();
+
+// the loader is never part of the runtime: hold at 00:00 while it is up, then start picture +
+// soundscape together from the top (sound needs a prior gesture; without one, wait at 00:00
+// for the first play press so both still start together)
+videoTime = 0; ended = false;
+setPlaying(false);
+{
+  const go = () => {
+    videoTime = 0; ended = false; lastFrame = performance.now();
+    const act = navigator.userActivation ? navigator.userActivation.hasBeenActive : false;
+    if (act) { PortalAudio.seek(0); setPlaying(true); } else showHud();
+  };
+  if (loaderUp()) { const gate = setInterval(() => { if (loaderUp()) return; clearInterval(gate); go(); }, 50); }
+  else go();
+}
+requestAnimationFrame(frame);
+
+setTimeout(() => { if (playing) hint.classList.add('gone'); }, 4500);
+</script>
+
+<script>
+(function () {
+  const btn     = document.getElementById('export-btn');
+  const hud     = document.getElementById('rec-hud');
+  const elEl    = document.getElementById('rec-el');
+  const elTo    = document.getElementById('rec-to');
+  const stopBtn = document.getElementById('rec-stop');
+  const note    = document.getElementById('rec-note');
+
+  // offscreen composite canvas: the field + the branded overlays (chrome +
+  // intro/outro cards) painted on, so the file matches the player exactly.
+  const rc = document.createElement('canvas'); rc.width = 1920; rc.height = 1080;
+  const rx = rc.getContext('2d', { alpha: false });
+
+  const HALO = '#FFF738', LUMEN = '#FAFAFA', SILVER = '#C9C9C8', SIGNAL = '#6B6B70';
+
+  function fmtt(s) { s = Math.max(0, Math.floor(s)); const m = Math.floor(s/60), x = s%60;
+    return (m<10?'0':'')+m+':'+(x<10?'0':'')+x; }
+
+  // centered line built from colored segments
+  function centeredLine(segs, y, font, ls) {
+    rx.font = font; rx.letterSpacing = ls; rx.textAlign = 'left'; rx.textBaseline = 'alphabetic';
+    let total = 0; for (const s of segs) total += rx.measureText(s.text).width;
+    let x = 960 - total / 2;
+    for (const s of segs) { rx.fillStyle = s.c; rx.fillText(s.text, x, y); x += rx.measureText(s.text).width; }
+    rx.letterSpacing = '0px';
+  }
+
+  // pixel "P" lettermark (6×8), matching the live HUD corner mark
+  const MARK_GRID = [
+    1,1,1,1,1,0,
+    1,1,0,0,1,1,
+    1,1,0,0,1,1,
+    1,1,1,1,1,1,
+    1,1,1,1,1,0,
+    1,1,0,0,0,0,
+    1,1,0,0,0,0,
+    1,1,0,0,0,0,
+  ];
+
+  // Replicate the live eyebrow + timecode exactly: pixel P (silver) · gap ·
+  // "PORTALS · FOCUSFIELD" (signal) · halo dot · "PORTAL" (signal), at the
+  // design's 1920-space scale (11px text) — NOT the old oversized 22px chrome.
+  function drawChrome(t) {
+    const LEFT = 40, CY = 44;          // left inset, vertical center of the row
+    const MW = 15, MH = 20;            // mark box 6/8 ratio
+    const cw = MW / 6, ch = MH / 8;    // pixel cell size
+    const GAP = 12;
+
+    // pixel P mark
+    rx.fillStyle = SILVER;
+    for (let r = 0; r < 8; r++) for (let c = 0; c < 6; c++) {
+      if (MARK_GRID[r * 6 + c]) rx.fillRect(LEFT + c * cw, CY - MH / 2 + r * ch, cw + 0.4, ch + 0.4);
+    }
+
+    rx.font = "500 11px 'JetBrains Mono', ui-monospace, monospace";
+    rx.letterSpacing = '3.7px';        // 0.34em
+    rx.textBaseline = 'middle';
+    rx.textAlign = 'left';
+
+    let x = LEFT + MW + GAP;
+    rx.fillStyle = SIGNAL;
+    rx.fillText('PORTALS · FOCUSFIELD', x, CY);
+    x += rx.measureText('PORTALS · FOCUSFIELD').width + GAP;
+    // halo dot (4px)
+    rx.fillStyle = HALO; rx.fillRect(x, CY - 2, 4, 4);
+    x += 4 + GAP;
+    rx.fillStyle = SIGNAL;
+    rx.fillText('PORTAL', x, CY);
+
+    if (TWEAKS.timecode) {
+      rx.font = "500 12px 'JetBrains Mono', ui-monospace, monospace";
+      rx.letterSpacing = '2.6px';      // 0.22em
+      rx.textAlign = 'right';
+      const cur = fmtt(t), tot = fmtt(DURATION);
+      let rxr = 1880;
+      // draw right→left: total (signal) · sep (nebula) · current (silver)
+      rx.fillStyle = SIGNAL; rx.fillText(tot, rxr, CY);
+      rxr -= rx.measureText(tot).width + 6;
+      rx.fillStyle = '#424348'; rx.fillText('/', rxr, CY);
+      rxr -= rx.measureText('/').width + 6;
+      rx.fillStyle = SILVER; rx.fillText(cur, rxr, CY);
+    }
+
+    rx.letterSpacing = '0px'; rx.textAlign = 'left'; rx.textBaseline = 'alphabetic';
+  }
+
+  function drawCards(t) {
+    // intro card — in 0–2.5, hold to 10, out 10–15 (matches the live loop)
+    let io = 0;
+    if (t < 2.5) io = t / 2.5; else if (t < 10) io = 1; else if (t < 15) io = 1 - (t - 10) / 5;
+    io = Math.max(0, Math.min(1, io));
+    if (io > 0.002) {
+      rx.save(); rx.globalAlpha = io;
+      centeredLine([
+        { text: 'PORTALS · FOCUSFIELD · VOL. 007  ', c: LUMEN },
+        { text: '·', c: HALO },
+        { text: '  NO. 007', c: LUMEN },
+      ], 392, "500 22px 'JetBrains Mono', monospace", '6px');
+      rx.textAlign = 'center'; rx.fillStyle = LUMEN;
+      rx.font = "400 128px 'Instrument Serif', serif";
+      rx.fillText('Portal', 960, 552);
+      centeredLine([
+        { text: '30 MINUTE', c: SILVER },
+        { text: '  ·  ', c: LUMEN },
+        { text: '2 PETER 1:11', c: HALO },
+        { text: '  ·  DEEP FOCUS', c: LUMEN },
+      ], 618, "500 22px 'JetBrains Mono', monospace", '5px');
+      rx.restore();
+    }
+    // outro card — fades in over the last 22s (same as the player)
+    const toEnd = DURATION - t;
+    let oo = 0; if (toEnd < 22) oo = Math.min(1, (22 - toEnd) / 2); oo = Math.max(0, Math.min(1, oo));
+    if (oo > 0.002) {
+      rx.save(); rx.globalAlpha = oo;
+      centeredLine([
+        { text: 'FOCUSFIELD  ', c: LUMEN },
+        { text: '·', c: HALO },
+        { text: '  PORTAL', c: LUMEN },
+      ], 452, "500 22px 'JetBrains Mono', monospace", '6px');
+      rx.textAlign = 'center'; rx.fillStyle = LUMEN;
+      rx.font = "400 72px 'Instrument Serif', serif";
+      rx.fillText('Mission Complete', 960, 548);
+      centeredLine([
+        { text: 'RUNTIME ', c: LUMEN },
+        { text: fmtt(DURATION), c: SILVER },
+        { text: '  ·  THANK YOU FOR FOCUSING', c: LUMEN },
+      ], 606, "500 22px 'JetBrains Mono', monospace", '4px');
+      rx.restore();
+    }
+  }
+
+  // render scene at absolute time t, apply the same intro/outro dimming the live
+  // loop does, then composite the branded overlays — straight into rc.
+  function renderFrameAt(t) {
+    videoTime = t;
+    renderScene(t);
+    let intensity = 1;
+    if (t < 13) { const b = Math.min(1, t / 13); const e = b * b * (3 - 2 * b); intensity = 0.04 + 0.96 * e; }
+    const toEnd = DURATION - t;
+    if (toEnd < 9) intensity = Math.min(intensity, Math.max(0, toEnd / 9));
+    if (intensity < 1) { ctx.fillStyle = 'rgba(0,0,0,' + (1 - intensity).toFixed(3) + ')'; ctx.fillRect(0, 0, 1920, 1080); }
+    rx.drawImage(canvas, 0, 0, 1920, 1080);
+    drawChrome(t);
+    drawCards(t);
+    if (window.OracleCard) OracleCard.draw(rx, t);
+  }
+
+  const FAST = !!(window.VideoEncoder && window.AudioEncoder && window.VideoFrame && window.AudioData);
+  let renderingMP4 = false, cancelMP4 = false;
+
+  function cleanupMP4(wasMuted, wasVol) {
+    window.__offlineRendering = false; renderingMP4 = false; cancelMP4 = false;
+    document.body.classList.remove('recording'); hud.classList.remove('on');
+    btn.disabled = false; stopBtn.textContent = 'Stop & Save';
+    const rv = document.getElementById('rec-verb'); if (rv) rv.textContent = 'Recording';
+    setMuted(wasMuted); try { PortalAudio.setVolume(wasVol / 100); } catch (e) {}
+    rebuild(); seek(0); setPlaying(false);
+  }
+
+  // Race a promise against a timeout so a wedged encoder/disk write can't hang the UI forever.
+  function withTimeout(promise, ms, label) {
+    let to;
+    const timeout = new Promise((_, rej) => { to = setTimeout(() => rej(new Error('Timed out: ' + label)), ms); });
+    return Promise.race([promise, timeout]).finally(() => clearTimeout(to));
+  }
+
+  async function renderMP4() {
+    if (renderingMP4) return;
+    const fps = 30, total = DURATION, N = Math.round(total * fps);
+    const wasMuted = TWEAKS.muted, wasVol = TWEAKS.volume;
+
+    // ---- pick the best resolution this browser can actually hardware-encode ----
+    // 4K UHD for max YouTube quality; auto-fall back to 1080p if unsupported.
+    const RES_4K = { w: 3840, h: 2160, codec: 'avc1.640033', bitrate: 40000000, label: '4K' };   // High@L5.1
+    const RES_HD = { w: 1920, h: 1080, codec: 'avc1.640028', bitrate: 12000000, label: '1080p' }; // High@L4.0
+    let RES = RES_HD;
+    try {
+      const sup = await VideoEncoder.isConfigSupported({ codec: RES_4K.codec, width: RES_4K.w, height: RES_4K.h, bitrate: RES_4K.bitrate, framerate: fps });
+      if (sup && sup.supported) RES = RES_4K;
+    } catch (e) { /* stay on 1080p */ }
+    const SX = RES.w / 1920, SY = RES.h / 1080;       // logical 1920×1080 → output scale
+    let fieldScaled = false;                          // whether we resized the field canvas
+    const fname = 'Portals-Portal-' + TWEAKS.durationMin + 'min-' + RES.label + '.mp4';
+
+    let Mux;
+    try { Mux = await import('https://cdn.jsdelivr.net/npm/mp4-muxer@5/+esm'); }
+    catch (e) { alert('Could not load the MP4 encoder (needs internet for the first render).'); return; }
+
+    let writable = null, target;
+    const blobParts = [];                 // streamed MP4 chunks when we can't write to disk
+    // The native save-to-folder picker only works in a real top-level tab; it's blocked
+    // inside the embedded preview iframe. Only try it when we're actually top-level.
+    try {
+      if (window.showSaveFilePicker && window.self === window.top) {
+        const h = await window.showSaveFilePicker({ suggestedName: fname, types: [{ description: 'MP4 video', accept: { 'video/mp4': ['.mp4'] } }] });
+        writable = await h.createWritable();
+        target = new Mux.FileSystemWritableFileStreamTarget(writable);
+      }
+    } catch (e) {
+      // AbortError = user dismissed the picker. Anything else (e.g. picker blocked) → stream.
+      if (e && e.name === 'AbortError') return;
+      writable = null;
+    }
+    if (!writable) {
+      // No disk handle: stream the muxer's output into a disk-backed Blob in chunks,
+      // instead of one giant contiguous ArrayBuffer (which exhausts memory on long videos).
+      // chunked + fragmented ⇒ writes arrive in order, so we just append each chunk.
+      // (the muxer still requires the position param to be declared.)
+      target = new Mux.StreamTarget({ chunked: true, onData: (d, _position) => blobParts.push(d.slice()) });
+    }
+
+    renderingMP4 = true; cancelMP4 = false;
+    document.body.classList.add('recording'); hud.classList.add('on'); btn.disabled = true;
+    const rv = document.getElementById('rec-verb'); if (rv) rv.textContent = 'Rendering';
+    stopBtn.textContent = 'Cancel'; elTo.textContent = fmtt(total); elEl.textContent = '0%';
+
+    // 1) soundscape — rendered offline in chunks (responsive + cancellable)
+    note.textContent = 'Rendering soundscape…';
+    let audioBuf = null;
+    try {
+      audioBuf = await PortalAudio.renderOffline(total, 0.9, (frac) => {
+        const p = Math.round(frac * 100);
+        elEl.textContent = p + '%';
+        note.textContent = 'Rendering soundscape… ' + p + '%';
+      }, () => cancelMP4);
+    }
+    catch (e) { console.error(e); alert('Audio render failed: ' + e.message); cleanupMP4(wasMuted, wasVol); return; }
+    if (cancelMP4) { note.textContent = 'Cancelled.'; cleanupMP4(wasMuted, wasVol); if (writable) { try { await writable.close(); } catch (e) {} } return; }
+
+    // 2) muxer + hardware encoders
+    let muxer, venc, aenc, encErr = null;
+    try {
+      // size the composite canvas to the output res; scale its ctx so all the
+      // hardcoded 1920×1080 chrome/card coordinates map straight onto 4K.
+      rc.width = RES.w; rc.height = RES.h;
+      rx.setTransform(SX, 0, 0, SY, 0, 0);
+      muxer = new Mux.Muxer({
+        target,
+        video: { codec: 'avc', width: RES.w, height: RES.h, frameRate: fps },
+        audio: { codec: 'aac', numberOfChannels: 2, sampleRate: 48000 },
+        fastStart: writable ? false : 'fragmented',
+        firstTimestampBehavior: 'offset',
+      });
+      venc = new VideoEncoder({ output: (c, m) => muxer.addVideoChunk(c, m), error: e => { console.error('venc', e); encErr = encErr || e; } });
+      venc.configure({ codec: RES.codec, width: RES.w, height: RES.h, bitrate: RES.bitrate, framerate: fps, bitrateMode: 'variable', latencyMode: 'quality' });
+      aenc = new AudioEncoder({ output: (c, m) => muxer.addAudioChunk(c, m), error: e => { console.error('aenc', e); encErr = encErr || e; } });
+      let abr = 256000;
+      for (const b of [384000, 320000]) { try { const s = await AudioEncoder.isConfigSupported({ codec: 'mp4a.40.2', numberOfChannels: 2, sampleRate: 48000, bitrate: b }); if (s && s.supported) { abr = b; break; } } catch (e) {} }
+      aenc.configure({ codec: 'mp4a.40.2', numberOfChannels: 2, sampleRate: 48000, bitrate: abr });
+    } catch (e) {
+      console.error(e); alert('This browser can’t hardware-encode MP4 here. Try Chrome or Edge.');
+      cleanupMP4(wasMuted, wasVol); return;
+    }
+
+    // 3) audio is encoded *interleaved* with the video below, so audio + video
+    //    timestamps stay monotonic — that keeps fragmented streaming low-memory
+    //    (the muxer flushes each fragment to disk instead of buffering the whole track).
+    const sr = audioBuf.sampleRate, ch0 = audioBuf.getChannelData(0);
+    const ch1 = audioBuf.numberOfChannels > 1 ? audioBuf.getChannelData(1) : ch0;
+    // the soundscape's clock starts at sample 0 of the offline buffer; stop at exactly the
+    // session length (the reverb tail past it is never encoded)
+    const A0 = 0, AEND = Math.min(audioBuf.length, A0 + Math.round(total * sr));
+    let aOff = A0;                         // next audio sample index to encode
+    async function pumpAudioTo(sampleTarget) {
+      const limit = Math.min(A0 + sampleTarget, AEND);
+      while (aOff < limit) {
+        const len = Math.min(1024, limit - aOff);
+        const data = new Float32Array(len * 2);
+        data.set(ch0.subarray(aOff, aOff + len), 0);
+        data.set(ch1.subarray(aOff, aOff + len), len);
+        const ad = new AudioData({ format: 'f32-planar', sampleRate: sr, numberOfFrames: len, numberOfChannels: 2, timestamp: Math.round((aOff - A0) / sr * 1e6), data });
+        aenc.encode(ad); ad.close();
+        aOff += len;
+        if (aenc.encodeQueueSize > 40) await new Promise(r => setTimeout(r, 0));
+      }
+    }
+
+    // 4) render + encode every video frame deterministically.
+    //    Everything from here through the file write is wrapped so a wedged encoder,
+    //    a rejected flush, or an out-of-memory finalize can NEVER leave the HUD stuck
+    //    on "Finalizing…" — we always surface the error and run cleanup.
+    window.__offlineRendering = true; rebuild();
+    // render the FIELD natively at output resolution (crisp 4K, not upscaled):
+    // grow the field canvas and scale its context so renderScene draws in the
+    // same 1920×1080 logical space but fills every 4K pixel.
+    canvas.width = RES.w; canvas.height = RES.h;
+    ctx.setTransform(SX, 0, 0, SY, 0, 0);
+    fieldScaled = true;
+    note.textContent = 'Rendering video… (' + RES.label + ')';
+    try {
+      for (let i = 0; i < N; i++) {
+        if (cancelMP4) break;
+        if (encErr) throw encErr;
+        renderFrameAt(i / fps);
+        const vf = new VideoFrame(rc, { timestamp: Math.round(i * 1e6 / fps), duration: Math.round(1e6 / fps) });
+        venc.encode(vf, { keyFrame: i % Math.round(fps / 2) === 0 });
+        vf.close();
+        await pumpAudioTo(Math.round((i + 1) / fps * sr));   // interleave this frame's audio
+        if (venc.encodeQueueSize > 10) await new Promise(res => { const c = () => venc.encodeQueueSize <= 4 ? res() : setTimeout(c, 4); c(); });
+        if (i % 6 === 0) { const p = Math.round(i / N * 100); elEl.textContent = p + '%'; note.textContent = 'Rendering video… ' + p + '%'; if (i % 30 === 0) await new Promise(r => setTimeout(r, 0)); }
+      }
+
+      note.textContent = 'Finalizing the MP4…';
+      elEl.textContent = '100%';
+      if (!cancelMP4) { await pumpAudioTo(AEND - A0); await aenc.flush(); }   // flush remaining audio
+      await new Promise(r => setTimeout(r, 50));
+      if (encErr) throw encErr;
+      // Backpressure keeps the queue tiny, so a real flush is near-instant. The watchdog
+      // only fires if a hardware encoder genuinely wedges — then we report instead of hang.
+      await withTimeout(venc.flush(), 120000, 'the video encoder stopped responding while finishing up');
+      if (encErr) throw encErr;
+      muxer.finalize();
+
+      // 5) write the file out
+      if (writable) {
+        note.textContent = 'Saving to disk…';
+        await new Promise(r => setTimeout(r, 30));
+        await withTimeout(writable.close(), 180000, 'saving the file to disk timed out');
+        note.textContent = cancelMP4 ? 'Cancelled.' : 'Done — saved to the folder you chose.';
+      } else if (!cancelMP4) {
+        note.textContent = 'Preparing download…';
+        await new Promise(r => setTimeout(r, 30));
+        const blob = new Blob(blobParts, { type: 'video/mp4' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a'); a.href = url; a.download = fname;
+        document.body.appendChild(a); a.click(); a.remove();
+        setTimeout(() => URL.revokeObjectURL(url), 60000);
+        note.textContent = 'Done — check your Downloads.';
+      } else {
+        note.textContent = 'Cancelled.';
+      }
+    } catch (e) {
+      console.error('render/finalize failed:', e);
+      if (writable) { try { await writable.close(); } catch (_) {} }
+      const memHint = !writable
+        ? '\n\nTip: open this page in its own browser tab (outside the embedded preview) so it can save straight to a folder you pick — that handles very long videos best.'
+        : '';
+      alert('The render couldn’t finish:\n\n' + ((e && e.message) ? e.message : e) + memHint);
+      note.textContent = 'Render failed — see the message.';
+    }
+    // restore the field canvas to its normal 1080p backing store + transform
+    if (fieldScaled) {
+      canvas.width = 1920; canvas.height = 1080;
+      ctx.setTransform(1, 0, 0, 1, 0, 0);
+      try { fit(); } catch (e) {}
+    }
+    cleanupMP4(wasMuted, wasVol);
+  }
+
+  // explainer modal
+  const modal = document.getElementById('exp-modal');
+  function openModal() {
+    const m = Math.max(1, Math.round(DURATION / 60));
+    const len = document.getElementById('exp-len'); if (len) len.textContent = m;
+    const sp = document.getElementById('exp-speed');
+    if (sp) sp.textContent = FAST
+      ? 'Renders in up to 4K for best YouTube quality. As fast as your computer allows — a 4K render takes longer and makes a large file, so use a save folder when asked.'
+      : 'Your browser can’t fast-render here — please use Chrome or Edge to export.';
+    const sv = document.getElementById('exp-save');
+    const canDisk = window.showSaveFilePicker && window.self === window.top;
+    if (sv) sv.innerHTML = canDisk
+      ? 'Pick a folder to save into; it streams straight to disk. <b>Keep this tab in front</b> while it works.'
+      : 'The finished file downloads automatically when it’s done — it streams together in chunks, so even long videos stay within memory. <b>Keep this tab in front</b> while it works.';
+    modal.classList.add('on');
+  }
+  function closeModal() { modal.classList.remove('on'); }
+
+  btn.addEventListener('click', openModal);
+  document.getElementById('exp-cancel').addEventListener('click', closeModal);
+  document.getElementById('exp-start').addEventListener('click', () => {
+    closeModal();
+    if (FAST) renderMP4();
+    else alert('This browser can’t render the MP4 here. Please open this page in Chrome or Edge and try Export again.');
+  });
+  stopBtn.addEventListener('click', () => { if (renderingMP4) cancelMP4 = true; });
+
+  window.addEventListener('keydown', (e) => {
+    if (renderingMP4) { e.stopImmediatePropagation(); e.preventDefault(); }
+  }, true);
+})();
+</script>
+<script src="oracle-card.js" data-verse="Then God Will Give You A Grand Entrance Into The Eternal Kingdom Of Our Lord And Savior Jesus Christ." data-ref="2 PETER 1:11 · NLT"></script>
+</body>
+</html>

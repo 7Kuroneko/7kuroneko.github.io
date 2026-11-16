@@ -1,5 +1,19 @@
 /* ============================================================================
- * FOCUSFIELD · GJ 504 b — generative soundscape "Dark Empress"
+ * FOCUSFIELD · GJ 504 b — generative soundscape "Dark Empress" (REMASTER + SOUNDFIELD)
+ * Soundfield layer (Obsidian-style, from the Overstory recipe), under the unchanged music:
+ *   · FIELD  a very wide C♯/G♯ drone (the two notes every chord shares), two voices per note hard
+ *            L/R ±7 ¢, breathing with the planet's half-rotation (105 s)
+ *   · HALO   a soft, non-pumping glow on each chord, 3 s in / 7 s out, an octave up, mostly hall
+ *   · HALL   a long, dark 11 s room on the whole mix for Obsidian-style smoothness
+ *   All soundfield oscillators are phase-anchored to absolute time, so 20 s export segments
+ *   still join without clicks.
+ * Remaster — same music (chords, lead, arpeggio, sub pattern, pumping pad), better quality and flow:
+ *   · YouTube level: −14 LUFS, true peak ≤ −1 dBTP (was −19.8 LUFS, ~6 dB quieter than the channel)
+ *   · phone/laptop translation: less 60–120 Hz boom, more 300–500 Hz body (lost ~7 dB on small speakers)
+ *   · gentler, smoother pump (−35 % → −18 % dips, slower in, fuller recovery)
+ *   · wider image: each pad saw spread across the stereo field; arpeggio further apart, softer attack
+ *   · no saturation on the master (the tanh clip stage is replaced by a clean limiter)
+ *   · section changes crossfade over 8 bars instead of 4
  * ----------------------------------------------------------------------------
  * Dark, regal, seductive: a slow, late-night synth ballad feel. Lush
  * pumping chords, a warm sub-bass pattern, a glassy 80s pluck arpeggio and a
@@ -32,6 +46,8 @@
  * ==========================================================================*/
 window.PinkAudio = (function () {
   const BPM = 68, BEAT = 60 / BPM, BAR = BEAT * 4, E8 = BEAT / 2, BLOCK = 16;
+  const TRIM = 2.25;   // final master: −14 LUFS, true peak under −1 dBTP at the export level   // remaster output trim (→ −14 LUFS)
+  const FIELD = { notes: [37, 44, 49, 56, 61], w: [0.55, 0.8, 0.75, 0.6, 0.4], wide: [0, 0.35, 0.6, 0.85, 0.9], level: 0.0065, halo: 0.0045, hall: 0.14, spin: 210 };
   const mtof = m => 440 * Math.pow(2, (m - 69) / 12);
   const PROG = [
     [37, [56, 59, 63, 64]],  // C♯m9
@@ -70,7 +86,7 @@ window.PinkAudio = (function () {
   const blockAt = i => i < BLOCKS.length ? BLOCKS[i] : BLOCKS[1 + (i - 1) % (BLOCKS.length - 1)];
   const ss = (a, b, x) => { const t = Math.min(1, Math.max(0, (x - a) / (b - a))); return t * t * (3 - 2 * t); };
   function mixAt(bar) {
-    const bi = Math.floor(bar / BLOCK), cur = blockAt(bi), prev = bi > 0 ? blockAt(bi - 1) : cur, f = ss(0, 4, bar % BLOCK), o = {};
+    const bi = Math.floor(bar / BLOCK), cur = blockAt(bi), prev = bi > 0 ? blockAt(bi - 1) : cur, f = ss(0, 8, bar % BLOCK), o = {};
     for (const k in cur) o[k] = prev[k] + (cur[k] - prev[k]) * f;
     o.frag = cur.frag; o.sparse = cur.sparse; return o;
   }
@@ -114,9 +130,14 @@ window.PinkAudio = (function () {
     const comp = c.createDynamicsCompressor(); comp.threshold.value = -20; comp.knee.value = 18; comp.ratio.value = 3; comp.attack.value = 0.012; comp.release.value = 0.5;
     const lp = c.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 5800; lp.Q.value = 0;
     const hp = c.createBiquadFilter(); hp.type = 'highpass'; hp.frequency.value = 30; hp.Q.value = 0;
-    const mk = c.createGain(); mk.gain.value = 1.3;
-    const clip = c.createWaveShaper(); clip.curve = curve('clip', 1.1, 0.92); clip.oversample = '2x';
-    G.master.connect(comp); comp.connect(lp); lp.connect(hp); hp.connect(mk); mk.connect(clip); clip.connect(dest); G.out = clip;
+    // remaster: translation EQ + trim + clean limiter (replaces the tanh clip stage)
+    lp.frequency.value = 7000;
+    const shelf = c.createBiquadFilter(); shelf.type = 'lowshelf'; shelf.frequency.value = 110; shelf.gain.value = -2.5;
+    const body = c.createBiquadFilter(); body.type = 'peaking'; body.frequency.value = 380; body.Q.value = 0.7; body.gain.value = 3.5;
+    const pres = c.createBiquadFilter(); pres.type = 'peaking'; pres.frequency.value = 2500; pres.Q.value = 0.8; pres.gain.value = 1.5;
+    const mk = c.createGain(); mk.gain.value = TRIM;
+    const lim = c.createDynamicsCompressor(); lim.threshold.value = -2.5; lim.knee.value = 0; lim.ratio.value = 20; lim.attack.value = 0.002; lim.release.value = 0.2;
+    G.master.connect(comp); comp.connect(lp); lp.connect(hp); hp.connect(shelf); shelf.connect(body); body.connect(pres); pres.connect(mk); mk.connect(lim); lim.connect(dest); G.out = lim;
     // space
     G.verb = c.createGain();
     const ir = modalIR(c.sampleRate), buf = c.createBuffer(2, ir[0].length, c.sampleRate);
@@ -143,6 +164,15 @@ window.PinkAudio = (function () {
       G.bus[n] = g;
     };
     bus('pad', 0.4, 0); bus('bass', 0.03, 0); bus('lead', 0.5, 0.45); bus('arp', 0.45, 0.5);
+    // soundfield: long dark hall on the whole mix + field/halo buses that live mostly in it
+    const fr = rng(911), fl = Math.floor(c.sampleRate * 11), fbuf = c.createBuffer(2, fl, c.sampleRate);
+    for (let ch = 0; ch < 2; ch++) { const d = fbuf.getChannelData(ch); let lp = 0; for (let i = 0; i < fl; i++) { const tt = i / c.sampleRate, w = fr() * 2 - 1; lp += 0.08 * (w - lp); d[i] = lp * Math.exp(-6.9 * tt / 10) * (1 - Math.exp(-tt * 15)); } }
+    const fhp = c.createBiquadFilter(); fhp.type = 'highpass'; fhp.frequency.value = 200; fhp.Q.value = 0.6;
+    const fhall = c.createConvolver(); fhp.connect(fhall); fhall.normalize = true; fhall.buffer = fbuf; const fwet = c.createGain(); fwet.gain.value = FIELD.hall;
+    const fsend = c.createGain(); fsend.gain.value = 1; G.master.connect(fsend); fsend.connect(fhp); fhall.connect(fwet); fwet.connect(comp);
+    G.field = c.createGain(); G.field.gain.value = 1; G.field.connect(G.master); const fs2 = c.createGain(); fs2.gain.value = 1.2; G.field.connect(fs2); fs2.connect(fhp);
+    G.halo = c.createGain(); G.halo.gain.value = 0.35; G.halo.connect(G.master); const hs = c.createGain(); hs.gain.value = 1.6; G.halo.connect(hs); hs.connect(fhp);
+    G.fieldDone = new Set();
     const re = new Float32Array(8), im = new Float32Array([0, 1, 0.5, 0.33, 0.22, 0.15, 0.1, 0.06]);
     G.emp = c.createPeriodicWave(re, im);
     G.sat = curve('sat', 1.6, 1);
@@ -156,8 +186,8 @@ window.PinkAudio = (function () {
     if (pump > 0.02) {
       for (let bt = Math.ceil(vt / BEAT) * BEAT; bt < vt + len + 3; bt += BEAT) {
         const ct = t + (bt - vt);
-        duck.gain.setValueAtTime(1, ct); duck.gain.linearRampToValueAtTime(1 - 0.35 * pump, ct + 0.08);
-        duck.gain.linearRampToValueAtTime(1, ct + BEAT * 0.78);
+        duck.gain.setValueAtTime(1, ct); duck.gain.linearRampToValueAtTime(1 - 0.18 * pump, ct + 0.16);
+        duck.gain.linearRampToValueAtTime(1, ct + BEAT * 0.92);
       }
     }
     const voice = (m, v, t1, l1, a1, r1) => {
@@ -169,8 +199,8 @@ window.PinkAudio = (function () {
       env.gain.setValueAtTime(amp, t1 + l1); env.gain.linearRampToValueAtTime(0.0001, end);
       const lpf = c.createBiquadFilter(); lpf.type = 'lowpass'; lpf.frequency.value = 1300 - v * 80; lpf.Q.value = 0;
       const pan = c.createStereoPanner(); pan.pan.value = [-0.45, 0.45, -0.2, 0.2][v];
-      lpf.connect(env); env.connect(pan); pan.connect(duck);
-      [-9, 0, 9].forEach(det => { const o = c.createOscillator(); o.type = 'sawtooth'; o.frequency.value = mtof(m); o.detune.value = det + v; o.connect(lpf); o.start(t1); o.stop(end + 0.05); });
+      lpf.channelCountMode = 'explicit'; lpf.channelCount = 2; lpf.connect(env); env.connect(pan); pan.connect(duck);
+      [[-9, -0.55], [0, 0], [9, 0.55]].forEach(([det, sp]) => { const o = c.createOscillator(); o.type = 'sawtooth'; o.frequency.value = mtof(m); o.detune.value = det + v; const sp2 = c.createStereoPanner(); sp2.pan.value = sp; o.connect(sp2).connect(lpf); o.start(t1); o.stop(end + 0.05); });
     };
     if (notes2) {
       notes.forEach((m, v) => voice(m, v, t, len / 2 + 0.4, 3, 0.8));
@@ -204,7 +234,7 @@ window.PinkAudio = (function () {
     vib.start(t); vib.stop(end + 0.05);
   }
   function velour(G, t, prev, midi, dur, lvl) {
-    const c = G.c, f = mtof(midi), amp = 0.085 * lvl;
+    const c = G.c, f = mtof(midi), amp = 0.068 * lvl;
     if (amp < 0.002) return;
     const o = c.createOscillator(); o.type = 'sine';
     o.frequency.setValueAtTime(prev ? mtof(prev) : f, t); o.frequency.exponentialRampToValueAtTime(f, t + 0.06);
@@ -222,12 +252,49 @@ window.PinkAudio = (function () {
     if (amp < 0.0008) return;
     const o = c.createOscillator(); o.type = 'triangle'; o.frequency.value = mtof(midi);
     const lpf = c.createBiquadFilter(); lpf.type = 'lowpass'; lpf.Q.value = 0;
-    lpf.frequency.setValueAtTime(2400, t); lpf.frequency.exponentialRampToValueAtTime(520, t + 0.3);
+    lpf.frequency.setValueAtTime(1900, t); lpf.frequency.exponentialRampToValueAtTime(480, t + 0.35);
     const g = c.createGain();
-    g.gain.setValueAtTime(0.0001, t); g.gain.linearRampToValueAtTime(amp, t + 0.01); g.gain.exponentialRampToValueAtTime(0.0001, t + 0.9);
+    g.gain.setValueAtTime(0.0001, t); g.gain.linearRampToValueAtTime(amp, t + 0.025); g.gain.exponentialRampToValueAtTime(0.0001, t + 0.95);
     const pan = c.createStereoPanner(); pan.pan.value = panv;
     o.connect(lpf); lpf.connect(g); g.connect(pan); pan.connect(G.bus.arp);
     o.start(t); o.stop(t + 0.95);
+  }
+
+  // ---------------------------------------------------------------- soundfield (phase-anchored to absolute time)
+  // a sine of frequency f that "started" at context time ts, begun at context time t0 >= ts with the right phase
+  function anchoredSine(c, f, ts, t0) {
+    const o = c.createOscillator(); o.frequency.value = f;
+    if (t0 > ts + 1e-4) { const ph = 2 * Math.PI * f * (t0 - ts); o.setPeriodicWave(c.createPeriodicWave(new Float32Array([0, Math.sin(ph)]), new Float32Array([0, Math.cos(ph)]), { disableNormalization: true })); }
+    else o.type = 'sine';
+    o.start(Math.max(t0, ts)); return o;
+  }
+  const ssv = u => Math.sin(Math.max(0, Math.min(1, u)) * Math.PI / 2) ** 2;
+  // FIELD: per note, events on a grid of whole cycles (~28 s) so neighbours overlap exactly in phase
+  function fieldEvents(t1, t2) {
+    const out = [];
+    FIELD.notes.forEach((m, ni) => { const f = mtof(m), P = Math.round(28 * f) / f;
+      for (let k = Math.max(0, Math.floor((t1 - P - 10) / P)); k * P < t2; k++) { const s = k * P; if (s + P + 10 > t1) out.push({ id: 'F' + ni + '_' + k, s, len: P + 10, f, w: FIELD.w[ni], wd: FIELD.wide[ni] }); } });
+    return out;
+  }
+  const breath = t => (0.72 + 0.28 * Math.sin(2 * Math.PI * t / (FIELD.spin / 2) - Math.PI / 2)) * ss(0, 14, t) * endF(t);
+  function fieldVoice(G, e, origin, minT) {
+    const c = G.c, ts = origin + e.s, te = ts + e.len, t0 = Math.max(ts, origin + minT); if (te <= t0 + 0.05) return;
+    const env = c.createGain(); env.connect(G.field);
+    const n = Math.max(2, Math.ceil((te - t0) / 0.5) + 1), v = new Float32Array(n);
+    for (let k = 0; k < n; k++) { const x = (t0 - ts) + (te - t0) * k / (n - 1), at = e.s + x; v[k] = Math.max(0.00001, FIELD.level * e.w * ssv(x / 10) * ssv((e.len - x) / 10) * breath(at)); }
+    try { env.gain.setValueCurveAtTime(v, t0, te - t0); } catch (er) {}
+    [[-7, -e.wd], [7, e.wd]].forEach(([cents, pn]) => { const o = anchoredSine(c, e.f * Math.pow(2, cents / 1200), ts, t0); const p = c.createStereoPanner(); p.pan.value = pn; o.connect(p); p.connect(env); o.stop(te + 0.05); });
+  }
+  // HALO: soft, non-pumping chord glow an octave up, 3 s in / 7 s out
+  function haloChord(G, t, notes, len, lvl, absT, minT) {
+    const c = G.c; notes.forEach((m, v) => {
+      const f = mtof(m + 12), ts = t, te = t + len + 7, t0 = Math.max(ts, (t - absT) + minT); if (te <= t0 + 0.05) return;
+      const amp = FIELD.halo * lvl * [1, 0.8, 0.7, 0.6][v], env = c.createGain(); env.connect(G.halo);
+      const n = Math.max(2, Math.ceil((te - t0) / 0.25) + 1), vv = new Float32Array(n);
+      for (let k = 0; k < n; k++) { const x = (t0 - ts) + (te - t0) * k / (n - 1); vv[k] = Math.max(0.00001, amp * ssv(x / 3) * ssv((len + 7 - x) / 7)); }
+      try { env.gain.setValueCurveAtTime(vv, t0, te - t0); } catch (er) {}
+      [[-6, -0.75], [6, 0.75]].forEach(([cents, pn]) => { const o = anchoredSine(c, f * Math.pow(2, cents / 1200), ts, t0); const p = c.createStereoPanner(); p.pan.value = pn; o.connect(p); p.connect(env); o.stop(te + 0.05); });
+    });
   }
 
   // ---------------------------------------------------------------- score
@@ -235,6 +302,9 @@ window.PinkAudio = (function () {
     const t0 = b * BAR, m = mixAt(b), ci = Math.floor(b / 2) % 8, ch = PROG[ci], second = b % 2;
     const notesNow = ch[2] && second ? ch[2] : ch[1];
     const ok = t => t >= minT && t < maxT, T = t => origin + t;
+    // soundfield events that sound inside this bar (each scheduled once per graph)
+    for (const e of fieldEvents(Math.max(t0, minT), Math.min(t0 + BAR, maxT))) { if (G.fieldDone.has(e.id)) continue; G.fieldDone.add(e.id); fieldVoice(G, e, origin, minT); }
+    if (!second && t0 + 2 * BAR + 7 > minT && t0 < maxT && !G.fieldDone.has('H' + b)) { G.fieldDone.add('H' + b); haloChord(G, T(t0), ch[1], 2 * BAR, m.pad * endF(t0) * ss(0, 10, t0), t0, minT); }
     if (!second && ok(t0)) crown(G, T(t0), ch[1], 2 * BAR, m.pad * endF(t0), m.pump, t0, ch[2]);
     if (m.bass > 0.02) {
       let prev = second ? ch[0] : PROG[(ci + 7) % 8][0];
@@ -242,7 +312,7 @@ window.PinkAudio = (function () {
     }
     if (m.arp > 0.02) {
       const ns = notesNow.map(n => n + 12);
-      for (let i = 0; i < 8; i++) { if (m.sparse && i % 2) continue; const t = t0 + i * E8; if (ok(t)) glint(G, T(t), ns[ARP[i]], m.arp * AV[i] * endF(t), i % 2 ? 0.4 : -0.4); }
+      for (let i = 0; i < 8; i++) { if (m.sparse && i % 2) continue; const t = t0 + i * E8; if (ok(t)) glint(G, T(t), ns[ARP[i]], m.arp * AV[i] * endF(t), i % 2 ? 0.6 : -0.6); }
     }
     if (m.lead > 0.02) {
       const ph = MEL[ci];
