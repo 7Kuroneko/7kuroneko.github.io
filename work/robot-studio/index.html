@@ -108,7 +108,7 @@ button,input{font:inherit;color:inherit}
 .cbtn:hover{background:rgba(127,127,127,.12)}
 .cbtn.on{background:var(--ink);color:#fff}
 .stage.void .cbtn.on,.stage.blue .cbtn.on{background:var(--field);color:var(--ink)}
-.dock{left:calc(50% + (var(--lw) - var(--rw))/2);bottom:18px;transform:translateX(-50%);border-radius:18px!important;transition:left .38s cubic-bezier(.2,.8,.2,1);pointer-events:auto;display:flex;align-items:center;gap:6px;padding:6px;max-width:calc(100% - 28px);overflow-x:auto;scrollbar-width:none}
+.dock{left:calc(50% + (var(--lw) - var(--rw))/2);bottom:18px;transform:translateX(-50%);border-radius:18px!important;transition:left .38s cubic-bezier(.2,.8,.2,1);pointer-events:auto;display:flex;align-items:center;gap:6px;padding:6px;max-width:calc(100% - var(--lw) - var(--rw) - 40px);overflow-x:auto;scrollbar-width:none}
 .dock::-webkit-scrollbar{display:none}
 .dock>*{flex:none}
 .seg{display:flex;gap:2px;padding:2px;border-radius:10px;background:rgba(127,127,127,.09)}
@@ -316,6 +316,15 @@ body:not(.dark) .navpill .tab.on{color:#0b2a3a!important}
 .vc b,.kpi b,.hero b{font-weight:600;letter-spacing:0}
 .tbtn,.cbtn,.tog,.tab,.dbtn b{font-weight:500;letter-spacing:.02em}
 
+/* desktop/tablet: keep the dock inside the space between the side panels */
+.app.tight #dock .rng>span{display:none}
+.app.tight #dock .rng input{width:72px}
+.app.tight #dock .dbtn{min-width:62px;padding:0 8px}
+.app.tight #dock .sep2{margin:0 1px}
+.app.tight2 #dock .rng,.app.tight2 #dock .rng+.sep2{display:none}
+.app.tight2 .pop .rng.mobx{display:flex}
+.app.tight2 #dStyle{padding:0 8px}
+.pop{max-width:calc(100% - var(--lw) - var(--rw) - 40px)}
 /* ============ MOBILE (≤760px): bottom-sheet layout ============ */
 .mobx{display:none}
 @media (max-width:760px){
@@ -692,6 +701,8 @@ const PRESETS=[
  {id:'cotton',eyes:'ring',n:'Cotton Suit',style:'suit',weave:'cloth',face:'knit',shell:'#e4e0d7',soft:'#e4e0d7',accent:'#e4e0d7',hand:'#f0eee9',foot:'#dcd7cd',visor:'#0b0b0c',rim:'#e4e0d7',ear:'#ece9e2',glow:'#bfe6ff',bg:'studio'},
  {id:'stone',eyes:'ring',n:'Stone Suit',style:'suit',weave:'cloth',face:'knit',shell:'#8e9093',soft:'#8e9093',accent:'#8e9093',hand:'#d9dadb',foot:'#8f9193',visor:'#0b0b0c',rim:'#8e9093',ear:'#b4b6b9',glow:'#cdeefe',bg:'studio'},
  {id:'taupe',eyes:'ring',n:'Taupe Suit',style:'suit',weave:'cloth',face:'knit',shell:'#b9ab99',soft:'#b9ab99',accent:'#b9ab99',hand:'#d8d0c4',foot:'#a89a87',visor:'#0a0a0b',rim:'#b9ab99',ear:'#b9ab99',glow:'#ffffff',bg:'studio'},
+ {id:'shinobi',eyes:'ring',n:'Shinobi',style:'suit',outfit:'ninja',weave:'cloth',face:'knit',shell:'#151517',soft:'#151517',accent:'#8c1d24',hand:'#232326',foot:'#151517',visor:'#0a0a0b',rim:'#151517',ear:'#151517',glow:'#ff5a48',bg:'void'},
+ {id:'shiro',eyes:'ring',n:'Shinobi Shiro',style:'suit',outfit:'ninja',weave:'cloth',face:'knit',shell:'#dedbd4',soft:'#dedbd4',accent:'#1d1e21',hand:'#cfccc5',foot:'#dedbd4',visor:'#0a0a0b',rim:'#dedbd4',ear:'#dedbd4',glow:'#bfe6ff',bg:'studio'},
  {id:'graphite',eyes:'led',n:'Graphite volt',style:'hard',weave:'perf',face:'plate',shell:'#3a3c41',soft:'#18191b',accent:'#c6f032',hand:'#2c2e33',foot:'#c6f032',visor:'#0b0c0d',rim:'#c6f032',ear:'#18191b',glow:'#c6f032',bg:'void'}
 ];
 const F=Object.assign({livery:'hito.',preset:'onyx',motor:'#30343a',metal:'#b2b7bd',wire:'#ff7a2e',cell:'#2f6fc4',pcb:'#173b2b',mode:'steady',glowI:1,active:'shell',zones:{face:true,ears:true,rim:false,seams:true,spine:true,logo:false}},PRESETS.find(p=>p.id==='onyx'));
@@ -789,7 +800,7 @@ function drawLivery(){
    ===================================================================== */
 const robot=new THREE.Group();scene.add(robot);
 const comps={};const allMeshes=[];const J={};const fingers=[];
-const COVER=new Set(['suitk','suitsole','eyering','iris','bezel','shell','soft','accent','visor','livery','glow','handc','footc','skull','plate','rim','ear','lens']);
+const COVER=new Set(['njwrap','njband','njobi','njrib','njplate','njgroove','liner','suitk','suitsole','eyering','iris','bezel','shell','soft','accent','visor','livery','glow','handc','footc','skull','plate','rim','ear','lens']);
 const GLOWS=[];
 function mat(role){const m=new THREE.MeshPhysicalMaterial({color:0xffffff});m.userData.role=role;
   if(role==='livery'){m.map=livTex;m.transparent=true;m.depthWrite=false;m.polygonOffset=true;m.polygonOffsetFactor=-2;m.side=THREE.DoubleSide;}
@@ -893,6 +904,9 @@ function hRim(p0,pl,t0,tl,k){const pts=[];const N=36;
   for(let i=0;i<N;i++)pts.push(hEll(p0+pl-pl*i/N,t0+tl,k));for(let i=0;i<N;i++)pts.push(hEll(p0,t0+tl-tl*i/N,k));
   return new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pts,true,'centripetal'),260,0.0024,8,true);}
 const skull=add(head,sph(1,64,48),'skull','shell',HC,0,HS,[0,0.02,-0.06]);
+// open skull + dark liner, used when the mask glass is clear so you can see into the head
+const skullOpen=add(head,new THREE.SphereGeometry(1,64,48,Math.PI/2+1.15,Math.PI*2-2.3),'skull','shell',HC,0,HS,[0,0.02,-0.06]);skullOpen.visible=false;
+const liner=add(head,new THREE.SphereGeometry(1,48,32,Math.PI/2+1.15,Math.PI*2-2.3),'liner','shell',HC,0,[HS[0]*0.97,HS[1]*0.97,HS[2]*0.97]);liner.visible=false;
 // A · full glass mask
 FACE.glass.push(add(head,new THREE.SphereGeometry(1,64,48,Math.PI/2-1.15,2.3,0.32,2.23),'visor','face',HC,0,[HS[0]*1.012,HS[1]*1.012,HS[2]*1.012],[0,0.02,0.1]));
 FACE.glass.push(add(head,hRim(Math.PI/2-1.15,2.3,0.32,2.23,1.016),'rim','face',[0,0,0],0,null,[0,0.02,0.1],'rim'));
@@ -927,8 +941,14 @@ for(const S of [1,-1]){
   head.add(im);comps.face.meshes.push(im);allMeshes.push(im);GLOWS.push(im);FACE.led.push(im);}}
 // ear modules with light rings
 for(const S of [1,-1]){
-  add(head,cyl(0.043,0.043,0.012,40),'ear','audio',[S*0.101,HY+0.004,-0.012],[0,0,Math.PI/2],[1.2,1,1],[S*0.07,0.02,0]);
-  add(head,torus(0.043,0.0024),'glow','face',[S*0.1075,HY+0.004,-0.012],[0,Math.PI/2,0],[1,1.2,1],[S*0.09,0.02,0],'ears');
+  // flush ear panel that follows the curve of the head, with a glowing outline
+  const EY=HY+0.004,EZ=-0.012,RY=0.052,RZ=0.043;
+  const onHead=(y,z,k)=>{const q=1-((y-HC[1])/HS[1])**2-((z-HC[2])/HS[2])**2;return new THREE.Vector3(S*HS[0]*Math.sqrt(Math.max(q,0))*k,y,z);};
+  const eg=new THREE.CircleGeometry(1,72,0,Math.PI*2);{const P=eg.attributes.position;for(let i=0;i<P.count;i++){const u=P.getX(i),v=P.getY(i);const p=onHead(EY+v*RY,EZ+u*RZ,1.006);P.setXYZ(i,p.x,p.y,p.z);}
+    if(S<0)eg.index.array.reverse&&eg.setIndex(Array.from(eg.index.array).reverse());eg.computeVertexNormals();}
+  add(head,eg,'ear','audio',[0,0,0],0,null,[S*0.07,0.02,0]);
+  const rp=[];for(let i=0;i<96;i++){const a=i/96*Math.PI*2;rp.push(onHead(EY+Math.sin(a)*RY,EZ+Math.cos(a)*RZ,1.009));}
+  add(head,new THREE.TubeGeometry(new THREE.CatmullRomCurve3(rp,true,'centripetal'),192,0.0019,8,true),'glow','face',[0,0,0],0,null,[S*0.09,0.02,0],'ears');
   add(head,cyl(0.0095,0.0095,0.022,20),'sensor','vision',[S*0.032,HY+0.012,0.094],[Math.PI/2,0,0],null,[0,0.02,0.03]);
   add(head,torus(0.0098,0.0017),'metal','vision',[S*0.032,HY+0.012,0.105],0,null,[0,0.02,0.03]);
 }
@@ -1026,13 +1046,16 @@ function styleRole(m,r){
   resetM(m);const st=F.style;
   switch(r){
     case 'shell': st==='knit'||st==='suit'?knit(m,F.shell):gloss(m,F.shell);break;
-    case 'skull': F.face==='knit'||st==='suit'?knit(m,F.shell):st==='knit'?satin(m,F.shell):gloss(m,F.shell);break;
+    case 'skull': st==='suit'&&F.outfit==='ninja'?(()=>{const c=new THREE.Color(F.shell),l=c.r*.3+c.g*.59+c.b*.11;knit(m,'#'+c.lerp(new THREE.Color(l<0.35?'#ffffff':'#000000'),l<0.35?0.05:0.2).getHexString());})():F.face==='knit'||st==='suit'?knit(m,F.shell):st==='knit'?satin(m,F.shell):gloss(m,F.shell);break;
     case 'soft': st==='suit'?knit(m,F.shell):st==='hard'?(m.color.set(F.soft),m.roughness=0.55,m.clearcoat=0.3):knit(m,F.soft);break;
     case 'accent': if(st==='suit'){knit(m,F.shell);break;}m.color.set(F.accent);m.roughness=st==='knit'?0.8:0.42;m.clearcoat=st==='knit'?0:0.4;break;
     case 'handc': m.color.set(F.hand);m.roughness=st==='knit'?0.6:0.4;m.clearcoat=st==='knit'?0.1:0.4;break;
     case 'footc': if(st==='suit'){knit(m,F.foot);break;}m.color.set(F.foot);m.roughness=0.55;m.clearcoat=0.25;break;
     case 'ear': st==='knit'||st==='suit'||F.face==='knit'?knit(m,F.ear):satin(m,F.ear);break;
-    case 'visor': m.color.set(F.visor);m.roughness=0.04;m.metalness=0.35;m.clearcoat=1;break;
+    case 'visor': m.transmission=0;m.thickness=0;m.opacity=1;m.transparent=false;m.depthWrite=true;
+      if(F.tint==='clear'){m.color.set('#ffffff');m.roughness=0.02;m.metalness=0;m.clearcoat=1;m.transmission=1;m.ior=1.5;m.thickness=0.003;m.transparent=true;m.opacity=1;m.depthWrite=false;}
+      else if(F.tint==='light'){m.color.set(F.visor).lerp(new THREE.Color('#ffffff'),0.55);m.roughness=0.03;m.metalness=0.05;m.clearcoat=1;m.transmission=0.65;m.ior=1.5;m.thickness=0.003;m.transparent=true;m.depthWrite=false;}
+      else{m.color.set(F.visor);m.roughness=0.04;m.metalness=0.35;m.clearcoat=1;}break;
     case 'plate': satin(m,F.visor);break;
     case 'rim': if(st==='suit'&&F.face!=='glass'){knit(m,F.shell);break;}m.color.set(F.rim);m.metalness=0.6;m.roughness=0.3;break;
     case 'lens': m.color.set('#030304');m.roughness=0.08;m.metalness=0.2;m.clearcoat=1;break;
@@ -1057,6 +1080,13 @@ function styleRole(m,r){
     case 'glass': m.color.set('#a9c4d8');m.roughness=0.05;m.clearcoat=1;break;
     case 'label': m.color.set(0xffffff);m.roughness=0.5;break;
     case 'suitk': knit(m,F.shell);break;
+    case 'njwrap': knit(m,F.shell);m.color.multiplyScalar(0.62);m.side=THREE.DoubleSide;break;
+    case 'njband': knit(m,F.accent);m.side=THREE.DoubleSide;break;
+    case 'njobi': knit(m,F.accent);m.side=THREE.DoubleSide;break;
+    case 'njrib': knit(m,F.shell);m.color.multiplyScalar(0.7);m.side=THREE.DoubleSide;break;
+    case 'njplate': m.color.set('#ffffff');m.roughness=0.32;m.metalness=0.85;m.clearcoat=0.3;break;
+    case 'njgroove': m.color.set('#050506');m.roughness=0.9;m.metalness=0;break;
+    case 'liner': m.color.set('#0c0d10');m.roughness=0.9;m.metalness=0;m.side=THREE.BackSide;break;
     case 'suitsole': m.color.set(F.foot).multiplyScalar(0.8);m.roughness=0.85;m.metalness=0;m.map=null;m.bumpMap=null;m.sheen=0;break;
   }
 }
@@ -1088,10 +1118,11 @@ function applyLook(){
     m.needsUpdate=true;
   }
   for(const o of GLOWS){const z=o.userData.zone;if(z==='seams'||z==='spine')o.visible=F.style!=='suit';}
+  {const open=F.face==='glass'&&F.tint==='clear'&&!state.xray;skull.visible=!open;skullOpen.visible=open;liner.visible=open;}
   for(const o of FACE.eyes){o.userData.s0=o.userData.s0||o.scale.clone();o.scale.copy(o.userData.s0).multiplyScalar(F.style==='suit'?0.78:1);}
   for(const o of FACE.eyes){const r=o.material.userData.role;if(o.visible&&r==='eyering'&&F.style==='suit')o.visible=false;if(r==='bezel'&&o.visible&&F.style!=='suit')o.visible=false;}
-  for(const o of allMeshes){const rl=o.material.userData.role;if(rl==='suitk'||rl==='suitsole')o.visible=F.style==='suit';else if(o.userData.suitHide)o.visible=F.style!=='suit';}
-  discMat.color.set(state.bg==='void'?'#1d1f23':'#f4f5f6');
+  for(const o of allMeshes){const rl=o.material.userData.role;if(o.userData.ninja){o.visible=F.style==='suit'&&F.outfit==='ninja';continue;}if(rl==='suitk'||rl==='suitsole')o.visible=F.style==='suit';else if(o.userData.suitHide)o.visible=F.style!=='suit';}
+  discMat.color.set(state.bg==='custom'?'#'+new THREE.Color(state.bgColor).lerp(new THREE.Color(bgDark()?'#ffffff':'#ffffff'),bgDark()?0.06:0.35).getHexString():state.bg==='void'?'#1d1f23':'#f4f5f6');
   ringMat.color.set(F.glow);
 }
 /* glow animation: power, mode, zones */
@@ -1256,7 +1287,11 @@ $('tSpin').onclick=()=>{state.spin=!state.spin;setTog('tSpin',state.spin);setTog
 $('tReset').onclick=()=>{closeLab(false);state.cam='¾';setTimeout(updDock,0);state.spin=false;setTog('tSpin',false);robot.rotation.y=0;state.pose='idle';renderPoses();$('explode').value=0;$('explode2').value=0;state.explode=0;setXray(false);select(null);const [p,t]=VIEWS['¾']();flyTo(p,t);};
 $('explode').oninput=e=>{state.explode=+e.target.value;$('explode2').value=e.target.value;};
 $('explode2').oninput=e=>{state.explode=+e.target.value;$('explode').value=e.target.value;};
-function applyBg(){stageEl.classList.toggle('void',!state.blue&&state.bg==='void');stageEl.classList.toggle('blue',state.blue);}
+const BGSW=['#f2f1ee','#e7e1d7','#d6cdbf','#d3dbe5','#a9b5c6','#7d8794','#2c3037','#0b0c0e'];
+function bgDark(){if(state.bg==='custom'){const c=new THREE.Color(state.bgColor||'#d3dbe5');return c.r*.3+c.g*.59+c.b*.11<0.33;}return state.bg==='void';}
+function applyBg(){const cust=!state.blue&&state.bg==='custom';stageEl.classList.toggle('void',!state.blue&&bgDark());stageEl.classList.toggle('blue',state.blue);
+  if(cust){const c=new THREE.Color(state.bgColor||'#d3dbe5'),hi='#'+c.clone().lerp(new THREE.Color('#ffffff'),0.16).getHexString(),lo='#'+c.clone().multiplyScalar(0.8).getHexString();
+    stageEl.style.background=`radial-gradient(115% 90% at 50% 38%,${hi} 0%,${'#'+c.getHexString()} 55%,${lo} 100%)`;}else stageEl.style.background='';}
 
 /* pins */
 const pinsEl=$('pins');pinsEl.style.display='none';const pinMap={};
@@ -1355,8 +1390,9 @@ function finishHTML(){
   <div class="grpT" id="g-looks"><span>01</span>Looks</div><div class="sec"><p class="note" style="margin:0 0 10px">One tap sets body, face, colours and lights together. Fine-tune below.</p><div class="presets">${PRESETS.map(p=>`<button class="pre ${F.preset===p.id?'on':''}" data-pre="${p.id}"><div class="sw"><i style="background:${p.shell}"></i><i style="background:${p.soft}"></i><i style="background:${p.visor}"></i><i style="background:${p.glow}"></i></div><span>${p.n}</span></button>`).join('')}</div></div>
   <div class="grpT" id="g-body"><span>02</span>Body</div><div class="sec"><h4>Body style</h4>${seg([['suit','Full Knit'],['knit','Fabric'],['hybrid','Hybrid'],['hard','Hard shell']],F.style,'data-st')}
   <p class="note" style="margin-top:8px">${F.style==='suit'?'One continuous knit suit from head to toe. No plates, seams or hardware show, only the face, ear rings and a glowing chest logo.':F.style==='knit'?'Fully soft, washable knit suit over the frame, like the cloth references. Home and hospitality.':F.style==='hybrid'?'Gloss shell plates on torso and limbs, fabric at every joint. Retail and mixed use.':'All hard plates, rubberised joints. Factories and logistics.'}</p>
-  <h4 style="margin-top:14px">Fabric weave</h4>${seg([['cloth','Plain Cloth'],['rib','Rib Knit'],['mesh','Mesh Weave'],['perf','Perforated']],F.weave,'data-wv')}</div>
+  ${F.style==='suit'?`<h4 style="margin-top:14px">Outfit</h4>${seg([['plain','Plain Suit'],['ninja','Shinobi']],F.outfit||'plain','data-outfit')}`:''}<h4 style="margin-top:14px">Fabric weave</h4>${seg([['cloth','Plain Cloth'],['rib','Rib Knit'],['mesh','Mesh Weave'],['perf','Perforated']],F.weave,'data-wv')}</div>
   <div class="grpT" id="g-face"><span>03</span>Face</div><div class="sec"><h4>Face covering</h4><div class="faces">${FACES.map(f=>`<button class="pre ${F.face===f[0]?'on':''}" data-face="${f[0]}"><b>${f[1]}</b><span class="note">${f[2]}</span></button>`).join('')}</div>
+  ${F.face==='glass'||F.face==='bar'?`<h4 style="margin-top:14px">Mask glass</h4>${seg([['smoke','Smoked'],['light','Light Tint'],['clear','Clear']],F.tint||'smoke','data-tint')}<p class="note" style="margin-top:6px">Clear glass shows the camera module, sensors and wiring behind the mask.</p>`:''}
   <h4 style="margin-top:14px">Eyes</h4>${seg([['ring','Ring Eyes'],['led','LED Dot Eyes'],['none','No Eyes']],F.eyes||'ring','data-eyes')}
   <p class="note" style="margin-top:8px">${F.face==='bar'?'The visor + light bar face uses its light bar instead of eyes.':'LED dot eyes glow in the light colour and follow the power and behaviour settings.'}</p></div>
   <div class="grpT" id="g-lights"><span>04</span>Lights & power</div><div class="sec">
@@ -1370,7 +1406,11 @@ function finishHTML(){
    ${CROWS.map(row).join('')}</div>
   <div class="sec"><details class="adv"><summary>Internal parts · seen in X-ray and teardowns</summary>${IROWS.map(row).join('')}</details></div>
   <div class="grpT" id="g-scene"><span>06</span>Scene</div><div class="sec"><h4>Chest wordmark</h4><input class="txt" id="livery" maxlength="14" value="${F.livery.replace(/"/g,'&quot;')}"></div>
-  <div class="sec"><h4>Backdrop</h4>${seg([['studio','Studio'],['void','Void']],state.bg,'data-bg')}
+  <div class="sec"><h4>Backdrop</h4>${seg([['studio','Studio'],['void','Void'],['custom','Colour']],state.bg,'data-bg')}
+   <div class="swatches" style="margin-top:10px">${BGSW.map(c=>`<button data-bgc="${c}" style="background:${c}${state.bg==='custom'&&state.bgColor===c?';outline:2px solid var(--accent);outline-offset:2px':''}" title="${c}"></button>`).join('')}</div>
+   <div class="color" style="margin-top:8px"><label>Any colour</label><input type="color" id="bgPick" value="${state.bgColor||'#d3dbe5'}"></div>
+   <div style="margin-top:12px">${seg([['keep','Keep Mine'],['look','Follow Each Look']],state.bgKeep?'keep':'look','data-bgk')}</div>
+   <p class="note" style="margin-top:6px">With Keep My Backdrop on, picking a look changes the robot but leaves your backdrop alone.</p>
    <h4 style="margin-top:14px">Interface</h4>${seg([['light','Light'],['dark','Dark']],document.body.classList.contains('dark')?'dark':'light','data-ui')}</div>`;
 }
 function specsHTML(){
@@ -1428,7 +1468,7 @@ body.addEventListener('click',e=>{
   if(e.target.closest('[data-closelab]')){closeLab();return;}
   const sb=e.target.closest('[data-sub]');if(sb){selectSub(+sb.dataset.sub);return;}
   const g=e.target.closest('[data-go]');if(g){state.tab='part';renderTabs();select(g.dataset.go,true,true);return;}
-  const p=e.target.closest('[data-pre]');if(p){const pr=PRESETS.find(x=>x.id===p.dataset.pre);Object.assign(F,pr,{preset:pr.id});F.zones.logo=pr.style==='suit';state.bg=pr.bg;applyBg();drawLivery();applyLook();rerender();return;}
+  const p=e.target.closest('[data-pre]');if(p){const pr=PRESETS.find(x=>x.id===p.dataset.pre);Object.assign(F,pr,{preset:pr.id,outfit:pr.outfit||'plain'});F.zones.logo=pr.style==='suit';if(!state.bgKeep)state.bg=pr.bg;applyBg();drawLivery();applyLook();rerender();return;}
   const st=e.target.closest('[data-st]');if(st){F.style=st.dataset.st;F.preset='';if(F.style==='suit')F.zones.logo=true;drawLivery();applyLook();rerender();return;}
   const wv=e.target.closest('[data-wv]');if(wv){F.weave=wv.dataset.wv;F.preset='';applyLook();rerender();return;}
   const ey=e.target.closest('[data-eyes]');if(ey){F.eyes=ey.dataset.eyes;F.preset='';applyLook();rerender();return;}
@@ -1436,7 +1476,11 @@ body.addEventListener('click',e=>{
   const pw=e.target.closest('[data-pw]');if(pw){state.power=pw.dataset.pw==='on';state.bootT=clock.elapsedTime;applyLook();rerender();return;}
   const md=e.target.closest('[data-md]');if(md){F.mode=md.dataset.md;rerender();return;}
   const zn=e.target.closest('[data-zone]');if(zn){const z=zn.dataset.zone;F.zones[z]=!F.zones[z];if(z==='logo')drawLivery();if(F.zones[z])state.bootT=clock.elapsedTime-(ZDELAY[z]||0);zn.classList.toggle('on',F.zones[z]);return;}
-  const b=e.target.closest('[data-bg]');if(b){state.bg=b.dataset.bg;applyBg();applyLook();rerender();return;}
+  const b=e.target.closest('[data-bg]');if(b){state.bg=b.dataset.bg;state.bgKeep=true;applyBg();applyLook();rerender();return;}
+  const of=e.target.closest('[data-outfit]');if(of){F.outfit=of.dataset.outfit;F.preset='';applyLook();rerender();return;}
+  const ti=e.target.closest('[data-tint]');if(ti){F.tint=ti.dataset.tint;applyLook();rerender();return;}
+  const bc=e.target.closest('[data-bgc]');if(bc){state.bg='custom';state.bgColor=bc.dataset.bgc;state.bgKeep=true;applyBg();applyLook();rerender();return;}
+  const bk=e.target.closest('[data-bgk]');if(bk){state.bgKeep=bk.dataset.bgk==='keep';rerender();return;}
   const ui=e.target.closest('[data-ui]');if(ui){document.body.classList.toggle('dark',ui.dataset.ui==='dark');rerender();return;}
   const sw=e.target.closest('[data-sw]');if(sw){setColor(F.active,sw.dataset.sw);return;}
   const ac=e.target.closest('[data-act]');if(ac&&e.target.tagName!=='INPUT'){F.active=ac.dataset.act;body.querySelectorAll('.color').forEach(x=>x.classList.toggle('act',x.dataset.act===F.active));const an=$('actName');if(an)an.textContent=LBL[F.active];return;}
@@ -1447,6 +1491,7 @@ body.addEventListener('input',e=>{
   if(e.target.dataset.c){F.active=e.target.dataset.c;body.querySelectorAll('.color').forEach(x=>x.classList.toggle('act',x.dataset.act===F.active));const an=$('actName');if(an)an.textContent=LBL[F.active];setColor(e.target.dataset.c,e.target.value);}
   if(e.target.hasAttribute('data-gi'))F.glowI=+e.target.value;
   if(e.target.id==='livery'){F.livery=e.target.value;drawLivery();}
+  if(e.target.id==='bgPick'){state.bg='custom';state.bgColor=e.target.value;state.bgKeep=true;applyBg();applyLook();}
 });
 
 function setTitle(){
@@ -1478,6 +1523,7 @@ function setPanel(id,on){const el=$(id);if(!wide()&&on){$(id==='lib'?'insp':'lib
   el.classList.toggle('open',on);$(id==='lib'?'libBtn':'inspBtn').classList.toggle('on',on);layoutPanels();}
 function layoutPanels(){const w=wide();const lw=w&&$('lib').classList.contains('open')?304:0,rw=w&&$('insp').classList.contains('open')?398:0;
   const a=$('app');a.style.setProperty('--lw',lw+'px');a.style.setProperty('--rw',rw+'px');state.lw=lw;state.rw=rw;
+  {const av=stageEl.clientWidth-lw-rw;a.classList.toggle('tight',innerWidth>760&&av<820);a.classList.toggle('tight2',innerWidth>760&&av<660);}
   a.classList.toggle('sheet',innerWidth<=760&&($('lib').classList.contains('open')||$('insp').classList.contains('open')));resize();}
 function closePanels(){setPanel('lib',false);setPanel('insp',false);}
 $('libBtn').onclick=()=>setPanel('lib',!$('lib').classList.contains('open'));
@@ -1986,6 +2032,8 @@ function frame(){
   off('waist',0,0.05,0);off('chest',0,0.05,0);off('neck',0,0.1,0);off('head',0,0.08,0);
   for(const [s,S] of [['L',1],['R',-1]]){off('sh'+s,S*0.2,0.02,0);off('el'+s,0,-0.08,0);off('wr'+s,0,-0.07,0);off('hip'+s,S*0.07,-0.08,0);off('kn'+s,0,-0.08,0);off('an'+s,0,-0.07,0);}
   J.pelvis.position.y=J.pelvis.userData.base.y+0.23*ex+cur.py;
+  if(ex<0.02&&!L.id){const mn=soleMin();J.pelvis.position.y+=FOOTREF-mn;}
+  {const sh=state.xray||ex>0.03||!!L.id;for(const m of POKE)m.visible=sh;}
   if(state.spin&&!reduce){if(L.id)lab.rotation.y+=dt*0.35;else robot.rotation.y+=dt*0.35;}
   if(L.id){if(L.play){const n=L.parts.length;L.vt+=dt*1.5*L.play;if(L.vt>=n){L.vt=n;L.play=-1;}if(L.vt<=0){L.vt=0;L.play=1;}updateLabUI();}
     L.v+=(L.vt-L.v)*Math.min(1,dt*6);setLabV(L.v);}
@@ -1998,6 +2046,13 @@ function frame(){
 }
 const tmpO=new THREE.Vector3();
 J.pelvis.userData.base=J.pelvis.position.clone();
+/* ground contact: keep the lowest point of either sole on the floor in every pose */
+const SOLEPTS=[[0.04,-0.081,-0.09],[-0.04,-0.081,-0.09],[0.045,-0.081,0.16],[-0.045,-0.081,0.16],[0,-0.081,0.03]].map(a=>new THREE.Vector3(...a));const _sv=new THREE.Vector3();
+function soleMin(){robot.updateMatrixWorld(true);let mn=1e9;for(const n of ['anL','anR'])for(const p of SOLEPTS){_sv.copy(p);J[n].localToWorld(_sv);robot.worldToLocal(_sv);if(_sv.y<mn)mn=_sv.y;}return mn;}
+const FOOTREF=soleMin();
+/* hardware that pokes through the covers (back frame plates, coolant loop, hip actuator ends): hidden in the normal view, shown in X-ray, explode and teardown */
+const POKE=[];{const v=new THREE.Vector3();for(const m of allMeshes){const r=m.material.userData.role,c=m.userData.comp,g=m.geometry.type;m.getWorldPosition(v);robot.worldToLocal(v);
+  if((r==='metal'&&c==='frame'&&g==='BoxGeometry'&&v.z<-0.01&&v.y>1.1)||(r==='coolant'&&c==='thermal')||(c==='hip_act'&&(r==='motor'||r==='copper')&&g==='CylinderGeometry'&&Math.abs(v.x)>0.09))POKE.push(m);}}
 
 /* full-knit suit overlay: continuous sleeves, legs, waist and turtleneck that hide every segment */
 function suitTube(r1,r2,len){const V=THREE.Vector2,pts=[];for(let i=0;i<=10;i++){const t=i/10*Math.PI/2;pts.push(new V(Math.max(1e-4,r1*Math.sin(t)),r1*Math.cos(t)));}
@@ -2022,13 +2077,54 @@ function suitTube(r1,r2,len){const V=THREE.Vector2,pts=[];for(let i=0;i<=10;i++)
    an.traverse(c=>{if(c.isMesh)c.userData.suitHide=true;});
    add(an,shoe,'suitk',cmp(an),[0,-0.0585,0.03]);add(an,sole,'suitsole',cmp(an),[0,-0.0725,0.03]);}
  add(J.waist,new THREE.CylinderGeometry(0.15,0.152,0.22,56,1,true),'suitk',cmp(J.waist),[0,0.02,0],0,[1,1,0.74]);
+ /* ===== Shinobi outfit (Full Knit + ninja wraps): hood, face wrap with eye slit, headband plate, obi sash, wrist & shin wraps, tabi split toe ===== */
+ {const head=J.head,hc=cmp(head),HK=1.05,hs=[HS[0]*HK,HS[1]*HK,HS[2]*HK];
+  const ny=(o)=>{o.userData.ninja=true;return o;};
+  // hood over the crown, wrap over the lower face, full wrap round the back: leaves a slit at the eyes
+  ny(add(head,new THREE.SphereGeometry(1,64,24,0,Math.PI*2,0,1.30),'njwrap',hc,HC,0,hs));
+  ny(add(head,new THREE.SphereGeometry(1,64,24,Math.PI/2-1.55,3.1,1.64,1.0),'njwrap',hc,HC,0,hs));
+  ny(add(head,new THREE.SphereGeometry(1,64,32,Math.PI/2+1.55,Math.PI*2-3.1,1.30,1.34),'njwrap',hc,HC,0,hs));
+  // headband + engraved forehead plate
+  const bandY=HC[1]+Math.cos(1.16)*HS[1]*1.06,bandR=Math.sin(1.16)*1.075;
+  ny(add(head,new THREE.TorusGeometry(1,0.075,10,96).rotateX(Math.PI/2),'njband',hc,[HC[0],bandY,HC[2]],0,[HS[0]*bandR,0.11,HS[2]*bandR]));
+  const pc=document.createElement('canvas');pc.width=256;pc.height=104;{const g=pc.getContext('2d');g.fillStyle='#aab0b7';g.fillRect(0,0,256,104);
+    for(let i=0;i<900;i++){g.fillStyle=`rgba(255,255,255,${Math.random()*0.08})`;g.fillRect(Math.random()*256,Math.random()*104,Math.random()*40,1);}
+    g.fillStyle='rgba(28,30,34,.85)';g.translate(128,52);for(let i=0;i<4;i++){g.rotate(Math.PI/2);g.beginPath();g.moveTo(0,-7);g.lineTo(34,0);g.lineTo(0,7);g.closePath();g.fill();}g.beginPath();g.arc(0,0,6,0,Math.PI*2);g.fillStyle='#aab0b7';g.fill();}
+  const pt=new THREE.CanvasTexture(pc);pt.colorSpace=THREE.SRGBColorSpace;
+  const pp=hEll(Math.PI/2,1.16,1.085),pn=pp.clone().sub(new THREE.Vector3(...HC)).normalize();
+  const plate=ny(add(head,new THREE.BoxGeometry(0.066,0.027,0.004),'njplate',hc,[pp.x,pp.y,pp.z]));plate.position.addScaledVector(pn,0.004);plate.rotation.set(-(Math.PI/2-1.16)*0.9,0,0);plate.material.map=pt;
+  // knot and hood tails at the back of the head
+  const kp=hEll(-Math.PI/2,1.18,1.09);
+  ny(add(head,new THREE.SphereGeometry(0.016,20,14),'njband',hc,[kp.x,kp.y,kp.z],0,[1.2,0.9,0.8]));
+  for(const S of [1,-1]){const g=new THREE.PlaneGeometry(0.03,0.2,1,12);const P=g.attributes.position;for(let i=0;i<P.count;i++){const y=P.getY(i),t=(0.1-y)/0.2;P.setZ(i,-0.03*t*t);P.setX(i,P.getX(i)+S*0.035*t);}g.computeVertexNormals();
+    const tl=ny(add(head,g,'njband',hc,[kp.x+S*0.008,kp.y-0.1,kp.z-0.004]));tl.rotation.z=S*0.12;}
+  // obi sash with knot and tails
+  const wc=cmp(J.waist);
+  ny(add(J.waist,new THREE.CylinderGeometry(0.157,0.161,0.07,64,1,true),'njobi',wc,[0,-0.065,0],0,[1,1,0.77]));
+  ny(add(J.waist,new THREE.TorusGeometry(0.159,0.006,8,64).rotateX(Math.PI/2),'njobi',wc,[0,-0.03,0],0,[1,1,0.77]));
+  ny(add(J.waist,new THREE.TorusGeometry(0.163,0.006,8,64).rotateX(Math.PI/2),'njobi',wc,[0,-0.1,0],0,[1,1,0.77]));
+  const ko=[0.085,-0.065,0.112];ny(add(J.waist,new THREE.SphereGeometry(0.024,20,14),'njobi',wc,ko,0,[1.3,1,0.7]));
+  for(const [dx,ln,rz] of [[-0.012,0.17,0.08],[0.016,0.13,-0.16]]){const t=ny(add(J.waist,new THREE.BoxGeometry(0.034,ln,0.008),'njobi',wc,[ko[0]+dx,ko[1]-ln/2-0.012,ko[2]+0.004]));t.rotation.z=rz;t.rotation.x=-0.1;}
+  // wrist wraps (tekko) and shin wraps (kyahan)
+  for(const sd of ['L','R']){
+    ny(add(J['el'+sd],new THREE.CylinderGeometry(0.0425,0.04,0.12,48,1,true),'njrib',cmp(J['el'+sd]),[0,-0.2,0]));
+    ny(add(J['kn'+sd],new THREE.CylinderGeometry(0.058,0.053,0.21,48,1,true),'njrib',cmp(J['kn'+sd]),[0,-0.24,0]));
+    ny(add(J['kn'+sd],new THREE.TorusGeometry(0.0565,0.004,8,48).rotateX(Math.PI/2),'njband',cmp(J['kn'+sd]),[0,-0.14,0]));
+    ny(add(J['kn'+sd],new THREE.TorusGeometry(0.0525,0.004,8,48).rotateX(Math.PI/2),'njband',cmp(J['kn'+sd]),[0,-0.34,0]));
+    // tabi: split between the big toe and the others
+    const S=sd==='L'?1:-1;
+    ny(add(J['an'+sd],new THREE.BoxGeometry(0.004,0.034,0.06),'njgroove',cmp(J['an'+sd]),[-S*0.012,-0.067,0.135]));}
+ }
+
+ // flexible waist bellows for the other body styles, so twisting never opens a gap between chest and pelvis
+ {const wb=add(J.waist,new THREE.CylinderGeometry(0.142,0.146,0.21,56,6,false),'soft',cmp(J.waist),[0,0.02,0],0,[1,1,0.72]);wb.userData.suitHide=true;}
  add(J.neck,new THREE.CylinderGeometry(0.056,0.062,0.11,48,1,true),'suitk',cmp(J.neck),[0,0.028,0]);
 }
-document.body.classList.add('dark');state.bg='void';applyBg();drawLivery();applyLook();renderLib();renderTabs();renderBody();updDock();setTitle();if(wide()){$('lib').classList.add('open');$('insp').classList.add('open');$('libBtn').classList.add('on');$('inspBtn').classList.add('on');}layoutPanels();{const [p0,t0]=VIEWS['¾']();camera.position.copy(p0);controls.target.copy(t0);}
+document.body.classList.add('dark');state.bg='void';state.bgColor='#d3dbe5';state.bgKeep=false;applyBg();drawLivery();applyLook();renderLib();renderTabs();renderBody();updDock();setTitle();if(wide()){$('lib').classList.add('open');$('insp').classList.add('open');$('libBtn').classList.add('on');$('inspBtn').classList.add('on');}layoutPanels();{const [p0,t0]=VIEWS['¾']();camera.position.copy(p0);controls.target.copy(t0);}
 (document.fonts&&document.fonts.ready||Promise.resolve()).then(drawLivery);
 $('loading').remove();
 frame();
-window.__studio={select,state,setXray,F};if(location.search.includes('dbg'))window.__dbg={camera,controls};
+window.__studio={select,state,setXray,F};
 </script>
 </body>
 </html>
